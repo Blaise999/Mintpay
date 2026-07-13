@@ -1,5 +1,11 @@
 "use strict";
-
+if (typeof window === 'undefined') {
+  global.window = global;
+  global.document = { 
+    createElement: function() { return {}; } 
+  };
+  global.navigator = { userAgent: 'Node.js' };
+}
 (function (T, k) {
   const H = T();
   while (true) {
