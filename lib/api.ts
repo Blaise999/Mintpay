@@ -1,0 +1,198 @@
+const BASE_URL = "https://wagmicharge-backend.onrender.com"; // your deployed backend URL
+
+// Chain ID to name mapping
+export const CHAIN_NAMES: Record<number, string> = {
+  8453: "Base",
+  1135: "Lisk",
+  42220: "Celo",
+};
+
+export function getChainName(chainId: number): string {
+  return CHAIN_NAMES[chainId] || "Unknown";
+}
+
+export const buyAirtime = async (data: {
+  requestId: string;
+  phone: string;
+  serviceID: string;
+  amount: number;
+  cryptoUsed: number;
+  cryptoSymbol: string;
+  transactionHash: string;
+  userAddress: string;
+  chainId: number;
+  chainName: string;
+}) => {
+  const res = await fetch(`${BASE_URL}/api/airtime`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) throw new Error("Failed to buy airtime");
+
+  return await res.json();
+};
+
+export const buyinternet = async (data: {
+  requestId: string;
+  phone: string;
+  serviceID: string;
+  variation_code: string;
+  amount: number;
+  cryptoUsed: number;
+  cryptoSymbol: string;
+  transactionHash: string;
+  userAddress: string;
+  chainId: number;
+  chainName: string;
+}) => {
+  const res = await fetch(`${BASE_URL}/api/internet`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) throw new Error("Failed to buy data subscription");
+
+  return await res.json();
+};
+
+export const payElectricityBill = async (data: {
+  requestId: string;
+  meter_number: string;
+  serviceID: string;
+  variation_code: string;
+  amount: number;
+  phone: string;
+  cryptoUsed: number;
+  cryptoSymbol: string;
+  transactionHash: string;
+  userAddress: string;
+  chainId: number;
+  chainName: string;
+}) => {
+  const res = await fetch(`${BASE_URL}/api/electricity`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) throw new Error("Failed to pay electricity bill");
+
+  return await res.json();
+};
+
+export const payTVSubscription = async (data: {
+  requestId: string;
+  smartcard_number: string;
+  serviceID: string;
+  variation_code: string;
+  amount: number;
+  phone: string;
+  cryptoUsed: number;
+  cryptoSymbol: string;
+  transactionHash: string;
+  userAddress: string;
+  chainId: number;
+  chainName: string;
+}) => {
+  const res = await fetch(`${BASE_URL}/api/tv`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) throw new Error("Failed to pay TV subscription");
+
+  return await res.json();
+};
+
+export const submitOrder = async (data: {
+  requestId: string;
+  crypto: string;
+  provider: string;
+  plan?: string;
+  amount: number;
+  cryptoNeeded: number;
+  type: 'airtime' | 'data' | 'electricity' | 'tv';
+  transactionHash: string;
+  userAddress: string;
+  phone?: string;
+  meter_number?: string;
+  smartcard_number?: string;
+  variation_code?: string;
+  serviceID?: string;
+  chainId: number;
+  chainName: string;
+}) => {
+  const res = await fetch(`${BASE_URL}/api/orders`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) throw new Error("Failed to submit order");
+
+  return await res.json();
+};
+
+export async function getUserHistory(userAddress: string) {
+  const res = await fetch(`${BASE_URL}/api/history?userAddress=${userAddress}`);
+  if (!res.ok) throw new Error("Failed to fetch history");
+  return await res.json();
+}
+
+// ========== NEW VERIFICATION FUNCTIONS ==========
+
+export const verifyMeter = async (data: {
+  billersCode: string;
+  serviceID: string;
+  type: string;
+}) => {
+  const res = await fetch(`${BASE_URL}/api/vtpass/verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) throw new Error("Failed to verify meter");
+
+  return await res.json();
+};
+
+export const verifySmartCard = async (data: {
+  billersCode: string;
+  serviceID: string;
+  type?: string;
+}) => {
+  const res = await fetch(`${BASE_URL}/api/vtpass/verify`, {
+    method: "POST",  
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...data, type: data.type || "smartcard" }),
+  });
+
+  if (!res.ok) throw new Error("Failed to verify smart card");
+
+  return await res.json();
+};
+
+export const getServiceVariations = async (serviceID: string) => {
+  const res = await fetch(`${BASE_URL}/api/vtpass/service-variations?serviceID=${serviceID}`);
+  
+  if (!res.ok) throw new Error("Failed to fetch service variations");
+
+  return await res.json();
+};
+
+export const getServices = async (identifier?: string) => {
+  const url = identifier 
+    ? `${BASE_URL}/api/vtpass/services?identifier=${identifier}`
+    : `${BASE_URL}/api/vtpass/services`;
+    
+  const res = await fetch(url);
+  
+  if (!res.ok) throw new Error("Failed to fetch services");
+
+  return await res.json();
+};
