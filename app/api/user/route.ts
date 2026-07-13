@@ -1,35 +1,48 @@
 // app/api/user/route.ts
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/server/mongodb";   // ← Make sure this path is correct
+import { getDb } from "@/lib/server/mongodb"; 
 
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {
   try {
-    const wallet = new URL(req.url).searchParams.get("wallet");
-    
-    console.log("[API /user] Requested wallet:", wallet);
+    const { searchParams } = new URL(req.url);
+    const wallet = searchParams.get("wallet");
 
     if (!wallet) {
-      return NextResponse.json({ error: "wallet parameter is required" }, { status: 400 });
+      return NextResponse.json({ error: "Wallet required" }, { status: 400 });
     }
 
+    const normalizedWallet = wallet.trim().toLowerCase();
     const db = await getDb();
-    const user = await db.collection("users").findOne({ walletAddress: wallet });
+    const usersCollection = db.collection("users");
 
-    console.log("[API /user] Found user:", user ? "YES" : "NO");
+    // 1. Try to find the existing user
+    let user = await usersCollection.findOne({ walletAddress: normalizedWallet });
 
+    // 2. If it's a brand-new user, save them for the first time!
     if (!user) {
-      return NextResponse.json({ user: null });
+      console.log("[API /user] New user detected. Creating profile for:", normalizedWallet);
+      
+      const newUser = {
+        walletAddress: normalizedWallet,
+        createdAt: new Date(),
+        role: "user",
+      };
+
+      const result = await usersCollection.insertOne(newUser);
+      
+      // Fetch the full document with its newly assigned database _id to fix TypeScript
+      user = await usersCollection.findOne({ _id: result.insertedId });
     }
 
     return NextResponse.json({ user });
-  } catch (e: any) {
-    console.error("[API /user] FULL ERROR:", e);
-    console.error(e?.stack);
-    
-    return NextResponse.json({ 
-      error: e?.message || "Internal server error" 
-    }, { status: 500 });
+
+  } catch (error: any) {
+    console.error("[API /user] SERVER ERROR:", error);
+    return NextResponse.json(
+      { error: error?.message || "Internal server error" }, 
+      { status: 500 }
+    );
   }
 }
