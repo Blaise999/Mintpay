@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { getUser, upsertUser, saveCard, markConnectedEmailSent, type CardInfo } from "@/lib/server/users"
 import { generateCardNumber, futureExpiry } from "@/lib/card"
-import { sendConnectedEmail, sendCardEmail } from "@/lib/server/email"
+import { sendWelcomeCardEmail, sendConnectedEmail } from "@/lib/server/email"
 
 export const runtime = "nodejs"
 
@@ -40,9 +40,16 @@ export async function POST(req: Request) {
     let emailed = false
     if (user?.email) {
       try {
-        await sendConnectedEmail(user.email, user.walletAddress)
+        if (card) {
+          await sendWelcomeCardEmail(user.email, {
+            name: user.name,
+            walletAddress: user.walletAddress,
+            card: { holder: card.holder, number: card.number, expiry: card.expiry },
+          })
+        } else {
+          await sendConnectedEmail(user.email, user.walletAddress)
+        }
         await markConnectedEmailSent(user.walletAddress)
-        if (card) await sendCardEmail(user.email, { holder: card.holder, number: card.number, expiry: card.expiry })
         emailed = true
       } catch (e) {
         console.error("[onboard] email failed:", e)

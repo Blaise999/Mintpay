@@ -55,8 +55,8 @@ export default function RootLayout({
     <html lang="en" className={`${sans.variable} ${display.variable}`}>
       <head>
         <meta name="google-site-verification" content="pCijtRPRcIw7lEvQNXnUtUE4WReAEAgiFl2FURDGrz0" />
-        <link rel="preconnect" href="https://wagmicharge-backend.onrender.com" crossOrigin="" />
-        <link rel="dns-prefetch" href="https://wagmicharge-backend.onrender.com" />
+        <link rel="preconnect" href="https://api.coingecko.com" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://api.coingecko.com" />
         <link rel="icon" href="/mintpay-mark.svg" type="image/svg+xml" />
         <link rel="icon" href="/mintpay-mark.png" type="image/png" sizes="512x512" />
         <link rel="shortcut icon" href="/mintpay-mark.svg" type="image/svg+xml" />

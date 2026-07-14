@@ -30,7 +30,7 @@ const utilities = [
 async function fetchPrices() {
   const ids = cryptos.map((c) => c.coingeckoId).join(",")
   const res = await fetch(
-    `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd,ngn`
+    `/api/price?ids=${ids}&vs_currencies=usd,ngn`
   )
   return await res.json()
 }

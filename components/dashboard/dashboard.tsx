@@ -2,122 +2,90 @@
 
 import { useState } from "react"
 import dynamic from "next/dynamic"
+import Link from "next/link"
 import { MainLayout } from "@/components/layout/main-layout"
 import { QuickActions } from "./quick-actions"
-import { useAccount } from "wagmi"
+import { MintPayCard } from "./mintpay-card"
 import { useSession } from "@/components/session-provider"
 import { Button } from "@/components/ui/button"
-import { Menu } from "lucide-react"
+import { Menu, ArrowRight } from "lucide-react"
 import { Sidebar } from "@/components/layout/sidebar"
+
 const Skeleton = () => <div className="h-40 w-full animate-pulse rounded-xl bg-slate-100 dark:bg-white/5" />
 const PortfolioOverview = dynamic(() => import("./portfolio-overview").then((m) => m.PortfolioOverview), { ssr: false, loading: Skeleton })
 const RecentTransactions = dynamic(() => import("./recent-transactions"), { ssr: false, loading: Skeleton })
 const MarketData = dynamic(() => import("./market-data").then((m) => m.MarketData), { ssr: false, loading: Skeleton })
-import { ProfileCard } from "./profile-card"
+
+function Panel({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-gray-950">
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="font-display text-lg font-bold">{title}</h2>
+        {action}
+      </div>
+      {children}
+    </section>
+  )
+}
 
 export function Dashboard() {
   const { address, user } = useSession()
-  const { isConnected: authenticated } = useAccount()
   const connectedWallet = address ? { address } : undefined
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const firstName = user?.name?.split(" ")[0]
 
   return (
     <MainLayout>
-      {/* Desktop overlay when sidebar is open */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 z-30 bg-black/50 hidden lg:block" 
-          onClick={() => setSidebarOpen(false)} 
-        />
-      )}
-
-      {/* Your existing Sidebar component */}
-      <Sidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
-      />
+      {sidebarOpen && <div className="fixed inset-0 z-30 hidden bg-black/50 lg:block" onClick={() => setSidebarOpen(false)} />}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="space-y-6">
-        <section>
-          <h2 className="mb-4 text-2xl font-semibold">Profile &amp; Card</h2>
-          <ProfileCard />
-        </section>
-        {/* Header Section */}
-        <div className="flex items-center space-x-4">
-          {/* Toggle Button - Inline with header */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="bg-background border shadow-md hover:bg-accent"
-          >
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="rounded-full">
             <Menu className="h-5 w-5" />
           </Button>
-          
-          <div className="flex flex-col space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-            <p className="text-muted-foreground">
-              {authenticated && connectedWallet
-                ? `Wallet: ${connectedWallet.address}`
-                : "Connect your wallet to get started."}
+          <div>
+            <h1 className="font-display text-3xl font-bold tracking-tight">
+              {firstName ? `Welcome back, ${firstName}` : "Dashboard"}
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              {address ? (
+                <span className="font-mono">{address.slice(0, 6)}…{address.slice(-4)}</span>
+              ) : "Connect your wallet to get started."}
             </p>
           </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Left Column - Portfolio Overview (Takes 3/4 width on lg screens) */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Portfolio Overview Card */}
-            <div className="bg-lightblue rounded-xl shadow-sm border border-lightblue-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold text-black-900">
-                  Portfolio Overview
-                </h2>
-                <div className="text-sm text-gray-500">
-                  Last updated: {new Date().toLocaleTimeString()}
-                </div>
-              </div>
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Left / main */}
+          <div className="space-y-6 lg:col-span-2">
+            <Panel title="Portfolio" action={<span className="text-xs text-slate-400">USD · updated {new Date().toLocaleTimeString()}</span>}>
               <PortfolioOverview wallet={connectedWallet} />
-            </div>
-
-            {/* Recent Transactions Card */}
-            <div className="bg-lightblue rounded-xl shadow-sm border border-lightblue-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold text-black-900">
-                  Recent Transactions
-                </h2>
-              </div>
+            </Panel>
+            <Panel title="Recent activity">
               <RecentTransactions wallet={connectedWallet} />
-            </div>
-
-            {/* Market Data Card */}
-            <div className="bg-lightblue rounded-xl shadow-sm border border-lightblue-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold text-black-900">
-                  Market Data
-                </h2>
-                <div className="text-sm text-gray-500">
-                  Real-time data
-                </div>
-              </div>
+            </Panel>
+            <Panel title="Markets" action={<span className="text-xs text-slate-400">USD · live</span>}>
               <MarketData />
-            </div>
+            </Panel>
           </div>
 
-          {/* Right Sidebar - Quick Actions */}
-          <div className="lg:col-span-1">
-            <div className="space-y-6">
-              {/* Quick Actions Card */}
-              <div className="bg-lightblue rounded-xl shadow-sm border border-lightblue-200 p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-semibold text-black-900">
-                    Quick Actions
-                  </h2>
-                </div>
-                <QuickActions wallet={connectedWallet} />
+          {/* Right / rail */}
+          <div className="space-y-6">
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-gray-950">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="font-display text-lg font-bold">Your card</h2>
+                <Link href="/profile" className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:underline">
+                  Manage <ArrowRight className="h-3 w-3" />
+                </Link>
               </div>
-            </div>
+              <MintPayCard holder={user?.card?.holder || user?.name?.toUpperCase()} number={user?.card?.number} expiry={user?.card?.expiry} />
+            </section>
+
+            <Panel title="Quick actions">
+              <QuickActions wallet={connectedWallet} />
+            </Panel>
           </div>
         </div>
       </div>

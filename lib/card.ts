@@ -36,26 +36,40 @@ export function futureExpiry(yearsAhead = 4): string {
   return `${mm}/${yy}`
 }
 
-/** Bulletproof-ish inline-styled HTML card for emails (no gradients relied upon). */
+/** Branded MintPay credit-card block for emails (table-based, solid fallback). */
 export function cardEmailHtml(opts: { holder: string; number: string; expiry: string }): string {
   const num = groupNumber(opts.number)
+  const holder = escapeHtml(opts.holder || "MINTPAY MEMBER")
   return `
-  <div style="width:340px;height:214px;border-radius:18px;background:#3730a3;background:linear-gradient(135deg,#1e40af,#6d28d9);padding:22px;font-family:Arial,Helvetica,sans-serif;color:#ffffff;box-shadow:0 12px 30px rgba(30,64,175,0.35)">
-    <table role="presentation" width="100%" style="border-collapse:collapse">
-      <tr>
-        <td style="font-size:18px;font-weight:bold;letter-spacing:0.5px">MintPay<div style="font-size:9px;font-weight:bold;letter-spacing:2px;opacity:0.8">CREDIT</div></td>
-        <td align="right" style="font-size:12px;opacity:0.85">CARD</td>
-      </tr>
-    </table>
-    <div style="width:46px;height:34px;border-radius:6px;background:#fcd34d;margin:26px 0 18px"></div>
-    <div style="font-size:20px;letter-spacing:3px;font-family:'Courier New',monospace">${num}</div>
-    <table role="presentation" width="100%" style="border-collapse:collapse;margin-top:16px">
-      <tr>
-        <td style="font-size:13px;text-transform:uppercase;letter-spacing:1px">${escapeHtml(opts.holder || "MINTPAY MEMBER")}</td>
-        <td align="right" style="font-size:13px">${opts.expiry}</td>
-      </tr>
-    </table>
-  </div>`
+  <table role="presentation" width="360" cellpadding="0" cellspacing="0" style="max-width:360px;width:100%;border-collapse:separate;">
+    <tr>
+      <td bgcolor="#4338CA" style="background:#4338CA;background:linear-gradient(135deg,#1E40AF 0%,#4338CA 55%,#6D28D9 100%);border-radius:18px;padding:24px;font-family:Arial,Helvetica,sans-serif;color:#ffffff;box-shadow:0 10px 30px rgba(67,56,202,0.35);">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="font-size:19px;font-weight:bold;letter-spacing:0.3px;color:#ffffff;">
+              MintPay
+              <div style="font-size:9px;font-weight:bold;letter-spacing:2px;color:#dbeafe;margin-top:2px;">CREDIT</div>
+            </td>
+            <td align="right" valign="top" style="font-size:11px;letter-spacing:1px;color:#c7d2fe;">CARD</td>
+          </tr>
+        </table>
+        <div style="width:46px;height:34px;background:#FCD34D;border-radius:7px;margin:26px 0 18px 0;"></div>
+        <div style="font-family:'Courier New',Courier,monospace;font-size:21px;letter-spacing:3px;color:#ffffff;">${num}</div>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:20px;">
+          <tr>
+            <td style="font-size:9px;letter-spacing:1px;color:#c7d2fe;text-transform:uppercase;">
+              Card holder<br>
+              <span style="font-size:14px;color:#ffffff;letter-spacing:0.5px;">${holder}</span>
+            </td>
+            <td align="right" style="font-size:9px;letter-spacing:1px;color:#c7d2fe;text-transform:uppercase;">
+              Expires<br>
+              <span style="font-size:14px;color:#ffffff;">${opts.expiry}</span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>`
 }
 
 function escapeHtml(s: string): string {

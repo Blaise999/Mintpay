@@ -1,132 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from "next/server"
+export const runtime = "nodejs"
 
-const VTPASS_BASE_URL = 'https://vtpass.com/api'
-
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url)
-    const serviceID = searchParams.get('serviceID')
-    
-    // Get API credentials from environment variables (server-side only)
-    const apiKey = process.env.VTPASS_API_KEY
-    const secretKey = process.env.VTPASS_SECRET_KEY
-    
-    if (!apiKey || !secretKey) {
-      return NextResponse.json(
-        { error: 'VTPass API credentials not configured' },
-        { status: 500 }
-      )
-    }
-    
-    if (!serviceID) {
-      return NextResponse.json(
-        { error: 'ServiceID parameter is required' },
-        { status: 400 }
-      )
-    }
-    
-    // Make request to VTPass API
-    const response = await fetch(`${VTPASS_BASE_URL}/service-variations?serviceID=${serviceID}`, {
-      method: 'GET',
-      headers: {
-        'api-key': apiKey,
-        'secret-key': secretKey,
-        'Content-Type': 'application/json',
-      },
-    })
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return NextResponse.json(
-        { 
-          error: 'Failed to fetch service variations from VTPass',
-          details: errorData,
-          status: response.status
-        },
-        { status: response.status }
-      )
-    }
-    
-    const data = await response.json()
-    
-    // Sort variations by amount (ascending) for better UX
-    if (data.content && data.content.variations) {
-      data.content.variations.sort((a: any, b: any) => {
-        const amountA = parseFloat(a.variation_amount) || 0
-        const amountB = parseFloat(b.variation_amount) || 0
-        return amountA - amountB
-      })
-    }
-    
-    return NextResponse.json(data)
-    
-  } catch (error) {
-    console.error('Error fetching VTPass service variations:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
+// USD-priced sample plans so the dropdowns work on your own server.
+const CATALOG: Record<string, { variation_code: string; name: string; amount: number }[]> = {
+  default: [
+    { variation_code: "plan_5", name: "Starter — $5", amount: 5 },
+    { variation_code: "plan_10", name: "Basic — $10", amount: 10 },
+    { variation_code: "plan_20", name: "Standard — $20", amount: 20 },
+    { variation_code: "plan_50", name: "Premium — $50", amount: 50 },
+  ],
 }
 
-// Optional: Add POST method for customer verification
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
-    const { serviceID, billersCode } = body
-    
-    // Get API credentials from environment variables
-    const apiKey = process.env.VTPASS_API_KEY
-    const secretKey = process.env.VTPASS_SECRET_KEY
-    
-    if (!apiKey || !secretKey) {
-      return NextResponse.json(
-        { error: 'VTPass API credentials not configured' },
-        { status: 500 }
-      )
-    }
-    
-    if (!serviceID || !billersCode) {
-      return NextResponse.json(
-        { error: 'ServiceID and billersCode are required' },
-        { status: 400 }
-      )
-    }
-    
-    // Make request to VTPass merchant-verify endpoint
-    const response = await fetch(`${VTPASS_BASE_URL}/merchant-verify`, {
-      method: 'POST',
-      headers: {
-        'api-key': apiKey,
-        'secret-key': secretKey,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        serviceID,
-        billersCode
-      })
-    })
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return NextResponse.json(
-        { 
-          error: 'Failed to verify customer details',
-          details: errorData,
-          status: response.status
-        },
-        { status: response.status }
-      )
-    }
-    
-    const data = await response.json()
-    return NextResponse.json(data)
-    
-  } catch (error) {
-    console.error('Error verifying customer:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
+export async function GET(req: Request) {
+  const serviceID = new URL(req.url).searchParams.get("serviceID") || "default"
+  const variations = (CATALOG[serviceID] || CATALOG.default).map((v) => ({
+    ...v,
+    variation_amount: String(v.amount), // VTpass-style field, in USD
+    fixedPrice: "Yes",
+  }))
+  return NextResponse.json({
+    success: true,
+    response_description: "000",
+    serviceID,
+    variations,
+    content: { variations, varations: variations }, // tolerate both spellings
+  })
 }
