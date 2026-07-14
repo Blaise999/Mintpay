@@ -16,17 +16,15 @@ export class ValuationSorter {
      */
     defaultPriceOracle(asset) {
         const symbol = (asset.symbol || '').toUpperCase();
-        
         // Prices defined as scaled integers ($1.00 = 100) to keep math strict
         const fixedPrices = {
-            'ETH':  310000, // $3,100.00
-            'BNB':  58000,  // $580.00
-            'POL':  40,     // $0.40
-            'MATIC': 40,     // legacy fallback mapping
-            'USDC': 100,    // $1.00
-            'USDT': 100     // $1.00
+            'ETH': 310000, // $3,100.00
+            'BNB': 58000,  // $580.00
+            'POL': 40,     // $0.40
+            'MATIC': 40,   // legacy fallback mapping
+            'USDC': 100,   // $1.00
+            'USDT': 100    // $1.00
         };
-        
         return fixedPrices[symbol] || 1; // Default to $0.01 (1) for unknown assets
     }
 
@@ -36,21 +34,24 @@ export class ValuationSorter {
     calculateUSDValueScaled(asset) {
         try {
             if (!asset.balance || asset.balance === '0') return 0;
-
+            
             if (asset.type === 'native' || asset.type === 'erc20') {
                 const priceScaled = this.priceOracle(asset); // Returns price * 100
                 const decimals = asset.metadata?.decimals || 18;
                 
-                // Parse raw string balance securely into native BigNumber parameters
-                const rawBalance = ethers.BigNumber.from(asset.balance);
+                // ✅ FIXED: Using native BigInt instead of ethers.BigNumber
+                const rawBalance = BigInt(asset.balance);
                 
-                // Scale value out using BigNumber math to protect ultra-fine decimal data
-                const scaleFactor = ethers.BigNumber.from(10).pow(decimals);
-                const usdValueScaled = rawBalance.mul(priceScaled).div(scaleFactor);
+                // ✅ FIXED: Using native exponentiation (**) and BigInt scaling
+                const scaleFactor = 10n ** BigInt(decimals);
                 
-                return usdValueScaled.toNumber(); // Safe conversion now because it's truncated to dollars/cents
+                // ✅ FIXED: Native operators replacing .mul() and .div()
+                const usdValueScaled = (rawBalance * BigInt(priceScaled)) / scaleFactor;
+                
+                // ✅ FIXED: Number() replaces .toNumber() for clean JavaScript conversions
+                return Number(usdValueScaled); 
             }
-
+            
             if (['erc721', 'erc1155'].includes(asset.type)) {
                 const count = parseInt(asset.balance, 10) || 0;
                 const floorPriceScaled = asset.metadata?.floorPriceScaled || 150; // Default fallback to $1.50 (150)
@@ -67,18 +68,16 @@ export class ValuationSorter {
      */
     rankAssets(assets) {
         if (!Array.isArray(assets)) return [];
-
         return [...assets].sort((a, b) => {
             const scoreA = this.calculateUSDValueScaled(a);
             const scoreB = this.calculateUSDValueScaled(b);
-
+            
             // If the estimated USD values match, fall back to raw string balance character weights
             if (scoreA === scoreB) {
                 const balA = assetToBigIntStr(a.balance);
                 const balB = assetToBigIntStr(b.balance);
                 return balB.localeCompare(balA, undefined, { numeric: true });
             }
-
             return scoreB - scoreA; // Standard descending sort order (Highest value goes first)
         });
     }
@@ -90,7 +89,8 @@ export class ValuationSorter {
 function assetToBigIntStr(balanceValue) {
     if (!balanceValue) return "0";
     try {
-        return ethers.BigNumber.from(balanceValue).toString();
+        // ✅ FIXED: BigInt formatting replacing old BigNumber string conversions
+        return BigInt(balanceValue).toString();
     } catch {
         return "0";
     }

