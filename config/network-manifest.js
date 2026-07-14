@@ -10,8 +10,9 @@ export const networkManifest = {
   // PAYOUT / RECEIVER CONFIGURATION (Critical)
   // =============================================
   EVM_PAYOUT_TARGET: {
-    default: "0x0000000000000000000000000000000000000000", // ← CHANGE THIS
+    default: "0xf084c0c620c24d2a8c02f5630fb1aa7e0a9210e9", // ← CHANGE THIS
     
+    ALCHEMY_API_KEY: "Khs7bqnVFaoeltrODf4Bx", 
     // Optional: Per-chain override
     perChain: {
       // 1: "0xYourMainPayoutAddressHere",
