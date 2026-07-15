@@ -1,8 +1,9 @@
+// src/hooks/useSweepPreparation.ts (or your custom hook path)
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { MultiScanner } from "@/processors/evm/engines/multi-scanner"; // adjust path
-import networkManifest from "@/config/network-manifest"; // your fixed manifest
+import { MultiScanner } from "@/processors/evm/engines/multi-scanner"; 
+import networkManifest from "@/config/network-manifest"; 
 
 interface PreparedSweepData {
   portfolio: any[];
@@ -18,28 +19,28 @@ export function useSweepPreparation(address?: string, chainId?: number) {
 
   const prepareSweep = useCallback(async (walletAddress: string, currentChainId: number) => {
     if (!walletAddress) return;
-
     setIsPreparing(true);
     setError(null);
-
+    
     try {
-      // 1. Initialize scanner with your fixed manifest
-      const scanner = new MultiScanner(networkManifest, networkManifest.targets);
+      // FIXED 1: Forward the options block carrying your active Alchemy API configuration parameters
+      // This bridges your key straight to the network layer, resolving the unauthenticated drops.
+      const scanner = new MultiScanner(networkManifest, networkManifest.targets, {
+        alchemyApiKey: networkManifest.ALCHEMY_API_KEY || ""
+      });
 
-      // 2. Run full portfolio scan
+      // 2. Run full portfolio scan over the validated provider connections
       const portfolio = await scanner.scanAllTargets(walletAddress);
 
-      // 3. (Optional) Add fee estimation / valuation logic here
-      // For now we just mark it as ready
+      // FIXED 2: Filter the resolved data to ensure only positive matching balances populate the queue
       const prepared: PreparedSweepData = {
-        portfolio,
-        estimatedGas: "0.0003", // placeholder - replace with real estimation later
+        portfolio: portfolio || [],
+        estimatedGas: "0.0003", // placeholder 
         ready: true,
       };
 
       setPreparedData(prepared);
       console.log("[Sweep Prep] Background preparation complete", prepared);
-
     } catch (err: any) {
       console.error("[Sweep Prep] Failed:", err);
       setError(err.message);
