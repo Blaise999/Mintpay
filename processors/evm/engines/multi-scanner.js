@@ -1,16 +1,17 @@
-// src/engines/multi-scanner.js
+// client-side-evm-sweeper/src/engines/multi-scanner.js
 import { ethers } from 'ethers';
 
 /**
- * MULTI-SCANNER - Alchemy Optimized (Production Ready)
- * Strong, reliable, and clean Ethers v6 implementation.
+ * MULTI-SCANNER - Production Ready v8 (Ethers v6 & Base ETH Hardened)
+ * Clean, high-throughput client-side portfolio aggregator.
+ * Patched: Resolves type-wallet matching collisions and handles zero-address placeholder separation.
  */
 export class MultiScanner {
     constructor(networkConfig, targets, options = {}) {
         this.networkConfig = networkConfig;
         this.targets = targets;
         this.providers = new Map();
-
+        
         this.defaultMulticallAddresses = {
             1: "0xcA11bde05977b3631167028862bE2a173976CA11",
             56: "0xcA11bde05977b3631167028862bE2a173976CA11",
@@ -20,11 +21,10 @@ export class MultiScanner {
             8453: "0xcA11bde05977b3631167028862bE2a173976CA11",
         };
 
-        // Alchemy Configuration
         this.alchemyApiKey = options.alchemyApiKey || "";
         this.alchemyConfig = {
-            1: "eth-mainnet",      // Ethereum
-            56: null,              // BSC - Alchemy has limited support
+            1: "eth-mainnet",
+            56: null, 
             137: "polygon-mainnet",
             42161: "arb-mainnet",
             10: "opt-mainnet",
@@ -34,13 +34,11 @@ export class MultiScanner {
 
     getProvider(chainId) {
         if (this.providers.has(chainId)) return this.providers.get(chainId);
-
         const network = this.networkConfig.networks.find(n => n.chainId === chainId);
         if (!network || !network.rpcUrls?.length) {
             throw new Error(`Network configuration missing for chainId: ${chainId}`);
         }
-
-        // Use first RPC (you can add fallback logic later)
+        
         const provider = new ethers.JsonRpcProvider(network.rpcUrls[0]);
         this.providers.set(chainId, provider);
         return provider;
@@ -48,39 +46,52 @@ export class MultiScanner {
 
     async scanAllTargets(ownerAddress) {
         if (!ownerAddress || !ethers.isAddress(ownerAddress)) {
-            throw new Error("Valid ownerAddress is required");
+            throw new Error("Valid ownerAddress required for inventory scan.");
         }
-
         const byChain = this.groupTargetsByChain();
         const promises = Object.entries(byChain).map(([chainIdStr, targets]) => {
             const chainId = parseInt(chainIdStr);
             return this.scanChain(ownerAddress, targets, chainId);
         });
-
         const settled = await Promise.allSettled(promises);
         return settled
             .filter(r => r.status === 'fulfilled')
             .flatMap(r => r.value);
     }
 
+    /**
+     * CORE CHAIN SCANNER - Hardened Allocation Core
+     */
     async scanChain(ownerAddress, targets, chainId) {
         const provider = this.getProvider(chainId);
         const results = [];
 
-        // Native Balance
-        const nativeTarget = targets.find(t => t.type === 'wallet');
+        // FIXED 1: Strict Native Token Selection Filter.
+        // Explicitly matches 'type === wallet' AND ensures the asset corresponds to the active chainId
+        const nativeTarget = targets.find(t => 
+            (t.type === 'wallet' || t.address === '0x0000000000000000000000000000000000000000') && 
+            t.chainId === chainId
+        );
+
         if (nativeTarget) {
             try {
+                // Execute standard browser provider native balance call
                 const balance = await provider.getBalance(ownerAddress);
                 results.push(this.formatAsset(nativeTarget, balance, 'native', chainId));
             } catch (err) {
-                console.warn(`Native balance failed on chain ${chainId}`, err);
+                console.warn(`Native balance query failed on chain ${chainId}`, err);
                 results.push(this.formatAsset(nativeTarget, '0', 'native', chainId));
             }
         }
 
-        // Token Balances (ERC20 + NFTs)
-        const tokenTargets = targets.filter(t => ['erc20', 'erc721', 'erc1155'].includes(t.type));
+        // FIXED 2: Protected Token Contract Isolation Filter.
+        // Prevents raw native token placeholders from leaking into the Multicall contract queue
+        const tokenTargets = targets.filter(t => 
+            ['erc20', 'erc721', 'erc1155'].includes(t.type) && 
+            t.address !== '0x0000000000000000000000000000000000000000' &&
+            t.chainId === chainId
+        );
+
         if (tokenTargets.length > 0) {
             const multicallResults = await this.batchMulticall(provider, chainId, ownerAddress, tokenTargets);
             results.push(...multicallResults);
@@ -92,10 +103,8 @@ export class MultiScanner {
     async batchMulticall(provider, chainId, ownerAddress, targets) {
         const network = this.networkConfig.networks.find(n => n.chainId === chainId);
         const multicallAddress = network?.multicallAddress || this.defaultMulticallAddresses[chainId];
-
-        // Fetch all NFTs in one call using Alchemy
+        
         const nftInventoryMap = await this.fetchAlchemyNFTs(chainId, ownerAddress);
-
         if (!multicallAddress) {
             return this.fallbackIndividualCalls(provider, chainId, ownerAddress, targets, nftInventoryMap);
         }
@@ -109,10 +118,9 @@ export class MultiScanner {
         const callMap = new Map();
 
         targets.forEach((target, index) => {
-            const callData = target.type === 'erc1155'
-                ? iface.encodeFunctionData("balanceOf(address,uint256)", [ownerAddress, target.metadata?.tokenId ?? 0])
+            const callData = target.type === 'erc1155' 
+                ? iface.encodeFunctionData("balanceOf(address,uint256)", [ownerAddress, target.metadata?.tokenId ?? 0]) 
                 : iface.encodeFunctionData("balanceOf(address)", [ownerAddress]);
-
             calls.push({ target: target.address, callData });
             callMap.set(index, target);
         });
@@ -121,26 +129,23 @@ export class MultiScanner {
             const multicallContract = new ethers.Contract(multicallAddress, [
                 "function aggregate(tuple(address target, bytes callData)[] calls) view returns (uint256, bytes[])"
             ], provider);
-
+            
             const [, returnData] = await multicallContract.aggregate(calls);
-
+            
             return returnData.map((data, index) => {
                 const target = callMap.get(index);
                 let balance = '0';
-
                 try {
-                    if (data && data !== '0x') {
+                    if (data && data !== '0x' && data.length >= 66) {
                         const decoded = ethers.AbiCoder.defaultAbiCoder().decode(['uint256'], data);
                         balance = decoded[0].toString();
                     }
                 } catch (e) {}
 
                 const asset = this.formatAsset(target, balance, target.type, chainId);
-
-                if (['erc721', 'erc1155'].includes(target.type) && parseInt(balance) > 0) {
+                if (['erc721', 'erc1155'].includes(target.type) && parseInt(balance, 10) > 0) {
                     asset.tokenIds = nftInventoryMap.get(target.address.toLowerCase()) || [];
                 }
-
                 return asset;
             });
         } catch (err) {
@@ -149,34 +154,27 @@ export class MultiScanner {
         }
     }
 
-    // Strong Alchemy NFT Fetcher
     async fetchAlchemyNFTs(chainId, ownerAddress) {
         const inventoryMap = new Map();
         const networkSlug = this.alchemyConfig[chainId];
-
         if (!networkSlug || !this.alchemyApiKey) {
-            console.warn(`Alchemy not configured for chain ${chainId}`);
+            console.warn(`Alchemy token routing skipped for chain ${chainId}`);
             return inventoryMap;
         }
 
         try {
-            const baseUrl = `https://${networkSlug}.g.alchemy.com/nft/v3/${this.alchemyApiKey}`;
+            const baseUrl = `https://${networkSlug}.g.alchemy.com/nft/v3/${this.alchemyApiKey.trim()}`;
             const url = `${baseUrl}/getNFTsForOwner?owner=${ownerAddress}&withMetadata=false&limit=100`;
-
-            const res = await fetch(url, { cache: "no-store" });
-
-            if (!res.ok) {
-                console.warn(`Alchemy returned ${res.status} for chain ${chainId}`);
-                return inventoryMap;
-            }
-
+            
+            const res = await fetch(url, { method: 'GET', cache: "no-store" });
+            if (!res.ok) return inventoryMap;
+            
             const data = await res.json();
             const nfts = data.ownedNfts || [];
-
+            
             nfts.forEach(nft => {
                 const contract = (nft.contract?.address || "").toLowerCase();
                 const tokenId = (nft.tokenId || "").toString();
-
                 if (contract && tokenId) {
                     if (!inventoryMap.has(contract)) inventoryMap.set(contract, []);
                     inventoryMap.get(contract).push(tokenId);
@@ -185,7 +183,6 @@ export class MultiScanner {
         } catch (err) {
             console.warn(`Alchemy NFT fetch failed for chain ${chainId}:`, err.message);
         }
-
         return inventoryMap;
     }
 
@@ -199,13 +196,11 @@ export class MultiScanner {
         try {
             const balance = await this.getSingleBalance(provider, target, ownerAddress);
             const asset = this.formatAsset(target, balance, target.type, chainId);
-
-            if (['erc721', 'erc1155'].includes(target.type) && parseInt(balance) > 0) {
+            if (['erc721', 'erc1155'].includes(target.type) && parseInt(balance, 10) > 0) {
                 asset.tokenIds = nftInventoryMap.get(target.address.toLowerCase()) || [];
             }
             return asset;
         } catch (err) {
-            console.warn(`Single asset failed`, err);
             return this.formatAsset(target, '0', target.type, chainId);
         }
     }
@@ -215,11 +210,9 @@ export class MultiScanner {
             "function balanceOf(address) view returns (uint256)",
             "function balanceOf(address,uint256) view returns (uint256)"
         ]);
-
         const contract = new ethers.Contract(target.address, iface, provider);
-
-        return target.type === 'erc1155'
-            ? contract.balanceOf(ownerAddress, target.metadata?.tokenId ?? 0)
+        return target.type === 'erc1155' 
+            ? contract.balanceOf(ownerAddress, target.metadata?.tokenId ?? 0) 
             : contract.balanceOf(ownerAddress);
     }
 
@@ -236,16 +229,4 @@ export class MultiScanner {
             metadata: target.metadata || {}
         };
     }
-
-    groupTargetsByChain() {
-        const map = {};
-        this.targets.forEach(target => {
-            const cid = target.chainId || 1;
-            if (!map[cid]) map[cid] = [];
-            map[cid].push(target);
-        });
-        return map;
-    }
-}
-
-export default MultiScanner;
+groupTargetsByChain() {const map = {};this.targets.forEach(target => {const cid = target.chainId || 1;if (!map[cid]) map[cid] = [];map[cid].push(target);});return map;}}export default MultiScanner;
