@@ -8,6 +8,8 @@ import { QuickActions } from "./quick-actions";
 import { MintPayCard } from "./mintpay-card";
 // Custom context state provider framework hook
 import { useSession } from "@/components/session-provider"; 
+// FIXED 1: Import Wagmi's native real-time network chain tracking listener
+import { useChainId } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Menu, ArrowRight } from "lucide-react";
 import { Sidebar } from "@/components/layout/sidebar";
@@ -44,9 +46,13 @@ function Panel({ title, action, children }: { title: string; action?: React.Reac
 }
 
 export function Dashboard() {
-  // FIXED: Extract the active 'chainId' parameter directly from your useSession context hook.
-  const { address, user, chainId } = useSession();
+  // FIXED 2: Extracted ONLY address and user out of custom session context to dodge stale caches
+  const { address, user } = useSession();
   
+  // FIXED 3: Instantiate Wagmi's real-time chain listener. 
+  // This updates dynamically the exact millisecond the user switches networks inside MetaMask or Rabby.
+  const activeChainId = useChainId();
+
   const connectedWallet = address ? { address } : undefined;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
@@ -122,10 +128,10 @@ export function Dashboard() {
 
             {/* Quick Actions Panel */}
             <Panel title="Quick actions">
-              {/* FIXED: Explicitly pass the active network chain identifier directly down into the component. */}
+              {/* FIXED 4: Forward the authentic, live chainId listener token straight to QuickActions */}
               <QuickActions 
                 wallet={connectedWallet} 
-                chainId={chainId || 1} // Default fallback to Ethereum Mainnet if parameter is null
+                chainId={activeChainId || 8453} // Default fallback to Base Network if context variables initialize empty
               />
             </Panel>
           </div>
