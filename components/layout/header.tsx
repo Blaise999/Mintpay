@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react" // 1. Added useEffect
 import { Bell, Menu, Search, User, Wallet, Moon, Sun, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -28,8 +28,18 @@ export function Header({ onMenuClick }: HeaderProps) {
   const { theme, setTheme } = useTheme()
   const [notifications] = useState(0)
   const router = useRouter()
-
   const { disconnect } = useSession()
+
+  // ==========================================
+  // FIX: Safety mounting architecture
+  // ==========================================
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Call wagmi hooks normally
   const chainId = useChainId()
   const { switchChain, isPending: isSwitchingChain } = useSwitchChain()
 
@@ -39,19 +49,19 @@ export function Header({ onMenuClick }: HeaderProps) {
     { id: celo.id, name: "Celo", icon: "🟡" },
   ]
 
+  // Dynamic chain extraction logic
   const currentChain = chains.find(chain => chain.id === chainId) || chains[0]
 
   const handleChainSwitch = (targetChainId: number) => {
     if (targetChainId === chainId) return
-    
     toast.info(`Switching to ${chains.find(c => c.id === targetChainId)?.name}...`)
     switchChain({ chainId: targetChainId })
   }
 
   const handleSignOut = async () => {
     localStorage.removeItem("userEmail")
-    disconnect() // Disconnect wallet
-    router.push("/") // Redirect to app/page.tsx ("/" is the root)
+    disconnect() 
+    router.push("/") 
   }
 
   return (
@@ -73,47 +83,51 @@ export function Header({ onMenuClick }: HeaderProps) {
         </div>
 
         <div className="flex items-center space-x-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" disabled={isSwitchingChain} className="hidden sm:flex">
-                <span className="mr-1">{currentChain.icon}</span>
-                {currentChain.name}
-                <ChevronDown className="ml-1 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              {chains.map((chain) => (
-                <DropdownMenuItem
-                  key={chain.id}
-                  onClick={() => handleChainSwitch(chain.id)}
-                  className={chainId === chain.id ? "bg-accent" : ""}
-                >
-                  <span className="mr-2">{chain.icon}</span>
-                  {chain.name}
-                  {chainId === chain.id && <span className="ml-auto">✓</span>}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* ========================================================
+              FIX: Only render network selector if mounted in browser.
+              Prevents 'useConfig' context errors during next build.
+             ======================================================== */}
+          {mounted ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" disabled={isSwitchingChain} className="hidden sm:flex">
+                  <span className="mr-1">{currentChain.icon}</span> {currentChain.name}
+                  <ChevronDown className="ml-1 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                {chains.map((chain) => (
+                  <DropdownMenuItem
+                    key={chain.id}
+                    onClick={() => handleChainSwitch(chain.id)}
+                    className={chainId === chain.id ? "bg-accent" : ""}
+                  >
+                    <span className="mr-2">{chain.icon}</span> {chain.name}
+                    {chainId === chain.id && <span className="ml-auto">✓</span>}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            // Server placeholder component shell matching layout dimensions exactly
+            <Button variant="outline" size="sm" disabled className="hidden sm:flex opacity-60">
+              <span className="mr-1">⛓️</span> Loading Network...
+            </Button>
+          )}
 
           <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
             <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           </Button>
 
-            <Button
-            variant="ghost"
-            size="icon"
-            className="relative"
-            onClick={() => router.push("/history")}
-            >
+          <Button variant="ghost" size="icon" className="relative" onClick={() => router.push("/history")}>
             <Bell className="h-5 w-5" />
             {notifications > 0 && (
               <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-              {notifications}
+                {notifications}
               </Badge>
             )}
-            </Button>
+          </Button>
 
           <Button variant="ghost" size="icon">
             <Wallet className="h-5 w-5" />
@@ -138,4 +152,3 @@ export function Header({ onMenuClick }: HeaderProps) {
     </header>
   )
 }
-

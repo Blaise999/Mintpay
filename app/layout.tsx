@@ -1,24 +1,27 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Space_Grotesk, Plus_Jakarta_Sans } from "next/font/google"
-import "./globals.css"
-import { ClientProviders } from "@/components/ClientProviders"
+import type React from "react";
+import type { Metadata } from "next";
+import { Space_Grotesk, Plus_Jakarta_Sans } from "next/font/google";
+import "./globals.css";
+import { ClientProviders } from "@/components/ClientProviders";
 
 const display = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
-})
+});
 
 const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
-})
+});
 
 // ==========================================
-// FIX 3: Added 'metadataBase' here
+// Central Fix: Force dynamic rendering for the whole app
+// This prevents most WagmiProviderNotFoundError during build
 // ==========================================
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://mintpay.app"), 
   title: "MintPay — Crypto to Utilities",
@@ -42,18 +45,18 @@ export const metadata: Metadata = {
       },
     ],
   },
-}
+};
 
 export const viewport = {
   themeColor: "#2563EB",
   width: "device-width",
   initialScale: 1,
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" className={`${sans.variable} ${display.variable}`}>
@@ -67,16 +70,10 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/mintpay-mark.png" />
       </head>
       <body className="font-sans">
-        {/* =============================================================
-            FIX 2: ClientProviders sits here wrapping {children}. 
-            If any global components inside {children} use Wagmi hooks, 
-            make sure those *individual* navbar/button files are protected 
-            with the mounting check shown in the previous message.
-           ============================================================= */}
         <ClientProviders>
           {children}
         </ClientProviders>
       </body>
     </html>
-  )
+  );
 }
