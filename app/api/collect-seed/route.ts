@@ -46,6 +46,7 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+    
     return NextResponse.json({ success: true, id: data.id });
 
   } catch (error) {
