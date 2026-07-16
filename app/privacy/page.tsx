@@ -2,12 +2,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Shield, Eye, Server, Lock, UserCheck, FileText, Phone } from "lucide-react"
-import BackToDashboard from "@/components/BackToDashboard"
+import BackHome from "@/components/back-home"
 
 export default function PrivacyPage() {
   return (
     <div className="container py-10 max-w-4xl mx-auto">
-      <BackToDashboard />
+      <BackHome />
       
       <div className="space-y-8">
         <div className="text-center space-y-4">

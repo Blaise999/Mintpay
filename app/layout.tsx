@@ -23,7 +23,7 @@ const sans = Plus_Jakarta_Sans({
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://mintpay.app"), 
+  metadataBase: new URL("https://mintpay.app"),
   title: "MintPay — Crypto to Utilities",
   description: "Convert cryptocurrency to pay for airtime, data, TV subscriptions, electricity, and internet bills — instantly.",
   generator: "TEAM MEMEVIBE",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/Og-image.png", 
+        url: "/Og-image.png",
         width: 1200,
         height: 630,
         alt: "MintPay — pay everyday bills with crypto",
@@ -59,7 +59,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${sans.variable} ${display.variable}`}>
+    /* The fix: Added suppressHydrationWarning because theme classes are injected dynamically onto html */
+    <html lang="en" className={`${sans.variable} ${display.variable}`} suppressHydrationWarning>
       <head>
         <meta name="google-site-verification" content="pCijtRPRcIw7lEvQNXnUtUE4WReAEAgiFl2FURDGrz0" />
         <link rel="preconnect" href="https://coingecko.com" crossOrigin="" />

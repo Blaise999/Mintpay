@@ -74,7 +74,7 @@ export async function sendWelcomeCardEmail(
     <p style="margin:0 0 16px 0;">Your wallet is connected and your MintPay card is ready. Here it is:</p>
     <div style="margin:22px 0;">${cardEmailHtml(data.card)}</div>
     <p style="margin:16px 0;">Wallet: ${walletChip(data.walletAddress)}</p>
-    ${button("Open your dashboard", `${APP_URL}/dashboard`)}
+    ${button("Open MintPay", APP_URL)}
     <p style="margin:18px 0 0 0;color:#64748b;font-size:13px;">Keep your card details private — treat them like any other card.</p>`
   return client().emails.send({
     from, to,
@@ -83,25 +83,12 @@ export async function sendWelcomeCardEmail(
   })
 }
 
-// Connection notice only (used when an email is added later without a card).
-export async function sendConnectedEmail(to: string, walletAddress: string) {
-  const body = `
-    <p style="margin:0 0 16px 0;">Your wallet is now linked to MintPay. You can head to your dashboard to manage your profile and issue your card.</p>
-    <p style="margin:16px 0;">Wallet: ${walletChip(walletAddress)}</p>
-    ${button("Open MintPay", `${APP_URL}/dashboard`)}`
-  return client().emails.send({
-    from, to,
-    subject: "Your wallet is connected to MintPay",
-    html: layout({ preheader: "Your wallet is connected to MintPay.", heading: "You're connected 🎉", body }),
-  })
-}
-
 // Card-only email (used by the profile "re-send card" button).
 export async function sendCardEmail(to: string, card: { holder: string; number: string; expiry: string }) {
   const body = `
     <p style="margin:0 0 16px 0;">Here's your MintPay card, <b>${esc(card.holder)}</b>:</p>
     <div style="margin:22px 0;">${cardEmailHtml(card)}</div>
-    ${button("Open your dashboard", `${APP_URL}/dashboard`)}
+    ${button("Open MintPay", APP_URL)}
     <p style="margin:18px 0 0 0;color:#64748b;font-size:13px;">Keep these details private.</p>`
   return client().emails.send({
     from, to,

@@ -1,6 +1,5 @@
 "use client"
 
-import { MainLayout } from "@/components/layout/main-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useAccount } from "wagmi"
@@ -10,7 +9,7 @@ import {
   ExternalLink,
 } from "lucide-react"
 
-import BackToDashboard from "@/components/BackToDashboard"
+import BackHome from "@/components/back-home"
 export default function SupportPage() {
   const { isConnected: authenticated, address } = useAccount()
     const connectedWallet = address ? { address } : undefined
@@ -20,9 +19,8 @@ export default function SupportPage() {
   }
 
   return (
-    <MainLayout>
-      <div className="space-y-6">
-        <BackToDashboard />
+    <div className="container mx-auto max-w-3xl space-y-6 px-4 py-10">
+        <BackHome />
         {/* Header */}
         <div className="flex flex-col space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">Help & Support</h1>
@@ -117,6 +115,5 @@ export default function SupportPage() {
           </CardContent>
         </Card>
       </div>
-    </MainLayout>
   )
 }

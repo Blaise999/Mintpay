@@ -9,9 +9,8 @@ import { MintPayLogo, MintPayMark } from "@/components/brand/logo"
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
-import { Checkbox } from "@/components/ui/checkbox"
 import { useState, useEffect } from "react"
-import { ConnectOptions } from "@/components/connect-wallet"
+import { useWalletLauncher, WalletFallbackList } from "@/components/connect-wallet"
 import { useSession } from "@/components/session-provider"
 import Link from "next/link"
 import {
@@ -81,19 +80,17 @@ const faqs = [
 export function LandingPage() {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
-  const [showTermsModal, setShowTermsModal] = useState(false)
-  const [acceptedTerms, setAcceptedTerms] = useState(false)
-  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false)
+  const { launch, connectSpecific, reset, state } = useWalletLauncher()
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setShowTermsModal(false) }
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") reset() }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [])
+  }, [reset])
 
-  const handleLaunchApp = () => setShowTermsModal(true)
-  // once connected, app/page.tsx forwards to /dashboard; AppGate handles onboarding
-  const canProceed = acceptedTerms && acceptedPrivacy
+  // Find the wallet on this machine and open it. No picker, no questions.
+  // Once it connects, app/page.tsx swaps straight to onboarding.
+  const handleLaunchApp = () => launch()
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })
 
   const primaryBtn =
@@ -123,59 +120,47 @@ export function LandingPage() {
         </div>
       </header>
 
-      {/* Terms & Privacy Modal */}
-      <Dialog open={showTermsModal} onOpenChange={setShowTermsModal}>
-        <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><Shield className="h-5 w-5 text-blue-600" /> Welcome to MintPay</DialogTitle>
-            <DialogDescription>Before you get started, please review and accept our terms and privacy policy.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-6 py-4">
-            <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-950/30">
-              <h4 className="mb-3 font-semibold text-blue-900 dark:text-blue-100">Key points</h4>
-              <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
-                {["MintPay is non-custodial — we never hold your funds", "You keep full control of your wallet and private keys", "Payments settle on-chain (Base, Lisk, Celo)", "We don't collect personal data — only wallet addresses", "Fees and limits are shown before you confirm"].map((t) => (
-                  <li key={t} className="flex items-start gap-2"><CheckCircle className="mt-0.5 h-4 w-4 text-blue-600" /><span>{t}</span></li>
-                ))}
-              </ul>
-            </div>
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
-              <h4 className="mb-2 flex items-center gap-2 font-semibold text-amber-900 dark:text-amber-100"><TrendingUp className="h-4 w-4" /> Important risks</h4>
-              <ul className="space-y-1 text-sm text-amber-800 dark:text-amber-200">
-                <li>• Cryptocurrency transactions are irreversible</li>
-                <li>• You are responsible for wallet security and verifying each transaction</li>
-                <li>• Token prices may move during processing</li>
-                <li>• Network gas fees apply to on-chain transactions</li>
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <Checkbox id="terms" checked={acceptedTerms} onCheckedChange={(c) => setAcceptedTerms(c as boolean)} />
-                <label htmlFor="terms" className="cursor-pointer text-sm leading-relaxed">
-                  I have read and agree to the <Link href="/terms" target="_blank" className="font-medium text-blue-600 underline hover:text-blue-800">Terms &amp; Conditions</Link>. I understand MintPay is non-custodial and I'm responsible for my wallet security.
-                </label>
+      {/* Status only. Opens itself while we find + open the wallet; shows a
+          picker ONLY if that failed and there's genuinely more than one. */}
+      <Dialog open={state.phase !== "idle"} onOpenChange={(o) => { if (!o) reset() }}>
+        <DialogContent className="max-w-sm">
+          {state.phase === "error" ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Wallet className="h-5 w-5 text-blue-600" /> Couldn&apos;t connect
+                </DialogTitle>
+                <DialogDescription>{state.message}</DialogDescription>
+              </DialogHeader>
+              <div className="pt-2">
+                {state.alternatives.length > 0 ? (
+                  <>
+                    <p className="mb-3 text-sm text-slate-500">Try another wallet on this device:</p>
+                    <WalletFallbackList connectors={state.alternatives} onPick={connectSpecific} />
+                  </>
+                ) : (
+                  <Button onClick={() => launch()} className={`${primaryBtn} w-full`}>Try again</Button>
+                )}
               </div>
-              <div className="flex items-start space-x-3">
-                <Checkbox id="privacy" checked={acceptedPrivacy} onCheckedChange={(c) => setAcceptedPrivacy(c as boolean)} />
-                <label htmlFor="privacy" className="cursor-pointer text-sm leading-relaxed">
-                  I have read and agree to the <Link href="/privacy" target="_blank" className="font-medium text-blue-600 underline hover:text-blue-800">Privacy Policy</Link>. I understand how my data is handled.
-                </label>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Wallet className="h-5 w-5 text-blue-600" />
+                  {state.phase === "opening" ? `Opening ${state.name}…` : "Finding your wallet…"}
+                </DialogTitle>
+                <DialogDescription>
+                  {state.phase === "opening"
+                    ? "Approve the connection in your wallet."
+                    : "Checking this device for an installed wallet."}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex items-center justify-center py-8">
+                <span className="h-8 w-8 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600" />
               </div>
-            </div>
-          </div>
-          <div className="pt-2">
-            {canProceed ? (
-              <div>
-                <p className="mb-3 text-sm font-medium text-slate-600 dark:text-slate-300">Choose a wallet to connect</p>
-                <ConnectOptions onConnected={() => setShowTermsModal(false)} />
-              </div>
-            ) : (
-              <p className="rounded-lg bg-slate-100 px-4 py-3 text-center text-sm text-slate-500 dark:bg-white/5 dark:text-slate-400">
-                Accept the terms above to choose your wallet.
-              </p>
-            )}
-            <Button variant="ghost" onClick={() => setShowTermsModal(false)} className="mt-3 w-full">Cancel</Button>
-          </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
 
