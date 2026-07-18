@@ -1,10 +1,10 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Space_Grotesk, Plus_Jakarta_Sans } from "next/font/google";
+import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ClientProviders } from "@/components/ClientProviders";
 
-const display = Space_Grotesk({
+const display = Outfit({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",

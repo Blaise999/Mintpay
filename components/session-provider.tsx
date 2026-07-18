@@ -20,7 +20,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const { address, isConnected, isConnecting, isReconnecting, chainId, connector } = useAccount();
   const [mounted, setMounted] = useState(false);
 
-  // Wagmi hydrates on the client; "ready" just means we can trust isConnected.
+  // wagmi hydrates on the client; "ready" just means we can trust isConnected.
   useEffect(() => setMounted(true), []);
 
   const value = useMemo(
@@ -31,7 +31,6 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       address,
       chainId,
       connectorName: connector?.name,
-      // This is the "Nuke" button
       disconnect: () => disconnect(),
     }),
     [mounted, isReconnecting, isConnected, isConnecting, address, chainId, connector, disconnect],

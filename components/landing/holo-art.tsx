@@ -12,34 +12,35 @@ export function HoloDefs() {
   return (
     <svg width="0" height="0" aria-hidden="true" style={{ position: "absolute" }}>
       <defs>
+        {/* Palette: electric blue -> mint green, pastel iridescent edges. */}
         <linearGradient id="holo" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#22D3EE" />
-          <stop offset="0.4" stopColor="#3B82F6" />
-          <stop offset="0.75" stopColor="#7C3AED" />
-          <stop offset="1" stopColor="#E879F9" />
+          <stop offset="0" stopColor="#5EEAA0" />
+          <stop offset="0.38" stopColor="#38BDF8" />
+          <stop offset="0.72" stopColor="#4F46E5" />
+          <stop offset="1" stopColor="#F5A9E8" />
         </linearGradient>
         <linearGradient id="holoRev" x1="1" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#67E8F9" />
-          <stop offset="0.5" stopColor="#6366F1" />
-          <stop offset="1" stopColor="#C026D3" />
+          <stop offset="0" stopColor="#A7F3D0" />
+          <stop offset="0.45" stopColor="#60A5FA" />
+          <stop offset="1" stopColor="#F0ABFC" />
         </linearGradient>
         <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#2563EB" />
-          <stop offset="1" stopColor="#7C3AED" />
+          <stop offset="0" stopColor="#0015FF" />
+          <stop offset="1" stopColor="#4ADE80" />
         </linearGradient>
         <linearGradient id="cardG" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#1E40AF" />
-          <stop offset="0.55" stopColor="#4338CA" />
-          <stop offset="1" stopColor="#6D28D9" />
+          <stop offset="0" stopColor="#0015FF" />
+          <stop offset="0.5" stopColor="#2775E8" />
+          <stop offset="1" stopColor="#4EE79A" />
         </linearGradient>
         <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#ffffff" stopOpacity="0.5" />
           <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
         </linearGradient>
         <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#22D3EE" />
-          <stop offset="0.5" stopColor="#818CF8" />
-          <stop offset="1" stopColor="#E879F9" />
+          <stop offset="0" stopColor="#86EFAC" />
+          <stop offset="0.5" stopColor="#93C5FD" />
+          <stop offset="1" stopColor="#F5A9E8" />
         </linearGradient>
       </defs>
     </svg>
@@ -91,8 +92,8 @@ export function CardArt({ className = "w-full" }: { className?: string }) {
           <rect x="0" y="0" width="34" height="34" rx="10" fill="#ffffff" fillOpacity="0.16" stroke="#ffffff" strokeOpacity="0.5" />
           <path d="M9 26 V11 L17 18 L25 11 V26" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" />
           <path d="M13.5 13 L17 8.5 L20.5 13" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
-          <text x="44" y="22" fill="#ffffff" fontFamily="'Space Grotesk', sans-serif" fontSize="22" fontWeight="700" letterSpacing="-0.5">MintPay</text>
-          <text x="45" y="34" fill="#ffffff" fillOpacity="0.75" fontFamily="'Space Grotesk', sans-serif" fontSize="8" fontWeight="700" letterSpacing="2">CREDIT</text>
+          <text x="44" y="22" fill="#ffffff" fontFamily="'Outfit', sans-serif" fontSize="22" fontWeight="700" letterSpacing="-0.5">MintPay</text>
+          <text x="45" y="34" fill="#ffffff" fillOpacity="0.75" fontFamily="'Outfit', sans-serif" fontSize="8" fontWeight="700" letterSpacing="2">CREDIT</text>
         </g>
         {/* contactless */}
         <g transform="translate(300 26)" stroke="#ffffff" strokeOpacity="0.85" strokeWidth="3" fill="none" strokeLinecap="round">
@@ -103,7 +104,7 @@ export function CardArt({ className = "w-full" }: { className?: string }) {
         <rect x="30" y="96" width="46" height="34" rx="7" fill="#FCD34D" opacity="0.9" />
         <path d="M53 96 v34 M30 108 h46 M30 118 h46" stroke="#B45309" strokeOpacity="0.5" strokeWidth="1.5" />
         {/* number */}
-        <text x="30" y="170" fill="#ffffff" fillOpacity="0.9" fontFamily="'Space Grotesk', monospace" fontSize="17" letterSpacing="3">••••  ••••  ••••  0927</text>
+        <text x="30" y="170" fill="#ffffff" fillOpacity="0.9" fontFamily="'Outfit', monospace" fontSize="17" letterSpacing="3">••••  ••••  ••••  0927</text>
       </g>
     </svg>
   )
@@ -278,7 +279,7 @@ export function PhoneTap({ className = "w-full" }: { className?: string }) {
           <g transform="translate(18 20)">
             <rect width="24" height="24" rx="7" fill="#ffffff" fillOpacity="0.16" stroke="#fff" strokeOpacity="0.5" />
             <path d="M6 18 V8 L12 13 L18 8 V18" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />
-            <text x="32" y="17" fill="#fff" fontFamily="'Space Grotesk',sans-serif" fontSize="15" fontWeight="700">MintPay</text>
+            <text x="32" y="17" fill="#fff" fontFamily="'Outfit',sans-serif" fontSize="15" fontWeight="700">MintPay</text>
           </g>
           <text x="18" y="112" fill="#fff" fillOpacity="0.85" fontSize="12" letterSpacing="2">•••• 0927</text>
         </g>
@@ -287,5 +288,87 @@ export function PhoneTap({ className = "w-full" }: { className?: string }) {
         <text x="134" y="360" fill="#94A3B8" fontSize="13" textAnchor="middle">Hold near reader</text>
       </g>
     </Phone>
+  )
+}
+
+/** Floating pay-tag in the Trust-style green, generic wordmark. */
+export function PayTag({ label = "Pay", className = "" }: { label?: string; className?: string }) {
+  return (
+    <svg viewBox="0 0 150 74" className={className} xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="payG" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#4EE79A" />
+          <stop offset="1" stopColor="#39D98A" />
+        </linearGradient>
+        <filter id="payShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="6" stdDeviation="7" floodColor="#0B0D17" floodOpacity="0.22" />
+        </filter>
+      </defs>
+      <g filter="url(#payShadow)">
+        <rect x="6" y="10" width="138" height="54" rx="16" fill="url(#payG)" />
+        <text x="75" y="45" textAnchor="middle" fontFamily="'Outfit', sans-serif"
+          fontSize="30" fontWeight="800" fill="#0B0D17" letterSpacing="-1">{label}</text>
+      </g>
+    </svg>
+  )
+}
+
+/** Iridescent 3D coin — the rainbow-chrome discs floating in the Receive screen. */
+export function HoloCoin({
+  glyph = "$",
+  className = "",
+  style,
+}: {
+  glyph?: string
+  className?: string
+  style?: React.CSSProperties
+}) {
+  const gid = "hc" + Math.random().toString(36).slice(2, 8)
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      className={className}
+      style={style}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient id={gid + "rim"} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#7DFFB8" />
+          <stop offset="0.3" stopColor="#5EE1F5" />
+          <stop offset="0.6" stopColor="#B79CFF" />
+          <stop offset="1" stopColor="#F5A9E8" />
+        </linearGradient>
+        <linearGradient id={gid + "face"} x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0" stopColor="#8DF0C4" />
+          <stop offset="0.35" stopColor="#67D9F0" />
+          <stop offset="0.7" stopColor="#A99BF7" />
+          <stop offset="1" stopColor="#F1A6E6" />
+        </linearGradient>
+        <filter id={gid + "sh"} x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="5" stdDeviation="5" floodColor="#0B0D17" floodOpacity="0.3" />
+        </filter>
+      </defs>
+      <g filter={`url(#${gid}sh)`}>
+        {/* extruded side */}
+        <ellipse cx="50" cy="58" rx="38" ry="34" fill={`url(#${gid}rim)`} opacity="0.55" />
+        {/* top face */}
+        <ellipse cx="50" cy="50" rx="38" ry="34" fill={`url(#${gid}face)`} />
+        <ellipse cx="50" cy="50" rx="30" ry="26" fill="none" stroke="#0B0D17" strokeOpacity="0.18" strokeWidth="2" />
+        <text
+          x="50"
+          y="60"
+          textAnchor="middle"
+          fontFamily="'Outfit', sans-serif"
+          fontSize="30"
+          fontWeight="800"
+          fill="#0B0D17"
+          fillOpacity="0.72"
+        >
+          {glyph}
+        </text>
+        {/* sheen */}
+        <ellipse cx="40" cy="40" rx="14" ry="9" fill="#fff" opacity="0.35" />
+      </g>
+    </svg>
   )
 }
