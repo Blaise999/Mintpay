@@ -261,13 +261,13 @@ export function LandingPage() {
             <MediaSlot src="/screen-1.png" alt="MintPay app" w={280} h={560} className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]" rounded="rounded-[38px]" />
             {/* pay badges — small, tilted, gently floating. Drop PNGs (transparent bg) to fill. */}
             <div className="animate-floaty absolute -left-[22%] top-[26%] w-[38%] drop-shadow-xl" style={{ ["--tilt" as any]: "-9deg" }}>
-              <MediaSlot src="/badge-gpay.jpg" alt="Google Pay" w={132} h={64} rounded="rounded-2xl" />
+              <MediaSlot src="/badge-gpay.png" alt="Google Pay" w={132} h={64} rounded="rounded-2xl" />
             </div>
             <div className="animate-floaty-slow absolute -right-[14%] top-[7%] w-[36%] drop-shadow-xl" style={{ ["--tilt" as any]: "7deg" }}>
-              <MediaSlot src="/badge-atm.jpg" alt="ATM" w={132} h={64} rounded="rounded-2xl" />
+              <MediaSlot src="/badge-atm.png" alt="ATM" w={132} h={64} rounded="rounded-2xl" />
             </div>
             <div className="animate-floaty absolute -right-[20%] top-[58%] w-[40%] drop-shadow-xl" style={{ ["--tilt" as any]: "-7deg" }}>
-              <MediaSlot src="/badge-applepay.jpg" alt="Apple Pay" w={132} h={64} rounded="rounded-2xl" />
+              <MediaSlot src="/badge-applepay.png" alt="Apple Pay" w={132} h={64} rounded="rounded-2xl" />
             </div>
           </div>
         }
