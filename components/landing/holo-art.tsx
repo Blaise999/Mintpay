@@ -113,7 +113,7 @@ export function CardArt({ className = "w-full" }: { className?: string }) {
 /* --- Simple iridescent props (shield / padlock / wifi / cloud) --- */
 export function Shield({ className = "h-16 w-16" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 100 100" className={className} xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 100 100" className={className} style={style} xmlns="http://www.w3.org/2000/svg">
       <path d="M50 8 L86 22 v28 c0 24 -18 36 -36 44 C32 86 14 74 14 50 V22 z" fill="url(#holo)" />
       <path d="M50 8 L86 22 v28 c0 24 -18 36 -36 44 z" fill="#0B1220" opacity="0.14" />
       <path d="M50 8 L86 22 v28 c0 24 -18 36 -36 44 C32 86 14 74 14 50 V22 z" fill="url(#sheen)" opacity="0.35" />
@@ -314,23 +314,10 @@ export function PayTag({ label = "Pay", className = "" }: { label?: string; clas
 }
 
 /** Iridescent 3D coin — the rainbow-chrome discs floating in the Receive screen. */
-export function HoloCoin({
-  glyph = "$",
-  className = "",
-  style,
-}: {
-  glyph?: string
-  className?: string
-  style?: React.CSSProperties
-}) {
+export function HoloCoin({ glyph = "$", className = "", style }: { glyph?: string; className?: string; style?: React.CSSProperties }) {
   const gid = "hc" + Math.random().toString(36).slice(2, 8)
   return (
-    <svg
-      viewBox="0 0 100 100"
-      className={className}
-      style={style}
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg viewBox="0 0 100 100" className={className} xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id={gid + "rim"} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#7DFFB8" />
@@ -354,18 +341,8 @@ export function HoloCoin({
         {/* top face */}
         <ellipse cx="50" cy="50" rx="38" ry="34" fill={`url(#${gid}face)`} />
         <ellipse cx="50" cy="50" rx="30" ry="26" fill="none" stroke="#0B0D17" strokeOpacity="0.18" strokeWidth="2" />
-        <text
-          x="50"
-          y="60"
-          textAnchor="middle"
-          fontFamily="'Outfit', sans-serif"
-          fontSize="30"
-          fontWeight="800"
-          fill="#0B0D17"
-          fillOpacity="0.72"
-        >
-          {glyph}
-        </text>
+        <text x="50" y="60" textAnchor="middle" fontFamily="'Outfit', sans-serif"
+          fontSize="30" fontWeight="800" fill="#0B0D17" fillOpacity="0.72">{glyph}</text>
         {/* sheen */}
         <ellipse cx="40" cy="40" rx="14" ry="9" fill="#fff" opacity="0.35" />
       </g>

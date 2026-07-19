@@ -173,7 +173,7 @@ export function LandingPage() {
 
         {/* One complete illustration — the coins/lock/wifi live inside the artwork. */}
         <MediaSlot
-          src="/mintpay.png" alt="MintPay card" w={560} h={420}
+          src="/mintpay.jpg" alt="MintPay card" w={560} h={420}
           className="mx-auto aspect-[560/420] w-full max-w-[560px]" rounded="rounded-3xl"
         />
       </section>
@@ -258,7 +258,7 @@ export function LandingPage() {
         body="Connect the wallet you already use and issue your MintPay card in a minute."
         art={
           <div className="relative aspect-[280/560] w-[280px]">
-            <MediaSlot src="/screen-1.png" alt="MintPay app" w={280} h={560} className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]" rounded="rounded-[38px]" />
+            <MediaSlot src="/screen-1.jpg" alt="MintPay app" w={280} h={560} className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]" rounded="rounded-[38px]" />
             {/* pay badges — small, tilted, gently floating. Drop PNGs (transparent bg) to fill. */}
             <div className="animate-floaty absolute -left-[22%] top-[26%] w-[38%] drop-shadow-xl" style={{ ["--tilt" as any]: "-9deg" }}>
               <MediaSlot src="/badge-gpay.png" alt="Google Pay" w={132} h={64} rounded="rounded-2xl" />
@@ -274,68 +274,40 @@ export function LandingPage() {
         bg="bg-white"
       />
 
-     <Split
-  flip
-  title="Pay directly"
-  accent="from your wallet"
-  body="No need to transfer funds to a third-party service — everything settles from the wallet you control."
-  art={
-    <div className="relative aspect-[280/560] w-[280px]">
-      <MediaSlot
-        src="/screen-2.jpg"
-        alt="Pay from your wallet"
-        w={280}
-        h={560}
-        className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]"
-        rounded="rounded-[38px]"
+      <Split
+        flip
+        title="Pay directly" accent="from your wallet"
+        body="No need to transfer funds to a third-party service — everything settles from the wallet you control."
+        art={
+          <div className="relative aspect-[280/560] w-[280px]">
+            <MediaSlot
+              src="/screen-2.jpg" alt="Pay from your wallet" w={280} h={560}
+              className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]"
+              rounded="rounded-[38px]"
+            />
+            {/* iridescent coins, gently floating (SVG) */}
+            <HoloCoin glyph="T" className="animate-floaty absolute -right-[12%] -top-[7%] w-[30%]" style={{ ["--tilt" as any]: "6deg" }} />
+            <HoloCoin glyph="◈" className="animate-floaty-slow absolute -left-[20%] top-[34%] w-[26%]" style={{ ["--tilt" as any]: "-12deg" }} />
+            <HoloCoin glyph="$" className="animate-floaty absolute -right-[22%] top-[40%] w-[30%]" style={{ ["--tilt" as any]: "6deg" }} />
+            <HoloCoin glyph="₽" className="animate-floaty-slow absolute -left-[14%] bottom-[13%] w-[24%]" style={{ ["--tilt" as any]: "-6deg" }} />
+            <HoloCoin glyph="E" className="animate-floaty absolute -bottom-[5%] right-[16%] w-[28%]" style={{ ["--tilt" as any]: "3deg" }} />
+          </div>
+        }
       />
 
-      {/* Iridescent floating coins */}
-      <HoloCoin
-        glyph="T"
-        className="animate-floaty absolute -right-[12%] -top-[7%] w-[30%]"
-        style={{ '--tilt': '6deg' } as any}
+      <Split
+        title="Pay with" accent="no limits!"
+        body="Your card is generated instantly and lives in your inbox — not in an account we hold on your behalf."
+        art={
+          <MediaSlot
+            src="/screen-3.jpg" alt="Tap to pay" w={280} h={560}
+            className="aspect-[280/560] w-[280px] drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]"
+            rounded="rounded-[38px]"
+          />
+        }
+        bg="bg-white"
       />
-      <HoloCoin
-        glyph="◈"
-        className="animate-floaty-slow absolute -left-[20%] top-[34%] w-[26%]"
-        style={{ '--tilt': '-12deg' } as any}
-      />
-      <HoloCoin
-        glyph="$"
-        className="animate-floaty absolute -right-[22%] top-[40%] w-[30%]"
-        style={{ '--tilt': '6deg' } as any}
-      />
-      <HoloCoin
-        glyph="₽"
-        className="animate-floaty-slow absolute -left-[14%] bottom-[13%] w-[24%]"
-        style={{ '--tilt': '-6deg' } as any}
-      />
-      <HoloCoin
-        glyph="E"
-        className="animate-floaty absolute -bottom-[5%] right-[16%] w-[28%]"
-        style={{ '--tilt': '3deg' } as any}
-      />
-    </div>
-  }
-/>
 
-<Split
-  title="Pay with"
-  accent="no limits!"
-  body="Your card is generated instantly and lives in your inbox — not in an account we hold on your behalf."
-  art={
-    <MediaSlot
-      src="/screen-3.png"
-      alt="Tap to pay"
-      w={280}
-      h={560}
-      className="aspect-[280/560] w-[280px] drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]"
-      rounded="rounded-[38px]"
-    />
-  }
-  bg="bg-white"
-/>
       {/* ------------------------------------------------------- advantages */}
       <section id="advantages" className="bg-[#F7F8FA]">
         <div className={`${section} py-24`}>
@@ -343,17 +315,21 @@ export function LandingPage() {
           <p className={`mt-3 text-[17px] ${muted}`}>Advantages of a crypto card over traditional banks</p>
 
           <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <Feature art={<MediaSlot src="/icon-1.png" alt="Instant start, no registration" w={150} h={150} className="h-[150px] w-[150px]" rounded="rounded-xl" />} title="Instant start, no registration"
+            <Feature art={<MediaSlot src="/icon-1.jpg" alt="Instant start, no registration" w={150} h={150} className="h-[150px] w-[150px]" rounded="rounded-xl" />} title="Instant start, no registration"
               body="No need to register or pass KYC verification. Start using the card right away." />
-            <Feature art={<MediaSlot src="/icon-2.png" alt="Direct connection to your wallet" w={150} h={150} className="h-[150px] w-[150px]" rounded="rounded-xl" />} title="Direct connection to your wallet"
+            <Feature art={<MediaSlot src="/icon-2.jpg" alt="Direct connection to your wallet" w={150} h={150} className="h-[150px] w-[150px]" rounded="rounded-xl" />} title="Direct connection to your wallet"
               body="Your card is tied to the wallet you already control — there's no balance to top up." />
-            <Feature art={<MediaSlot src="/icon-3.png" alt="Funds security" w={150} h={150} className="h-[150px] w-[150px]" rounded="rounded-xl" />} title="Funds security"
-              body="We never take custody. Your keys stay yours and we can't move anything without you." />
-            <Feature art={<MediaSlot src="/icon-4.png" alt="Low cost" w={150} h={150} className="h-[150px] w-[150px]" rounded="rounded-xl" />} title="Low cost"
+            <Feature art={<MediaSlot src="/icon-3.jpg" alt="Card security" w={150} h={150} className="h-[150px] w-[150px]" rounded="rounded-xl" />} title="Card security"
+              body="Freeze and unfreeze your card, get transaction notifications, and set spending controls — all from your side." />
+            <Feature art={<MediaSlot src="/icon-4.jpg" alt="8% cashback rewards" w={150} h={150} className="h-[150px] w-[150px]" rounded="rounded-xl" />} title="8% cashback rewards"
+              body="Turn everyday spending into rewards. Enjoy 8% cashback on all purchases while experiencing secure, seamless payments." />
+            <Feature art={<MediaSlot src="/icon-5.jpg" alt="Instant access, no KYC" w={150} h={150} className="h-[150px] w-[150px]" rounded="rounded-xl" />} title="Instant access. No KYC."
+              body="Simply connect your wallet to your card and start spending anonymously. Stay in complete control with no personal data, IP address, or wallet balance tracking." />
+            <Feature art={<MediaSlot src="/icon-6.jpg" alt="Low cost" w={150} h={150} className="h-[150px] w-[150px]" rounded="rounded-xl" />} title="Low cost"
               body="Issuing a card is free. No hidden charges, no monthly costs." />
-            <Feature art={<MediaSlot src="/icon-5.png" alt="Nothing stored" w={150} h={150} className="h-[150px] w-[150px]" rounded="rounded-xl" />} title="Nothing stored"
+            <Feature art={<MediaSlot src="/icon-7.jpg" alt="Nothing stored" w={150} h={150} className="h-[150px] w-[150px]" rounded="rounded-xl" />} title="Nothing stored"
               body="We don't keep a database. Your details are used once to issue the card, then they're gone." />
-            <Feature art={<MediaSlot src="/icon-6.png" alt="Any wallet, any device" w={150} h={150} className="h-[150px] w-[150px]" rounded="rounded-xl" />} title="Any wallet, any device"
+            <Feature art={<MediaSlot src="/icon-8.jpg" alt="Any wallet, any device" w={150} h={150} className="h-[150px] w-[150px]" rounded="rounded-xl" />} title="Any wallet, any device"
               body="Browser extension, mobile app, or in-wallet browser — we find what you're running and open it." />
           </div>
         </div>
