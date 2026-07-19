@@ -281,7 +281,7 @@ export function LandingPage() {
         art={
           <div className="relative aspect-[280/560] w-[280px]">
             <MediaSlot
-              src="/screen-2.png" alt="Pay from your wallet" w={280} h={560}
+              src="/screen-2.jpg" alt="Pay from your wallet" w={280} h={560}
               className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]"
               rounded="rounded-[38px]"
             />
