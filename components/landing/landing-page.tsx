@@ -300,7 +300,7 @@ export function LandingPage() {
         body="Your card is generated instantly and lives in your inbox — not in an account we hold on your behalf."
         art={
           <MediaSlot
-            src="/screen-3.jpg" alt="Tap to pay" w={280} h={560}
+            src="/screen-3.png" alt="Tap to pay" w={280} h={560}
             className="aspect-[280/560] w-[280px] drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]"
             rounded="rounded-[38px]"
           />
