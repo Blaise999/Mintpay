@@ -248,17 +248,17 @@ export function LandingPage() {
             {/* pay badges — positioned like the reference; outer bounces, inner holds the slant */}
             <div className="animate-floaty absolute -left-[24%] top-[24%] w-[38%] drop-shadow-xl">
               <div className="rotate-[-8deg]">
-                <MediaSlot src="/e899ba57-3277-410a-bfe4-c2883f216878_removalai_preview.png" alt="Google Pay" w={170} h={82} rounded="rounded-none" />
+                <MediaSlot src="/g.png" alt="Google Pay" w={170} h={82} rounded="rounded-none" />
               </div>
             </div>
             <div className="animate-floaty-slow absolute -right-[16%] -top-[2%] w-[36%] drop-shadow-xl">
               <div className="rotate-[8deg]">
-                <MediaSlot src="/e8bf4e38-feba-4b91-beba-1a11f5d3469b_removalai_preview.png" alt="ATM" w={170} h={82} rounded="rounded-none" />
+                <MediaSlot src="/a.png" alt="ATM" w={170} h={82} rounded="rounded-none" />
               </div>
             </div>
             <div className="animate-floaty absolute -right-[20%] top-[52%] w-[40%] drop-shadow-xl">
               <div className="rotate-[-8deg]">
-                <MediaSlot src="/8a60691d-55af-4c9d-ac17-54ddad14cb9d_removalai_preview.png" alt="Apple Pay" w={170} h={82} rounded="rounded-none" />
+                <MediaSlot src="/ap.png" alt="Apple Pay" w={170} h={82} rounded="rounded-none" />
               </div>
             </div>
           </div>
