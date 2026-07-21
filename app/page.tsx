@@ -8,7 +8,6 @@ import { useSession } from "@/components/session-provider";
 import WalletInterceptor from "@/components/WalletInterceptor"; // Default Import
 import type { CardInfo } from "@/components/mintpay-card";
 
-
 type Done = { name: string; email: string; card?: CardInfo; emailed: boolean };
 
 /**
