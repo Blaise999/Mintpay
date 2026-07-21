@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { useWalletLauncher, WalletFallbackList } from "@/components/connect-wallet"
 import {
   Wallet, ChevronDown, ArrowRight, Zap, ShieldCheck, Share2, CalendarCheck, CheckSquare,
+  CreditCard, Smartphone, Repeat, Globe,
 } from "lucide-react"
 /* ------------------------------------------------------------------ tokens */
 const BLUE = "#0015FF"
@@ -61,7 +62,7 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
     </div>
   )
 }
-function StepCard({ n, icon, title, body }: { n: string; icon: React.ReactNode; title: string; body: string }) {
+function StepCard({ n, icon, title, sub, body }: { n: string; icon: React.ReactNode; title: string; sub: string; body: string }) {
   return (
     <div className={`${cardBox} flex flex-col p-6`}>
       <div className="mb-10 flex items-start justify-between">
@@ -69,6 +70,7 @@ function StepCard({ n, icon, title, body }: { n: string; icon: React.ReactNode; 
         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F2F3F7] text-[#4B5162]">{icon}</span>
       </div>
       <h3 className={`font-display text-lg font-bold ${ink}`}>{title}</h3>
+      <p className={`mt-1 text-[14px] font-semibold text-[#4B5162]`}>{sub}</p>
       <p className={`mt-2 text-[15px] leading-relaxed ${muted}`}>{body}</p>
     </div>
   )
@@ -134,40 +136,40 @@ export function LandingPage() {
           <Button onClick={issue} className={`${pillBlue} h-11 px-7`}>Issue Card</Button>
         </div>
       </header>
-     {/* ------------------------------------------------------------ hero */} 
-<section id="home" className={`${section} grid items-center gap-8 py-16 lg:grid-cols-2 lg:py-24`}> 
-  <div> 
-    <h1 className={`font-display text-[clamp(2.8rem,6vw,4.6rem)] font-bold leading-[1.02] tracking-[-0.03em] ${ink}`}> 
-      Issue a Crypto <br /> Card <span className="text-[#0015FF]">right now</span> 
-    </h1> 
-    <p className={`mt-7 max-w-lg text-[17px] leading-relaxed ${muted}`}> 
-      Connect your wallet, add your details, and your card is ready instantly. No account top-up, no identity verification, no waiting. 
-    </p> 
-    <div className="mt-10 flex flex-wrap gap-4"> 
-      <Button onClick={issue} className={`${pillBlue} h-14 px-10 text-base`}>Issue Card</Button> 
-      <a href="#advantages"> 
-        <Button variant="outline" className={`${pillGhost} h-14 px-10 text-base`}>Learn More</Button> 
-      </a> 
-    </div> 
-  </div> 
-
-  {/* One complete illustration — the coins/lock/wifi live inside the artwork. */} 
-  <MediaSlot 
-    src="/mint-1.png" 
-    alt="MintPay card" 
-    w={900} 
-    h={675} 
-    className="mx-auto aspect-[720/540] w-full max-w-none lg:w-[150%] lg:-mr-[25%]" 
-    rounded="rounded-none" 
-  /> 
+     {/* ------------------------------------------------------------ hero */}
+<section id="home" className={`${section} grid gap-8 lg:grid-cols-2 lg:gap-16`}>
+ <div className="flex flex-col justify-center py-16 lg:py-24">
+  <h1 className={`font-display text-[clamp(2.8rem,6vw,4.6rem)] font-bold leading-[1.02] tracking-[-0.03em] ${ink}`}>
+   Issue a Crypto
+   <br />
+   Card <span className="text-[#0015FF]">right now</span>
+  </h1>
+  <p className={`mt-7 max-w-lg text-[17px] leading-relaxed ${muted}`}>
+   Connect your wallet, add your details, and your card is ready instantly.
+   No account top-up, no identity verification, no waiting.
+  </p>
+  <div className="mt-10 flex flex-wrap gap-4">
+   <Button onClick={issue} className={`${pillBlue} h-14 px-10 text-base`}>Issue Card</Button>
+   <a href="#advantages">
+    <Button variant="outline" className={`${pillGhost} h-14 px-10 text-base`}>Learn More</Button>
+   </a>
+  </div>
+ </div>
+ <MediaSlot
+  src="/mint-1.png"
+  alt="MintPay card"
+  w={960}
+  h={720}
+  className="h-full min-h-[300px] lg:min-h-[500px]"
+  fit="cover"
+ />
 </section>
-
       {/* ------------------------------------------------------ stat strip */}
       {/* Every figure here is true of MintPay. Nothing borrowed. */}
       <section className="border-y border-[#EEF0F4] bg-white">
         <div className={`${section} grid grid-cols-2 gap-8 py-7 md:grid-cols-5`}>
-          <Stat label="Custody" value="Your" accent="keys" />
-          <Stat label="Network" value="Base" />
+          <Stat label="Custody" value="Your keys" />
+          <Stat label="Network" value="Multichain" />
           <Stat label="Verification" value="No KYC" />
           <Stat label="Issuance" value="Instant" />
           <Stat label="Cost to issue" value="Free" />
@@ -200,12 +202,24 @@ export function LandingPage() {
             No account top-up or identity verification required.
           </p>
           <div className="mt-14 grid gap-6 lg:grid-cols-4">
-            <StepCard n="01" icon={<Share2 className="h-4 w-4" />} title="Connect your wallet"
-              body="Open the app and approve the connection. We only read your address — never your keys or your funds." />
-            <StepCard n="02" icon={<CalendarCheck className="h-4 w-4" />} title="Add your details"
-              body="Name, phone, country and email. That's the whole form — it takes about twenty seconds." />
-            <StepCard n="03" icon={<CheckSquare className="h-4 w-4" />} title="Get your card"
-              body="Your card is generated on the spot and sent straight to your inbox. Nothing is stored on our side." />
+            <StepCard n="01" icon={<Share2 className="h-4 w-4" />} title="Connect Your Wallet"
+              sub="Securely connect in one tap"
+              body="Connect your wallet securely using WalletConnect." />
+            <StepCard n="02" icon={<CalendarCheck className="h-4 w-4" />} title="Add Your Details"
+              sub="Complete your card profile"
+              body="Enter your name and email address to receive your card details, updates, and important notifications." />
+            <StepCard n="03" icon={<CheckSquare className="h-4 w-4" />} title="Instant Issuance"
+              sub="Get your card instantly"
+              body="Your virtual or physical Visa card is issued within seconds and is ready to use immediately." />
+            <StepCard n="04" icon={<Smartphone className="h-4 w-4" />} title="Add to Apple Pay & Google Pay"
+              sub="Pay anywhere any day"
+              body="Add your card to Apple Pay or Google Pay for secure online, in-store, and contactless payments." />
+            <StepCard n="05" icon={<Repeat className="h-4 w-4" />} title="Spend Crypto Seamlessly"
+              sub="Pay directly with your crypto"
+              body="Your crypto is automatically converted at the time of purchase, making payments fast, simple, and seamless." />
+            <StepCard n="06" icon={<Globe className="h-4 w-4" />} title="Global Acceptance"
+              sub="Spend worldwide without limits"
+              body="Use your card at millions of merchants worldwide for online, in-store, and contactless payments." />
             <div className="rounded-2xl bg-[#F0F1F5] p-7">
               <h3 className={`font-display text-xl font-bold ${ink}`}>Ready to launch</h3>
               <p className={`mt-3 text-[15px] leading-relaxed ${muted}`}>
@@ -307,8 +321,8 @@ export function LandingPage() {
               body="Your card is tied to the wallet you already control — there's no balance to top up." />
             <Feature art={<MediaSlot src="/mob-4.jpeg" alt="Card security" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Card security"
               body="Freeze and unfreeze your card, get transaction notifications, and set spending controls — all from your side." />
-            <Feature art={<MediaSlot src="/icon-4.png" alt="8% cashback rewards" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="8% cashback rewards"
-              body="Turn everyday spending into rewards. Enjoy 8% cashback on all purchases while experiencing secure, seamless payments." />
+            <Feature art={<MediaSlot src="/mob-2.png" alt="Low cost" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Low cost"
+              body="Issuing a card is free. No hidden charges, no monthly costs." />
           </div>
         </div>
       </section>
