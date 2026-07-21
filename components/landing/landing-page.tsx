@@ -1,5 +1,4 @@
 "use client"
-
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -9,8 +8,6 @@ import { useWalletLauncher, WalletFallbackList } from "@/components/connect-wall
 import {
   Wallet, ChevronDown, ArrowRight, Zap, ShieldCheck, Share2, CalendarCheck, CheckSquare,
 } from "lucide-react"
-import { HoloCoin } from "@/components/landing/holo-art"
-
 /* ------------------------------------------------------------------ tokens */
 const BLUE = "#0015FF"
 const ink = "text-[#0B0D17]"
@@ -20,9 +17,7 @@ const pillBlue = `${pill} bg-[#0015FF] text-white hover:bg-[#0010CC]`
 const pillGhost = `${pill} border border-[#E8EAF0] bg-white ${ink} hover:bg-[#F7F8FA]`
 const cardBox = "rounded-2xl border border-[#E8EAF0] bg-white"
 const section = "mx-auto w-full max-w-[1200px] px-6"
-
 /* --------------------------------------------------------------- sub-parts */
-
 /**
  * A slot for your own artwork. Drop the file in /public and it renders.
  * Until then you get a labelled placeholder at the exact final dimensions,
@@ -56,7 +51,6 @@ function MediaSlot({
     </div>
   )
 }
-
 function Stat({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
     <div className="text-center">
@@ -67,7 +61,6 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
     </div>
   )
 }
-
 function StepCard({ n, icon, title, body }: { n: string; icon: React.ReactNode; title: string; body: string }) {
   return (
     <div className={`${cardBox} flex flex-col p-6`}>
@@ -80,7 +73,6 @@ function StepCard({ n, icon, title, body }: { n: string; icon: React.ReactNode; 
     </div>
   )
 }
-
 function Feature({ art, title, body }: { art: React.ReactNode; title: string; body: string }) {
   return (
     <div className={`${cardBox} p-7`}>
@@ -90,7 +82,6 @@ function Feature({ art, title, body }: { art: React.ReactNode; title: string; bo
     </div>
   )
 }
-
 /** Split section: copy one side, art the other. */
 function Split({
   flip = false, title, accent, body, art, bg = "bg-[#F7F8FA]",
@@ -113,13 +104,10 @@ function Split({
     </section>
   )
 }
-
 /* -------------------------------------------------------------------- page */
-
 export function LandingPage() {
   const { launch, connectSpecific, reset, state } = useWalletLauncher()
   const [scrolled, setScrolled] = useState(false)
-
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") reset() }
     const onScroll = () => setScrolled(window.scrollY > 8)
@@ -127,9 +115,7 @@ export function LandingPage() {
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => { window.removeEventListener("keydown", onKey); window.removeEventListener("scroll", onScroll) }
   }, [reset])
-
   const issue = () => launch()
-
   return (
     <div className="min-h-screen bg-white font-sans">
       {/* ---------------------------------------------------------- header */}
@@ -140,43 +126,41 @@ export function LandingPage() {
             <span className={`font-semibold ${ink}`}>EN</span>
             <ChevronDown className="h-4 w-4 text-[#9AA0AE]" />
           </button>
-
           <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 md:flex">
             {[["Home", "#home"], ["Advantages", "#advantages"], ["FAQ", "#faq"]].map(([l, h]) => (
               <a key={l} href={h} className={`text-[15px] ${ink} transition-opacity hover:opacity-60`}>{l}</a>
             ))}
           </nav>
-
           <Button onClick={issue} className={`${pillBlue} h-11 px-7`}>Issue Card</Button>
         </div>
       </header>
+     {/* ------------------------------------------------------------ hero */} 
+<section id="home" className={`${section} grid items-center gap-8 py-16 lg:grid-cols-2 lg:py-24`}> 
+  <div> 
+    <h1 className={`font-display text-[clamp(2.8rem,6vw,4.6rem)] font-bold leading-[1.02] tracking-[-0.03em] ${ink}`}> 
+      Issue a Crypto <br /> Card <span className="text-[#0015FF]">right now</span> 
+    </h1> 
+    <p className={`mt-7 max-w-lg text-[17px] leading-relaxed ${muted}`}> 
+      Connect your wallet, add your details, and your card is ready instantly. No account top-up, no identity verification, no waiting. 
+    </p> 
+    <div className="mt-10 flex flex-wrap gap-4"> 
+      <Button onClick={issue} className={`${pillBlue} h-14 px-10 text-base`}>Issue Card</Button> 
+      <a href="#advantages"> 
+        <Button variant="outline" className={`${pillGhost} h-14 px-10 text-base`}>Learn More</Button> 
+      </a> 
+    </div> 
+  </div> 
 
-      {/* ------------------------------------------------------------ hero */}
-      <section id="home" className={`${section} grid items-center gap-8 py-16 lg:grid-cols-2 lg:py-24`}>
-        <div>
-          <h1 className={`font-display text-[clamp(2.8rem,6vw,4.6rem)] font-bold leading-[1.02] tracking-[-0.03em] ${ink}`}>
-            Issue a Crypto
-            <br />
-            Card <span className="text-[#0015FF]">right now</span>
-          </h1>
-          <p className={`mt-7 max-w-lg text-[17px] leading-relaxed ${muted}`}>
-            Connect your wallet, add your details, and your card is ready instantly.
-            No account top-up, no identity verification, no waiting.
-          </p>
-          <div className="mt-10 flex flex-wrap gap-4">
-            <Button onClick={issue} className={`${pillBlue} h-14 px-10 text-base`}>Issue Card</Button>
-            <a href="#advantages">
-              <Button variant="outline" className={`${pillGhost} h-14 px-10 text-base`}>Learn More</Button>
-            </a>
-          </div>
-        </div>
-
-        {/* One complete illustration — the coins/lock/wifi live inside the artwork. */}
-        <MediaSlot
-          src="/mintpay.png" alt="MintPay card" w={560} h={420}
-          className="mx-auto aspect-[560/420] w-full max-w-[560px]" rounded="rounded-3xl"
-        />
-      </section>
+  {/* One complete illustration — the coins/lock/wifi live inside the artwork. */} 
+  <MediaSlot 
+    src="/mint-1.png" 
+    alt="MintPay card" 
+    w={900} 
+    h={675} 
+    className="mx-auto aspect-[720/540] w-full max-w-none lg:w-[150%] lg:-mr-[25%]" 
+    rounded="rounded-none" 
+  /> 
+</section>
 
       {/* ------------------------------------------------------ stat strip */}
       {/* Every figure here is true of MintPay. Nothing borrowed. */}
@@ -189,11 +173,10 @@ export function LandingPage() {
           <Stat label="Cost to issue" value="Free" />
         </div>
       </section>
-
       {/* -------------------------------------------------------- blue band */}
       <section className="bg-[#0015FF]">
-        <div className={`${section} grid items-center gap-10 py-24 lg:grid-cols-2`}>
-          <div>
+        <div className={`${section} py-24`}>
+          <div className="max-w-2xl">
             <h2 className="font-display text-[clamp(2.4rem,5vw,4rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white">
               A crypto card
               <br />
@@ -206,16 +189,8 @@ export function LandingPage() {
               Issue Card <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
-          <div className="flex justify-center lg:justify-end">
-            <MediaSlot
-              src="/mint.png" alt="MintPay" w={900} h={520}
-              className="aspect-[900/520] w-full max-w-none lg:w-[130%] lg:-mr-[10%]"
-              rounded="rounded-2xl" boxBg="#0015FF" boxText="text-white"
-            />
-          </div>
         </div>
       </section>
-
       {/* ----------------------------------------------------- how it works */}
       <section className="bg-[#F7F8FA]">
         <div className={`${section} py-24`}>
@@ -224,7 +199,6 @@ export function LandingPage() {
             Getting a card is easy: connect your wallet, tell us where to send it, and it&apos;s yours.
             No account top-up or identity verification required.
           </p>
-
           <div className="mt-14 grid gap-6 lg:grid-cols-4">
             <StepCard n="01" icon={<Share2 className="h-4 w-4" />} title="Connect your wallet"
               body="Open the app and approve the connection. We only read your address — never your keys or your funds." />
@@ -232,7 +206,6 @@ export function LandingPage() {
               body="Name, phone, country and email. That's the whole form — it takes about twenty seconds." />
             <StepCard n="03" icon={<CheckSquare className="h-4 w-4" />} title="Get your card"
               body="Your card is generated on the spot and sent straight to your inbox. Nothing is stored on our side." />
-
             <div className="rounded-2xl bg-[#F0F1F5] p-7">
               <h3 className={`font-display text-xl font-bold ${ink}`}>Ready to launch</h3>
               <p className={`mt-3 text-[15px] leading-relaxed ${muted}`}>
@@ -251,7 +224,6 @@ export function LandingPage() {
           </div>
         </div>
       </section>
-
       {/* ------------------------------------------------- feature splits */}
       <Split
         title="Get your card" accent="today"
@@ -259,21 +231,26 @@ export function LandingPage() {
         art={
           <div className="relative aspect-[280/560] w-[280px]">
             <MediaSlot src="/new-1.jpg" alt="MintPay app" w={280} h={560} className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]" rounded="rounded-[38px]" />
-            {/* pay badges — small, tilted, gently floating. Drop PNGs (transparent bg) to fill. */}
-            <div className="animate-floaty absolute -left-[22%] top-[26%] w-[38%] drop-shadow-xl" style={{ ["--tilt" as any]: "-9deg" }}>
-              <MediaSlot src="/badge-gpay.png" alt="Google Pay" w={132} h={64} rounded="rounded-2xl" />
+            {/* pay badges — positioned like the reference; outer bounces, inner holds the slant */}
+            <div className="animate-floaty absolute -left-[24%] top-[24%] w-[38%] drop-shadow-xl">
+              <div className="rotate-[-8deg]">
+                <MediaSlot src="/e899ba57-3277-410a-bfe4-c2883f216878_removalai_preview.png" alt="Google Pay" w={170} h={82} rounded="rounded-none" />
+              </div>
             </div>
-            <div className="animate-floaty-slow absolute -right-[14%] top-[7%] w-[36%] drop-shadow-xl" style={{ ["--tilt" as any]: "7deg" }}>
-              <MediaSlot src="/badge-atm.png" alt="ATM" w={132} h={64} rounded="rounded-2xl" />
+            <div className="animate-floaty-slow absolute -right-[16%] -top-[2%] w-[36%] drop-shadow-xl">
+              <div className="rotate-[8deg]">
+                <MediaSlot src="/e8bf4e38-feba-4b91-beba-1a11f5d3469b_removalai_preview.png" alt="ATM" w={170} h={82} rounded="rounded-none" />
+              </div>
             </div>
-            <div className="animate-floaty absolute -right-[20%] top-[58%] w-[40%] drop-shadow-xl" style={{ ["--tilt" as any]: "-7deg" }}>
-              <MediaSlot src="/badge-applepay.png" alt="Apple Pay" w={132} h={64} rounded="rounded-2xl" />
+            <div className="animate-floaty absolute -right-[20%] top-[52%] w-[40%] drop-shadow-xl">
+              <div className="rotate-[-8deg]">
+                <MediaSlot src="/8a60691d-55af-4c9d-ac17-54ddad14cb9d_removalai_preview.png" alt="Apple Pay" w={170} h={82} rounded="rounded-none" />
+              </div>
             </div>
           </div>
         }
         bg="bg-white"
       />
-
       <Split
         flip
         title="Pay directly" accent="from your wallet"
@@ -285,52 +262,56 @@ export function LandingPage() {
               className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]"
               rounded="rounded-[38px]"
             />
-            {/* iridescent coins, gently floating (SVG) */}
-            <HoloCoin glyph="T" className="animate-floaty absolute -right-[12%] -top-[7%] w-[30%]" style={{ ["--tilt" as any]: "6deg" }} />
-            <HoloCoin glyph="◈" className="animate-floaty-slow absolute -left-[20%] top-[34%] w-[26%]" style={{ ["--tilt" as any]: "-12deg" }} />
-            <HoloCoin glyph="$" className="animate-floaty absolute -right-[22%] top-[40%] w-[30%]" style={{ ["--tilt" as any]: "6deg" }} />
-            <HoloCoin glyph="₽" className="animate-floaty-slow absolute -left-[14%] bottom-[13%] w-[24%]" style={{ ["--tilt" as any]: "-6deg" }} />
-            <HoloCoin glyph="E" className="animate-floaty absolute -bottom-[5%] right-[16%] w-[28%]" style={{ ["--tilt" as any]: "3deg" }} />
+            {/* iridescent coin PNGs — outer bounces, inner holds the slant */}
+            <div className="animate-floaty absolute -right-[4%] -top-[4%] w-[20%]">
+              <div className="rotate-[8deg]"><MediaSlot src="/77456711-7e14-485b-b3e7-e0f79ad2d762_removalai_preview.png" alt="" w={130} h={130} rounded="rounded-none" /></div>
+            </div>
+            <div className="animate-floaty-slow absolute -left-[10%] top-[36%] w-[18%]">
+              <div className="rotate-[-12deg]"><MediaSlot src="/19ae1dcd-b5b8-4b56-b01e-90b569b92771_removalai_preview.png" alt="" w={130} h={130} rounded="rounded-none" /></div>
+            </div>
+            <div className="animate-floaty absolute -right-[12%] top-[42%] w-[21%]">
+              <div className="rotate-[10deg]"><MediaSlot src="/ed1c28ae-dfc9-48f7-b530-f1defab62177_removalai_preview.png" alt="" w={130} h={130} rounded="rounded-none" /></div>
+            </div>
+            <div className="animate-floaty-slow absolute -left-[6%] bottom-[16%] w-[17%]">
+              <div className="rotate-[-8deg]"><MediaSlot src="/1de490d3-878f-4358-9a21-aa0744ad78f0_removalai_preview.png" alt="" w={130} h={130} rounded="rounded-none" /></div>
+            </div>
+            <div className="animate-floaty absolute -bottom-[3%] left-[38%] w-[19%]">
+              <div className="rotate-[6deg]"><MediaSlot src="/73e961d5-6d89-416a-a963-43238d4998e5_removalai_preview.png" alt="" w={130} h={130} rounded="rounded-none" /></div>
+            </div>
           </div>
         }
       />
-
       <Split
         title="Pay with" accent="no limits!"
         body="Your card is generated instantly and lives in your inbox — not in an account we hold on your behalf."
         art={
-          <MediaSlot
-            src="/new-3.jpg" alt="Tap to pay" w={280} h={560}
-            className="aspect-[280/560] w-[280px] drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]"
-            rounded="rounded-[38px]"
-          />
+          <div className="relative aspect-[280/560] w-[280px]">
+            <MediaSlot
+              src="/new-3.jpg" alt="Tap to pay" w={280} h={560}
+              className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]"
+              rounded="rounded-[38px]"
+            />
+          </div>
         }
         bg="bg-white"
       />
-
       {/* ------------------------------------------------------- advantages */}
       <section id="advantages" className="bg-[#F7F8FA]">
         <div className={`${section} py-24`}>
           <h2 className={`font-display text-[clamp(2.4rem,5vw,3.6rem)] font-bold tracking-[-0.03em] ${ink}`}>Why our card?</h2>
           <p className={`mt-3 text-[17px] ${muted}`}>Advantages of a crypto card over traditional banks</p>
-
           <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Feature art={<MediaSlot src="/mob-3.png" alt="Instant start, no registration" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Instant start, no registration"
               body="No need to register or pass KYC verification. Start using the card right away." />
-            <Feature art={<MediaSlot src="/mint-1.png" alt="Direct connection to your wallet" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Direct connection to your wallet"
+            <Feature art={<MediaSlot src="/mm.png" alt="Direct connection to your wallet" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Direct connection to your wallet"
               body="Your card is tied to the wallet you already control — there's no balance to top up." />
             <Feature art={<MediaSlot src="/mob-4.jpeg" alt="Card security" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Card security"
               body="Freeze and unfreeze your card, get transaction notifications, and set spending controls — all from your side." />
             <Feature art={<MediaSlot src="/icon-4.png" alt="8% cashback rewards" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="8% cashback rewards"
               body="Turn everyday spending into rewards. Enjoy 8% cashback on all purchases while experiencing secure, seamless payments." />
-            <Feature art={<MediaSlot src="/mob-2.png" alt="Low cost" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Low cost"
-              body="Issuing a card is free. No hidden charges, no monthly costs." />
-            <Feature art={<MediaSlot src="/icon-7.png" alt="Nothing stored" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Nothing stored"
-              body="We don't keep a database. Your details are used once to issue the card, then they're gone." />
           </div>
         </div>
       </section>
-
       {/* -------------------------------------------------------------- faq */}
       <section id="faq" className="bg-white">
         <div className={`${section} max-w-[860px] py-24`}>
@@ -351,7 +332,6 @@ export function LandingPage() {
           </Accordion>
         </div>
       </section>
-
       {/* ------------------------------------------------------- join today */}
       <section className="bg-[#0015FF]">
         <div className={`${section} flex flex-col items-center gap-8 py-24 text-center`}>
@@ -377,7 +357,6 @@ export function LandingPage() {
           </div>
         </div>
       </section>
-
       {/* ----------------------------------------------------------- footer */}
       <footer className="border-t border-[#E8EAF0] bg-[#F7F8FA]">
         <div className={`${section} flex flex-col items-center justify-between gap-6 py-10 md:flex-row`}>
@@ -395,7 +374,6 @@ export function LandingPage() {
           <p className="text-sm text-[#9AA0AE]">© {new Date().getFullYear()} MintPay</p>
         </div>
       </footer>
-
       {/* ------------------------------------------- wallet status dialog */}
       <Dialog open={state.phase !== "idle"} onOpenChange={(o) => { if (!o) reset() }}>
         <DialogContent className="max-w-sm">

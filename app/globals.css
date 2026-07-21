@@ -102,8 +102,8 @@ h1, h2, h3, .font-display {
 
 /* gentle hover for floating badges/coins */
 @keyframes floaty {
-  0%, 100% { transform: translateY(0) rotate(var(--tilt, 0deg)); }
-  50%      { transform: translateY(-10px) rotate(var(--tilt, 0deg)); }
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
 }
 .animate-floaty { animation: floaty 4s ease-in-out infinite; }
 .animate-floaty-slow { animation: floaty 5.5s ease-in-out infinite; }
