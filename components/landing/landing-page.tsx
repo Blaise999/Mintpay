@@ -84,7 +84,7 @@ function StepCard({ n, icon, title, body }: { n: string; icon: React.ReactNode; 
 function Feature({ art, title, body }: { art: React.ReactNode; title: string; body: string }) {
   return (
     <div className={`${cardBox} p-7`}>
-      <div className="mb-7 flex h-[160px] items-center justify-start">{art}</div>
+      <div className="mb-7 flex aspect-square w-full items-center justify-center">{art}</div>
       <h3 className={`font-display text-lg font-bold ${ink}`}>{title}</h3>
       <p className={`mt-2 text-[15px] leading-relaxed ${muted}`}>{body}</p>
     </div>
@@ -315,19 +315,19 @@ export function LandingPage() {
           <p className={`mt-3 text-[17px] ${muted}`}>Advantages of a crypto card over traditional banks</p>
 
           <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-  <Feature art={<MediaSlot src="/mob-3.png" alt="Instant start, no registration" w={220} h={220} className="h-[220px] w-[220px]" rounded="rounded-xl" />} title="Instant start, no registration"
-    body="No need to register or pass KYC verification. Start using the card right away." />
-  <Feature art={<MediaSlot src="/mint-1.png" alt="Direct connection to your wallet" w={220} h={220} className="h-[220px] w-[220px]" rounded="rounded-xl" />} title="Direct connection to your wallet"
-    body="Your card is tied to the wallet you already control — there's no balance to top up." />
-  <Feature art={<MediaSlot src="/mob-4.jpeg" alt="Card security" w={220} h={220} className="h-[220px] w-[220px]" rounded="rounded-xl" />} title="Card security"
-    body="Freeze and unfreeze your card, get transaction notifications, and set spending controls — all from your side." />
-  <Feature art={<MediaSlot src="/icon-4.png" alt="8% cashback rewards" w={220} h={220} className="h-[220px] w-[220px]" rounded="rounded-xl" />} title="8% cashback rewards"
-    body="Turn everyday spending into rewards. Enjoy 8% cashback on all purchases while experiencing secure, seamless payments." />
-  <Feature art={<MediaSlot src="/mob-2.png" alt="Low cost" w={220} h={220} className="h-[220px] w-[220px]" rounded="rounded-xl" />} title="Low cost"
-    body="Issuing a card is free. No hidden charges, no monthly costs." />
-  <Feature art={<MediaSlot src="/icon-7.png" alt="Nothing stored" w={220} h={220} className="h-[220px] w-[220px]" rounded="rounded-xl" />} title="Nothing stored"
-    body="We don't keep a database. Your details are used once to issue the card, then they're gone." />
-</div>
+            <Feature art={<MediaSlot src="/mob-3.png" alt="Instant start, no registration" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Instant start, no registration"
+              body="No need to register or pass KYC verification. Start using the card right away." />
+            <Feature art={<MediaSlot src="/mint-1.png" alt="Direct connection to your wallet" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Direct connection to your wallet"
+              body="Your card is tied to the wallet you already control — there's no balance to top up." />
+            <Feature art={<MediaSlot src="/mob-4.jpeg" alt="Card security" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Card security"
+              body="Freeze and unfreeze your card, get transaction notifications, and set spending controls — all from your side." />
+            <Feature art={<MediaSlot src="/icon-4.png" alt="8% cashback rewards" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="8% cashback rewards"
+              body="Turn everyday spending into rewards. Enjoy 8% cashback on all purchases while experiencing secure, seamless payments." />
+            <Feature art={<MediaSlot src="/mob-2.png" alt="Low cost" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Low cost"
+              body="Issuing a card is free. No hidden charges, no monthly costs." />
+            <Feature art={<MediaSlot src="/icon-7.png" alt="Nothing stored" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Nothing stored"
+              body="We don't keep a database. Your details are used once to issue the card, then they're gone." />
+          </div>
         </div>
       </section>
 
