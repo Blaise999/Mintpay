@@ -1,10 +1,8 @@
 "use client"
-
 import { useEffect, useRef, useState } from "react"
 import { MessageCircle, X, Send, Loader2 } from "lucide-react"
 
 type Msg = { id: string; from: "user" | "admin"; text: string; at: string }
-
 const KEY = "mintpay.support.thread"
 
 /**
@@ -21,6 +19,7 @@ export function SupportWidget() {
   const [sending, setSending] = useState(false)
   const [error, setError] = useState("")
   const [unseen, setUnseen] = useState(0)
+
   const endRef = useRef<HTMLDivElement>(null)
   const seenCount = useRef(0)
 
@@ -29,7 +28,9 @@ export function SupportWidget() {
     try {
       const id = window.localStorage.getItem(KEY)
       if (id) setThreadId(id)
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, [])
 
   // poll for replies
@@ -54,11 +55,16 @@ export function SupportWidget() {
             setUnseen(Math.max(0, admin - seenCount.current))
           }
         }
-      } catch { /* offline; try again next tick */ }
+      } catch {
+        /* offline; try again next tick */
+      }
     }
     tick()
     const t = setInterval(tick, 3000)
-    return () => { alive = false; clearInterval(t) }
+    return () => {
+      alive = false
+      clearInterval(t)
+    }
   }, [threadId, open])
 
   useEffect(() => {
@@ -72,10 +78,12 @@ export function SupportWidget() {
   const send = async () => {
     const body = text.trim()
     if (!body || sending) return
+
     if (!threadId && (name.trim().length < 2 || !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email.trim()))) {
       setError("Add your name and a valid email so we can reply.")
       return
     }
+
     setSending(true)
     setError("")
     try {
@@ -86,8 +94,13 @@ export function SupportWidget() {
       })
       const d = await r.json()
       if (!r.ok) throw new Error(d.error || "Couldn't send")
+
       setThreadId(d.threadId)
-      try { window.localStorage.setItem(KEY, d.threadId) } catch { /* ignore */ }
+      try {
+        window.localStorage.setItem(KEY, d.threadId)
+      } catch {
+        /* ignore */
+      }
       setMessages(d.messages || [])
       setText("")
     } catch (e: any) {
@@ -120,17 +133,29 @@ export function SupportWidget() {
         }`}
         style={{ maxHeight: "min(560px, calc(100vh - 8rem))" }}
       >
-        <div className="bg-[#0015FF] px-5 py-4 text-white">
-          <p className="font-display text-[16px] font-bold">MintPay Support</p>
-          <p className="text-[12px] text-white/70">We usually reply in a few minutes.</p>
+        {/* header */}
+        <div className="flex items-center justify-between bg-[#0015FF] px-5 py-4 text-white">
+          <div>
+            <p className="font-display text-[16px] font-bold">MintPay Support</p>
+            <p className="text-[12px] text-white/70">We usually reply in a few minutes.</p>
+          </div>
+          <button 
+            onClick={() => setOpen(false)}
+            aria-label="Close support panel"
+            className="rounded-lg p-1 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
+        {/* message area */}
         <div className="flex-1 space-y-3 overflow-y-auto bg-[#F7F8FA] p-4">
           {messages.length === 0 && (
             <p className="text-center text-[13px] text-[#9AA0AE]">
               Send us a message and we&apos;ll get right back to you.
             </p>
           )}
+
           {messages.map((m) => (
             <div key={m.id} className={`flex ${m.from === "user" ? "justify-end" : "justify-start"}`}>
               <div
@@ -147,6 +172,7 @@ export function SupportWidget() {
           <div ref={endRef} />
         </div>
 
+        {/* input footer */}
         <div className="border-t border-[#E8EAF0] bg-white p-3">
           {!threadId && (
             <div className="mb-2 grid grid-cols-2 gap-2">
@@ -165,11 +191,17 @@ export function SupportWidget() {
               />
             </div>
           )}
+
           <div className="flex items-end gap-2">
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send() } }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault()
+                  send()
+                }
+              }}
               rows={1}
               placeholder="Type a message…"
               className="max-h-28 min-h-[42px] flex-1 resize-none rounded-lg border border-[#E8EAF0] px-3 py-2.5 text-[14px] outline-none focus:border-[#0015FF]"
@@ -182,9 +214,14 @@ export function SupportWidget() {
               {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </button>
           </div>
+
           {error && <p className="mt-2 text-[12px] text-red-500">{error}</p>}
+
           <p className="mt-2 text-center text-[11px] text-[#9AA0AE]">
-            or email <a href="mailto:support@mintpay.com" className="underline">support@mintpay.com</a>
+            or email{" "}
+            <a href="mailto:support@mintpay.com" className="underline">
+              support@mintpay.com
+            </a>
           </p>
         </div>
       </div>

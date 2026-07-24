@@ -292,28 +292,28 @@ export function LandingPage() {
       </section>
       {/* ------------------------------------------------- feature splits */}
       <Split
-        title="Get your card" accent="today"
-        body="Connect the wallet you already use and issue your MintPay card in a minute."
-        art={
-          <div className="relative aspect-[280/560] w-[280px]">
-            <MediaSlot src="/new-1.jpg" alt="MintPay app" w={280} h={560} className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]" rounded="rounded-[38px]" />
-            {/* pay badges — outer bounces, inner holds the slant */}
-            <div className="animate-floaty absolute -left-[24%] top-[24%] w-[38%] drop-shadow-xl">
-              <div className="rotate-[-8deg]">
-                <MediaSlot src="/g.png" alt="Google Pay" w={170} h={82} rounded="rounded-none" />
-              </div>
-            </div>
-            <div className="animate-floaty-slow absolute -right-[16%] -top-[2%] w-[36%] drop-shadow-xl">
-              <div className="rotate-[8deg]">
-                <MediaSlot src="/a.png" alt="ATM" w={170} h={82} rounded="rounded-none" />
-              </div>
-            </div>
-            <div className="animate-floaty absolute -right-[20%] top-[52%] w-[40%] drop-shadow-xl">
-              <div className="rotate-[-8deg]">
-                <MediaSlot src="/ap.png" alt="Apple Pay" w={170} h={82} rounded="rounded-none" />
-              </div>
-            </div>
-          </div>
+  title="Get your card" accent="today"
+  body="Connect the wallet you already use and issue your MintPay card in a minute."
+  art={
+    <div className="relative aspect-[280/560] w-[280px]">
+      <MediaSlot src="/new-1.jpg" alt="MintPay app" w={280} h={560} className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]" rounded="rounded-[38px]" />
+      {/* pay badges — outer bounces, inner holds the slant */}
+      <div className="animate-floaty absolute -left-[24%] top-[24%] w-[32%] drop-shadow-xl">
+        <div className="rotate-[-8deg]">
+          <MediaSlot src="/g.png" alt="Google Pay" w={145} h={70} rounded="rounded-none" />
+        </div>
+      </div>
+      <div className="animate-floaty-slow absolute -right-[16%] -top-[2%] w-[30%] drop-shadow-xl">
+        <div className="rotate-[8deg]">
+          <MediaSlot src="/a.png" alt="ATM" w={145} h={70} rounded="rounded-none" />
+        </div>
+      </div>
+      <div className="animate-floaty absolute -right-[20%] top-[52%] w-[34%] drop-shadow-xl">
+        <div className="rotate-[-8deg]">
+          <MediaSlot src="/ap.png" alt="Apple Pay" w={145} h={70} rounded="rounded-none" />
+        </div>
+      </div>
+    </div>
         }
         bg="bg-white"
       />
