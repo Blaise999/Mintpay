@@ -5,9 +5,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { useWalletLauncher, WalletFallbackList } from "@/components/connect-wallet"
+import { SupportWidget } from "@/components/support-widget"
 import {
-  Wallet, ChevronDown, ArrowRight, Zap, ShieldCheck, Share2, CalendarCheck, CheckSquare,
-  CreditCard, Smartphone, Repeat, Globe,
+  Wallet, ArrowRight, Menu, X, Zap, ShieldCheck, Share2, CalendarCheck, CheckSquare,
+  Smartphone, Repeat, Globe,
 } from "lucide-react"
 /* ------------------------------------------------------------------ tokens */
 const BLUE = "#0015FF"
@@ -18,12 +19,8 @@ const pillBlue = `${pill} bg-[#0015FF] text-white hover:bg-[#0010CC]`
 const pillGhost = `${pill} border border-[#E8EAF0] bg-white ${ink} hover:bg-[#F7F8FA]`
 const cardBox = "rounded-2xl border border-[#E8EAF0] bg-white"
 const section = "mx-auto w-full max-w-[1200px] px-6"
+const NAV: [string, string][] = [["Home", "#home"], ["Advantages", "#advantages"], ["FAQ", "#faq"]]
 /* --------------------------------------------------------------- sub-parts */
-/**
- * A slot for your own artwork. Drop the file in /public and it renders.
- * Until then you get a labelled placeholder at the exact final dimensions,
- * so the layout never shifts when the real image lands.
- */
 function MediaSlot({
   src, alt, w, h, className = "", rounded = "rounded-2xl", boxBg, boxText, fit = "contain",
 }: { src: string; alt: string; w: number; h: number; className?: string; rounded?: string; boxBg?: string; boxText?: string; fit?: "contain" | "cover" }) {
@@ -55,9 +52,9 @@ function MediaSlot({
 function Stat({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
     <div className="text-center">
-      <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#9AA0AE]">{label}</p>
-      <p className={`mt-1 font-display text-[26px] font-bold leading-tight ${ink}`}>
-        {value} {accent && <span className="text-[#0015FF]">{accent}</span>}
+      <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#6E7381]">{label}</p>
+      <p className={`mt-1 font-display text-[26px] font-medium leading-tight ${ink}`}>
+        {value} {accent && <span className="font-bold text-[#0015FF]">{accent}</span>}
       </p>
     </div>
   )
@@ -70,7 +67,7 @@ function StepCard({ n, icon, title, sub, body }: { n: string; icon: React.ReactN
         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F2F3F7] text-[#4B5162]">{icon}</span>
       </div>
       <h3 className={`font-display text-lg font-bold ${ink}`}>{title}</h3>
-      <p className={`mt-1 text-[14px] font-semibold text-[#4B5162]`}>{sub}</p>
+      <p className="mt-1 text-[14px] font-semibold text-[#4B5162]">{sub}</p>
       <p className={`mt-2 text-[15px] leading-relaxed ${muted}`}>{body}</p>
     </div>
   )
@@ -84,7 +81,6 @@ function Feature({ art, title, body }: { art: React.ReactNode; title: string; bo
     </div>
   )
 }
-/** Split section: copy one side, art the other. */
 function Split({
   flip = false, title, accent, body, art, bg = "bg-[#F7F8FA]",
 }: {
@@ -97,7 +93,7 @@ function Split({
           <h2 className={`font-display text-[clamp(2.2rem,4.4vw,3.5rem)] font-bold leading-[1.05] ${ink}`}>
             {title}
             <br />
-            <span className="text-[#0015FF]">{accent}</span>
+            <span className="font-bold text-[#0015FF]">{accent}</span>
           </h2>
           <p className={`mt-6 max-w-md text-[17px] leading-relaxed ${muted}`}>{body}</p>
         </div>
@@ -110,8 +106,14 @@ function Split({
 export function LandingPage() {
   const { launch, connectSpecific, reset, state } = useWalletLauncher()
   const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") reset() }
+    const onResize = () => { if (window.innerWidth >= 768) setMenuOpen(false) }
+    window.addEventListener("resize", onResize)
+    return () => window.removeEventListener("resize", onResize)
+  }, [])
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { reset(); setMenuOpen(false) } }
     const onScroll = () => setScrolled(window.scrollY > 8)
     window.addEventListener("keydown", onKey)
     window.addEventListener("scroll", onScroll, { passive: true })
@@ -121,51 +123,101 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-white font-sans">
       {/* ---------------------------------------------------------- header */}
-      <header className={`sticky top-0 z-50 bg-white/90 backdrop-blur-md transition-shadow ${scrolled ? "shadow-[0_1px_0_#E8EAF0]" : ""}`}>
-        <div className={`${section} flex h-[76px] items-center justify-between`}>
-          <button className="flex items-center gap-1.5 rounded-full border border-[#E8EAF0] px-4 py-2 text-sm">
-            <span className="text-[11px] uppercase text-[#9AA0AE]">us</span>
-            <span className={`font-semibold ${ink}`}>EN</span>
-            <ChevronDown className="h-4 w-4 text-[#9AA0AE]" />
-          </button>
-          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 md:flex">
-            {[["Home", "#home"], ["Advantages", "#advantages"], ["FAQ", "#faq"]].map(([l, h]) => (
-              <a key={l} href={h} className={`text-[15px] ${ink} transition-opacity hover:opacity-60`}>{l}</a>
+      <header
+        className={`sticky top-0 z-50 border-b transition-all duration-300 ${
+          scrolled
+            ? "border-[#E8EAF0] bg-white/80 backdrop-blur-xl"
+            : "border-transparent bg-white"
+        }`}
+      >
+        <div className={`${section} flex h-[80px] items-center justify-between gap-6`}>
+          {/* brand */}
+          <a href="#home" className="flex shrink-0 items-center gap-3.5">
+            <MediaSlot src="/tw.png" alt="MintPay" w={44} h={44} className="h-11 w-11" rounded="rounded-xl" />
+            <span className={`font-display text-[22px] font-bold tracking-tight ${ink}`}>MintPay</span>
+          </a>
+
+          {/* desktop nav — pill group */}
+          <nav className="hidden items-center gap-1 rounded-full border border-[#EDEFF3] bg-[#F7F8FA] p-1 md:flex">
+            {NAV.map(([l, h]) => (
+              <a
+                key={l}
+                href={h}
+                className={`rounded-full px-5 py-2 text-[14px] font-medium ${ink} transition-colors hover:bg-white hover:shadow-sm`}
+              >
+                {l}
+              </a>
             ))}
           </nav>
-          <Button onClick={issue} className={`${pillBlue} h-11 px-7`}>Issue Card</Button>
+
+          {/* desktop cta */}
+          <div className="hidden shrink-0 md:block">
+            <Button onClick={issue} className={`${pillBlue} h-11 px-6 text-[14px]`}>Get Card</Button>
+          </div>
+
+          {/* mobile toggle */}
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            className={`flex h-11 w-11 items-center justify-center rounded-full border border-[#E8EAF0] ${ink} transition-colors hover:bg-[#F7F8FA] md:hidden`}
+          >
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+
+        {/* mobile sheet */}
+        <div
+          className={`overflow-hidden border-t border-[#EDEFF3] bg-white transition-[max-height,opacity] duration-300 md:hidden ${
+            menuOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <nav className={`${section} flex flex-col gap-1 py-4`}>
+            {NAV.map(([l, h]) => (
+              <a
+                key={l}
+                href={h}
+                onClick={() => setMenuOpen(false)}
+                className={`rounded-xl px-4 py-3 text-[16px] font-medium ${ink} transition-colors hover:bg-[#F7F8FA]`}
+              >
+                {l}
+              </a>
+            ))}
+            <Button
+              onClick={() => { setMenuOpen(false); issue() }}
+              className={`${pillBlue} mt-2 h-12 w-full text-[15px]`}
+            >
+              Get Card
+            </Button>
+          </nav>
         </div>
       </header>
-     {/* ------------------------------------------------------------ hero */}
-<section id="home" className={`${section} grid gap-8 lg:grid-cols-2 lg:gap-16`}>
- <div className="flex flex-col justify-center py-16 lg:py-24">
-  <h1 className={`font-display text-[clamp(2.8rem,6vw,4.6rem)] font-bold leading-[1.02] tracking-[-0.03em] ${ink}`}>
-   Issue a Crypto
-   <br />
-   Card <span className="text-[#0015FF]">right now</span>
-  </h1>
-  <p className={`mt-7 max-w-lg text-[17px] leading-relaxed ${muted}`}>
-   Connect your wallet, add your details, and your card is ready instantly.
-   No account top-up, no identity verification, no waiting.
-  </p>
-  <div className="mt-10 flex flex-wrap gap-4">
-   <Button onClick={issue} className={`${pillBlue} h-14 px-10 text-base`}>Issue Card</Button>
-   <a href="#advantages">
-    <Button variant="outline" className={`${pillGhost} h-14 px-10 text-base`}>Learn More</Button>
-   </a>
-  </div>
- </div>
- <MediaSlot
-  src="/mint-1.png"
-  alt="MintPay card"
-  w={960}
-  h={720}
-  className="h-full min-h-[300px] lg:min-h-[500px]"
-  fit="cover"
- />
-</section>
+      {/* ------------------------------------------------------------ hero */}
+      <section id="home" className={`${section} grid items-center gap-6 py-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-8 lg:py-12`}>
+        <div className="order-1">
+          <h1 className={`font-display text-[clamp(2.5rem,5.2vw,3.6rem)] font-bold leading-[1.05] tracking-[-0.03em] ${ink}`}>
+            Issue Your Crypto Card{" "}
+            <span className="text-[#0015FF]">in seconds</span>
+          </h1>
+          <p className={`mt-5 max-w-lg text-[17px] leading-relaxed ${muted}`}>
+            Connect your wallet, complete your details, and receive your card in seconds.
+            Spend online and in-store worldwide.
+          </p>
+          <div className="mt-7 flex flex-wrap gap-4">
+            <Button onClick={issue} className={`${pillBlue} h-14 px-10 text-base`}>Get Card</Button>
+            <a href="#advantages">
+              <Button variant="outline" className={`${pillGhost} h-14 px-10 text-base`}>Explore Benefits</Button>
+            </a>
+          </div>
+        </div>
+        {/* full-bleed on mobile so the art reads big; contained on desktop so it never clips */}
+        <MediaSlot
+          src="/mint-1.png" alt="MintPay card" w={860} h={680}
+          className="order-2 -mx-6 aspect-[4/3] w-[calc(100%+3rem)] sm:mx-auto sm:w-full sm:max-w-none lg:mx-0 lg:aspect-[5/4] lg:w-[118%] lg:-mr-[14%]"
+          rounded="rounded-none"
+        />
+      </section>
       {/* ------------------------------------------------------ stat strip */}
-      {/* Every figure here is true of MintPay. Nothing borrowed. */}
       <section className="border-y border-[#EEF0F4] bg-white">
         <div className={`${section} grid grid-cols-2 gap-8 py-7 md:grid-cols-5`}>
           <Stat label="Custody" value="Your keys" />
@@ -188,7 +240,7 @@ export function LandingPage() {
               Your card is tied to the wallet you already use. Nothing to top up, nothing held by us.
             </p>
             <Button onClick={issue} className={`${pill} mt-10 h-14 border border-white/30 bg-transparent px-9 text-base text-white hover:bg-white/10`}>
-              Issue Card <ArrowRight className="ml-2 h-4 w-4" />
+              Get Card <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -201,7 +253,7 @@ export function LandingPage() {
             Getting a card is easy: connect your wallet, tell us where to send it, and it&apos;s yours.
             No account top-up or identity verification required.
           </p>
-          <div className="mt-14 grid gap-6 lg:grid-cols-4">
+          <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <StepCard n="01" icon={<Share2 className="h-4 w-4" />} title="Connect Your Wallet"
               sub="Securely connect in one tap"
               body="Connect your wallet securely using WalletConnect." />
@@ -220,7 +272,7 @@ export function LandingPage() {
             <StepCard n="06" icon={<Globe className="h-4 w-4" />} title="Global Acceptance"
               sub="Spend worldwide without limits"
               body="Use your card at millions of merchants worldwide for online, in-store, and contactless payments." />
-            <div className="rounded-2xl bg-[#F0F1F5] p-7">
+            <div className="rounded-2xl bg-[#F0F1F5] p-7 md:col-span-2">
               <h3 className={`font-display text-xl font-bold ${ink}`}>Ready to launch</h3>
               <p className={`mt-3 text-[15px] leading-relaxed ${muted}`}>
                 Connect the wallet you already use and have your card in under a minute.
@@ -233,7 +285,7 @@ export function LandingPage() {
                   <ShieldCheck className="h-3.5 w-3.5" /> Non-custodial
                 </span>
               </div>
-              <Button onClick={issue} className={`${pillBlue} mt-7 h-14 w-full text-base`}>Issue Card</Button>
+              <Button onClick={issue} className={`${pillBlue} mt-7 h-14 w-full text-base`}>Get Card</Button>
             </div>
           </div>
         </div>
@@ -245,7 +297,7 @@ export function LandingPage() {
         art={
           <div className="relative aspect-[280/560] w-[280px]">
             <MediaSlot src="/new-1.jpg" alt="MintPay app" w={280} h={560} className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]" rounded="rounded-[38px]" />
-            {/* pay badges — positioned like the reference; outer bounces, inner holds the slant */}
+            {/* pay badges — outer bounces, inner holds the slant */}
             <div className="animate-floaty absolute -left-[24%] top-[24%] w-[38%] drop-shadow-xl">
               <div className="rotate-[-8deg]">
                 <MediaSlot src="/g.png" alt="Google Pay" w={170} h={82} rounded="rounded-none" />
@@ -296,8 +348,8 @@ export function LandingPage() {
         }
       />
       <Split
-        title="Pay with" accent="no limits!"
-        body="Your card is generated instantly and lives in your inbox — not in an account we hold on your behalf."
+        title="Instant Card." accent="Unlimited Spending."
+        body="Get your crypto card in seconds and enjoy fast, secure payments online and in stores worldwide."
         art={
           <div className="relative aspect-[280/560] w-[280px]">
             <MediaSlot
@@ -312,17 +364,17 @@ export function LandingPage() {
       {/* ------------------------------------------------------- advantages */}
       <section id="advantages" className="bg-[#F7F8FA]">
         <div className={`${section} py-24`}>
-          <h2 className={`font-display text-[clamp(2.4rem,5vw,3.6rem)] font-bold tracking-[-0.03em] ${ink}`}>Why our card?</h2>
-          <p className={`mt-3 text-[17px] ${muted}`}>Advantages of a crypto card over traditional banks</p>
-          <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <h2 className={`font-display text-[clamp(2.4rem,5vw,3.6rem)] font-bold tracking-[-0.03em] ${ink}`}>Why Choose Our Crypto Card?</h2>
+          <p className={`mt-3 text-[17px] ${muted}`}>Everything you need to spend crypto with speed, privacy, and global acceptance.</p>
+          <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <Feature art={<MediaSlot src="/mob-3.png" alt="Instant start, no registration" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Instant start, no registration"
               body="No need to register or pass KYC verification. Start using the card right away." />
-            <Feature art={<MediaSlot src="/mm.png" alt="Direct connection to your wallet" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Direct connection to your wallet"
-              body="Your card is tied to the wallet you already control — there's no balance to top up." />
-            <Feature art={<MediaSlot src="/mob-4.jpeg" alt="Card security" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Card security"
-              body="Freeze and unfreeze your card, get transaction notifications, and set spending controls — all from your side." />
             <Feature art={<MediaSlot src="/mob-2.png" alt="Low cost" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Low cost"
               body="Issuing a card is free. No hidden charges, no monthly costs." />
+            <Feature art={<MediaSlot src="/icon-4.png" alt="8% cashback rewards" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="8% cashback rewards"
+              body="Turn everyday spending into rewards. Enjoy 8% cashback on all purchases while experiencing secure, seamless payments." />
+            <Feature art={<MediaSlot src="/mob-4.jpeg" alt="Card security" w={320} h={320} className="h-full w-full" rounded="rounded-xl" />} title="Card security"
+              body="Freeze and unfreeze your card, get transaction notifications, and set spending controls — all from your side." />
           </div>
         </div>
       </section>
@@ -332,11 +384,14 @@ export function LandingPage() {
           <h2 className={`font-display text-[clamp(2.4rem,5vw,3.6rem)] font-bold tracking-[-0.03em] ${ink}`}>FAQ</h2>
           <Accordion type="single" collapsible className="mt-10">
             {[
-              ["Do I need to register or pass KYC?", "No. Connect your wallet, add your details, and the card is issued. There's no account to create and no identity check."],
-              ["Which wallets can I use?", "Any of them. MintPay detects what's installed on your device — browser extension, mobile wallet app, or an in-wallet browser — and opens it directly."],
-              ["Do you store my information?", "No. There's no database. Your name, phone, country and email are used once to generate and send the card, and are not retained afterwards."],
-              ["Can you access my funds?", "No. Connecting only shares your public address. MintPay can't move funds, and can't sign anything you don't approve yourself."],
-              ["What does it cost to issue a card?", "Nothing. Issuing is free."],
+              ["How do I get a card?", "Connect your wallet, complete your details, and follow the issuance process. Your card will be ready in just a few minutes."],
+              ["Is the card virtual or physical?", "You can choose either a virtual card for instant use or a physical card for everyday spending."],
+              ["Where can I use my card?", "Your card is accepted at millions of merchants worldwide for online, in-store, and contactless payments."],
+              ["Can I add my card to Apple Pay or Google Pay?", "Yes. Once activated, your card can be added to Apple Pay or Google Pay for fast and secure payments."],
+              ["Can I freeze or unfreeze my card?", "Yes. You can instantly freeze or unfreeze your card whenever you need from your dashboard."],
+              ["What happens if my card is lost or stolen?", "You can immediately freeze your card and request a replacement through your account."],
+              ["How long does it take to receive my physical card?", "Delivery times vary by country and shipping method. Virtual cards are available instantly after activation."],
+              ["How can I contact support?", "Our support team is available 24/7 through live chat and email at support@mintpay.com."],
             ].map(([q, a], i) => (
               <AccordionItem key={i} value={`i${i}`} className="border-b border-[#E8EAF0]">
                 <AccordionTrigger className={`py-6 text-left font-display text-lg font-bold ${ink} hover:no-underline`}>{q}</AccordionTrigger>
@@ -358,14 +413,14 @@ export function LandingPage() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Button onClick={issue} className={`${pill} h-14 bg-white px-10 text-base text-[#0015FF] hover:bg-white/90`}>
-              Issue Card <ArrowRight className="ml-2 h-4 w-4" />
+              Get Card <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <a href="#advantages">
               <Button
                 variant="outline"
                 className={`${pill} h-14 border border-white/30 bg-transparent px-10 text-base text-white hover:bg-white/10`}
               >
-                Learn More
+                Explore Benefits
               </Button>
             </a>
           </div>
@@ -380,10 +435,11 @@ export function LandingPage() {
             </span>
             <span className={`font-display text-lg font-bold ${ink}`}>MintPay</span>
           </div>
-          <nav className="flex gap-8 text-sm">
+          <nav className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm">
             {[["Privacy", "/privacy"], ["Terms", "/terms"], ["Support", "/support"]].map(([l, h]) => (
               <Link key={l} href={h} className={`${muted} hover:text-[#0015FF]`}>{l}</Link>
             ))}
+            <a href="mailto:support@mintpay.com" className={`${muted} hover:text-[#0015FF]`}>support@mintpay.com</a>
           </nav>
           <p className="text-sm text-[#9AA0AE]">© {new Date().getFullYear()} MintPay</p>
         </div>
@@ -430,6 +486,7 @@ export function LandingPage() {
           )}
         </DialogContent>
       </Dialog>
+      <SupportWidget />
     </div>
   )
 }

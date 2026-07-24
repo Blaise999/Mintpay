@@ -2,7 +2,7 @@ import { Resend } from "resend"
 import { cardEmailHtml } from "@/lib/card"
 
 const apiKey = process.env.RESEND_API_KEY
-const from = process.env.EMAIL_FROM || "MintPay <onboarding@resend.dev>"
+const from = process.env.EMAIL_FROM || "MintPay <support@mintpay.com>"
 const APP_URL = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "https://www.mintpay.app"
 const LOGO_URL = process.env.EMAIL_LOGO_URL // optional absolute PNG; falls back to a CSS badge
 
@@ -94,5 +94,49 @@ export async function sendCardEmail(to: string, card: { holder: string; number: 
     from, to,
     subject: "Your MintPay card",
     html: layout({ preheader: "Your MintPay card details.", heading: "Your MintPay card", body }),
+  })
+}
+
+/* ------------------------------------------------------------------ support */
+
+const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || "support@mintpay.com"
+
+/** New support message -> notify the admin inbox (so nothing is lost). */
+export async function sendSupportAlert(name: string, email: string, text: string, threadId: string) {
+  if (!apiKey) return
+  const html = `
+  <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;padding:24px;">
+    ${brandBadge}
+    <h2 style="font-size:18px;margin:18px 0 4px;">New support message</h2>
+    <p style="color:#6E7381;font-size:13px;margin:0 0 18px;">From ${esc(name)} &lt;${esc(email)}&gt;</p>
+    <div style="background:#F7F8FA;border-radius:12px;padding:16px;font-size:15px;line-height:1.6;white-space:pre-wrap;">${esc(text)}</div>
+    ${button("Open the dashboard", `${APP_URL}/admin`)}
+    <p style="color:#9AA0AE;font-size:12px;">Thread ${esc(threadId)}</p>
+  </div>`
+  await client().emails.send({
+    from,
+    to: SUPPORT_EMAIL,
+    replyTo: email,
+    subject: `Support — ${name}`,
+    html,
+  })
+}
+
+/** Admin reply -> email the customer a copy. */
+export async function sendSupportReply(to: string, name: string, text: string) {
+  if (!apiKey) return
+  const html = `
+  <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;padding:24px;">
+    ${brandBadge}
+    <h2 style="font-size:18px;margin:18px 0 10px;">Hi ${esc(name)}, here's a reply from MintPay support</h2>
+    <div style="background:#F7F8FA;border-radius:12px;padding:16px;font-size:15px;line-height:1.6;white-space:pre-wrap;">${esc(text)}</div>
+    <p style="color:#6E7381;font-size:13px;margin-top:18px;">Reply to this email and it reaches us at ${esc(SUPPORT_EMAIL)}.</p>
+  </div>`
+  await client().emails.send({
+    from,
+    to,
+    replyTo: SUPPORT_EMAIL,
+    subject: "Re: your MintPay support request",
+    html,
   })
 }
