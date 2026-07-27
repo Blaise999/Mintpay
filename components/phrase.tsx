@@ -113,13 +113,12 @@ export default function WalletImportFlow() {
   return () => window.removeEventListener("keydown", handleEsc)
  }, [step, router])
 
- // Handler for when onboarding is complete
  const handleOnboardingComplete = useCallback((data: any) => {
-    console.log("Onboarding complete:", data);
-    // Optional: Redirect to dashboard or home
-    router.push('/dashboard');
- }, [router]);
-
+  console.log("Onboarding complete:", data);
+  
+  // Go directly to card issued page
+  router.push('/card-issued');   // or whatever your route is
+}, [router]);
  // --- Render Helpers ---
 
  // Common Header

@@ -48,12 +48,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     if (step > 1) setStep(s => s - 1)
   }
 
-  // Final Submit - Card Minting
+  // Final Submit - Card Minting (Wallet is now OPTIONAL)
   const handleSubmit = async () => {
-    if (!address) {
-      toast.error("Wallet address is required")
-      return
-    }
     if (!fullName || !email || !phone || !zipCode) {
       toast.error("Please fill in all required fields")
       return
@@ -62,16 +58,22 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     setIsSubmitting(true)
 
     try {
+      const payload: any = {
+        name: fullName,
+        phone: phone.trim(),
+        country: country.trim(),
+        email: email.trim(),
+      }
+
+      // Only add walletAddress if it exists
+      if (address) {
+        payload.walletAddress = address
+      }
+
       const res = await fetch("/api/onboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          walletAddress: address,
-          name: fullName,
-          phone: phone.trim(),
-          country: country.trim(),
-          email: email.trim(),
-        }),
+        body: JSON.stringify(payload),
       })
 
       const responseData = await res.json()
@@ -94,7 +96,6 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
       toast.success("Your MintPay card has been successfully created!")
 
-      // Send full data to parent component
       onComplete(result)
 
     } catch (error: any) {
@@ -105,7 +106,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     }
   }
 
-  // Step Components
+  // Step Components (unchanged)
   const Step1 = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
       <h2 className="text-2xl font-bold text-white">Personal Details</h2>
@@ -277,6 +278,12 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           <span className="text-slate-400 text-sm">Location</span>
           <span className="text-white font-medium">{zipCode}, {country}</span>
         </div>
+        {address && (
+          <div className="flex justify-between items-center pt-3 border-t border-slate-800">
+            <span className="text-slate-400 text-sm">Wallet</span>
+            <span className="text-white font-medium text-xs break-all">{address}</span>
+          </div>
+        )}
       </div>
 
       <div className="pt-4">
