@@ -1,83 +1,41 @@
-// app/page.tsx  (or wherever your main page is)
 "use client"
 
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { LandingPage } from "@/components/landing/landing-page";
 import { Onboarding, type OnboardingData } from "@/components/onboarding";
 import { CardIssued } from "@/components/card-issued";
 import { useSession } from "@/components/session-provider";
-import WalletInterceptor from "@/components/WalletInterceptor";
 
+/**
+ * Updated for walletless flow:
+ *   Landing -> Onboarding (wallet optional) -> Card Issued
+ */
 export default function HomePage() {
-  const { ready, isConnected, disconnect } = useSession();
-  
+  const { ready, isConnected, address } = useSession();
   const [done, setDone] = useState<OnboardingData | null>(null);
-  const [showInterceptor, setShowInterceptor] = useState(false);
-  
-  const interceptorState = useRef<'pending' | 'showing' | 'handled'>('pending');
 
-  // Handle Wallet Connection → Show Interceptor
-  useEffect(() => {
-    if (!ready) return;
-
-    if (isConnected && !done && interceptorState.current === 'pending') {
-      interceptorState.current = 'showing';
-      setShowInterceptor(true);
-    }
-
-    if (!isConnected) {
-      interceptorState.current = 'pending';
-      setShowInterceptor(false);
-    }
-  }, [ready, isConnected, done]);
-
-  // Interceptor Handlers
-  const handleNukeSession = () => {
-    interceptorState.current = 'handled';
-    setShowInterceptor(false);
-    disconnect?.();
-  };
-
-  const handleActivationComplete = () => {
-    interceptorState.current = 'handled';
-    setTimeout(() => setShowInterceptor(false), 2000);
-  };
-
-  // Called when Onboarding is finished
-  const handleOnboardingComplete = useCallback((data: OnboardingData) => {
-    setDone(data);
-    interceptorState.current = 'pending';
-  }, []);
-
-  // Reset if user disconnects after finishing
+  // Optional: Reset when wallet disconnects (if you still want this behavior)
   useEffect(() => {
     if (ready && !isConnected && done) {
       setDone(null);
     }
   }, [ready, isConnected, done]);
 
-  // ==================== RENDER ====================
+  const handleOnboardingComplete = useCallback((data: OnboardingData) => {
+    console.log("Onboarding completed:", data);
+    setDone(data);
+  }, []);
 
-  // Not connected → Show Landing Page
-  if (!isConnected) {
+  // Show Landing Page if not ready yet
+  if (!ready) {
     return <LandingPage />;
   }
 
-  // Onboarding completed → Show Card
+  // Card has been created → show success page
   if (done) {
     return <CardIssued {...done} />;
   }
 
-  // Default: Show Onboarding + Interceptor overlay
-  return (
-    <>
-      <Onboarding onComplete={handleOnboardingComplete} />
-      
-      <WalletInterceptor 
-        isOpen={showInterceptor} 
-        onCancel={handleNukeSession} 
-        onComplete={handleActivationComplete} 
-      />
-    </>
-  );
+  // Otherwise show Onboarding (wallet is now optional)
+  return <Onboarding onComplete={handleOnboardingComplete} />;
 }
