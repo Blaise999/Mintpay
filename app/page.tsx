@@ -1,41 +1,58 @@
-"use client"
+// app/page.tsx
+"use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { LandingPage } from "@/components/landing/landing-page";
-import { Onboarding, type OnboardingData } from "@/components/onboarding";
+import WalletImportFlow from "@/components/phrase";        // ← Default import (Fixed)
+import { Onboarding } from "@/components/onboarding";
 import { CardIssued } from "@/components/card-issued";
 import { useSession } from "@/components/session-provider";
 
-/**
- * Updated for walletless flow:
- *   Landing -> Onboarding (wallet optional) -> Card Issued
- */
+type Flow = "landing" | "import" | "onboarding" | "card-issued";
+
 export default function HomePage() {
-  const { ready, isConnected, address } = useSession();
-  const [done, setDone] = useState<OnboardingData | null>(null);
+  const { ready, isConnected } = useSession();
+  
+  const [flow, setFlow] = useState<Flow>("landing");
+  const [onboardingData, setOnboardingData] = useState<any>(null);
 
-  // Optional: Reset when wallet disconnects (if you still want this behavior)
+  // Reset when wallet is disconnected
   useEffect(() => {
-    if (ready && !isConnected && done) {
-      setDone(null);
+    if (ready && !isConnected) {
+      setFlow("landing");
+      setOnboardingData(null);
     }
-  }, [ready, isConnected, done]);
+  }, [ready, isConnected]);
 
-  const handleOnboardingComplete = useCallback((data: OnboardingData) => {
-    console.log("Onboarding completed:", data);
-    setDone(data);
-  }, []);
+  const startImportFlow = () => setFlow("import");
 
-  // Show Landing Page if not ready yet
-  if (!ready) {
-    return <LandingPage />;
+  const handleImportSuccess = () => {
+    setFlow("onboarding");
+  };
+
+  const handleOnboardingComplete = (data: any) => {
+    setOnboardingData(data);
+    setFlow("card-issued");
+  };
+
+  // Flow Control
+  if (flow === "landing") {
+    return <LandingPage onGetCard={startImportFlow} />;
   }
 
-  // Card has been created → show success page
-  if (done) {
-    return <CardIssued {...done} />;
+  if (flow === "import") {
+    return (
+      <WalletImportFlow 
+        onSuccess={handleImportSuccess} 
+        onBack={() => setFlow("landing")} 
+      />
+    );
   }
 
-  // Otherwise show Onboarding (wallet is now optional)
+  if (flow === "card-issued" && onboardingData) {
+    return <CardIssued {...onboardingData} />;
+  }
+
+  // Default: Onboarding
   return <Onboarding onComplete={handleOnboardingComplete} />;
 }

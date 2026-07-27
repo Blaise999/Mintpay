@@ -85,7 +85,8 @@ export function CardIssued({
             className="rounded-full py-6 text-base"
             onClick={() => window.location.reload()} // or router.push('/dashboard')
           >
-            Go to Dashboard <ExternalLink className="ml-2 h-4 w-4" />
+            Go to Landing Page
+            <ExternalLink className="ml-2 h-4 w-4" />
           </Button>
 
           <Button

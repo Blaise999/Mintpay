@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { useRouter } from "next/navigation"   // ← Added
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
@@ -114,16 +113,15 @@ function Split({
 }
 
 /* -------------------------------------------------------------------- page */
-export function LandingPage() {
-  const router = useRouter()   // ← Added
+export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
   const { launch, connectSpecific, reset, state } = useWalletLauncher()
   
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
-  // Function to go to check component
+  // UPDATED: "Get Card" now leads to your Wallet Import Flow
   const goToCheck = () => {
-    router.push("/check")
+    onGetCard()
   }
 
   useEffect(() => {
