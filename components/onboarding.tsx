@@ -1,131 +1,321 @@
+// components/onboarding.tsx
 "use client"
 
 import { useState } from "react"
-import { useSession } from "@/components/session-provider"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { MintPayMark } from "@/components/brand/logo"
-import { Loader2, ArrowRight } from "lucide-react"
+import { ArrowRight, Loader2 } from "lucide-react"
+import { useSession } from "./session-provider"
 import { toast } from "sonner"
 import type { CardInfo } from "@/components/mintpay-card"
 
-/**
- * Step 2. Wallet's connected — take name / number / country / email,
- * the server checks the email, mints the card and mails it. Nothing is stored.
- */
-export function Onboarding({
-  onComplete,
-}: {
-  onComplete: (data: { name: string; email: string; card?: CardInfo; emailed: boolean }) => void
-}) {
-  const { address } = useSession()
-  const [name, setName] = useState("")
-  const [phone, setPhone] = useState("")
-  const [country, setCountry] = useState("")
-  const [email, setEmail] = useState("")
-  const [submitting, setSubmitting] = useState(false)
+export interface OnboardingData {
+  name: string
+  email: string
+  card?: CardInfo
+  emailed: boolean
+  firstName: string
+  lastName: string
+  phone: string
+  zipCode: string
+  country: string
+}
 
-  const valid =
-    name.trim().length > 1 &&
-    phone.replace(/\D/g, "").length >= 7 &&
-    country.trim().length > 1 &&
-    /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email.trim())
+interface OnboardingProps {
+  onComplete: (data: OnboardingData) => void
+}
 
-  const submit = async () => {
-    if (!address || !valid || submitting) return
-    setSubmitting(true)
+export function Onboarding({ onComplete }: OnboardingProps) {
+  const { data: session, address } = useSession()
+  
+  const [step, setStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Form States
+  const [firstName, setFirstName] = useState(session?.user?.name?.split(" ")[0] || "")
+  const [lastName, setLastName] = useState(session?.user?.name?.split(" ")[1] || "")
+  const [email, setEmail] = useState(session?.user?.email || "")
+  const [phone, setPhone] = useState(session?.user?.phone || "")
+  const [zipCode, setZipCode] = useState("")
+  const [country, setCountry] = useState("United States")
+
+  const fullName = `${firstName.trim()} ${lastName.trim()}`.trim()
+
+  // Navigation
+  const nextStep = () => {
+    if (step < 4) setStep(s => s + 1)
+  }
+
+  const prevStep = () => {
+    if (step > 1) setStep(s => s - 1)
+  }
+
+  // Final Submit - Card Minting
+  const handleSubmit = async () => {
+    if (!address) {
+      toast.error("Wallet address is required")
+      return
+    }
+    if (!fullName || !email || !phone || !zipCode) {
+      toast.error("Please fill in all required fields")
+      return
+    }
+
+    setIsSubmitting(true)
+
     try {
       const res = await fetch("/api/onboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           walletAddress: address,
-          name: name.trim(),
+          name: fullName,
           phone: phone.trim(),
           country: country.trim(),
           email: email.trim(),
         }),
       })
-      const d = await res.json()
-      if (!res.ok) throw new Error(d.error || "Something went wrong")
 
-      onComplete({ name: name.trim(), email: email.trim(), card: d.card, emailed: Boolean(d.emailed) })
-    } catch (e: any) {
-      toast.error(e?.message || "Something went wrong")
-      setSubmitting(false)
+      const responseData = await res.json()
+
+      if (!res.ok) {
+        throw new Error(responseData.error || "Failed to create your card")
+      }
+
+      const result: OnboardingData = {
+        name: fullName,
+        email: email.trim(),
+        card: responseData.card,
+        emailed: Boolean(responseData.emailed),
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        phone: phone.trim(),
+        zipCode: zipCode.trim(),
+        country: country.trim(),
+      }
+
+      toast.success("Your MintPay card has been successfully created!")
+
+      // Send full data to parent component
+      onComplete(result)
+
+    } catch (error: any) {
+      console.error(error)
+      toast.error(error?.message || "Something went wrong. Please try again.")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
-  const field = "border-white/10 bg-white/5 text-white placeholder:text-slate-500"
+  // Step Components
+  const Step1 = () => (
+    <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
+      <h2 className="text-2xl font-bold text-white">Personal Details</h2>
+      <p className="text-slate-400 text-sm">Let's start with your name.</p>
+      
+      <div className="space-y-4">
+        <div>
+          <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">First Name</label>
+          <input
+            type="text"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition-colors"
+            placeholder="John"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Last Name</label>
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition-colors"
+            placeholder="Doe"
+          />
+        </div>
+      </div>
+
+      <div className="pt-4">
+        <button
+          onClick={nextStep}
+          disabled={!firstName.trim() || !lastName.trim()}
+          className={`w-full py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-all ${
+            (!firstName.trim() || !lastName.trim()) 
+              ? "bg-slate-800 text-slate-500" 
+              : "bg-white text-slate-950 hover:bg-slate-200"
+          }`}
+        >
+          Next <ArrowRight className="h-5 w-5" />
+        </button>
+      </div>
+    </div>
+  )
+
+  const Step2 = () => (
+    <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
+      <h2 className="text-2xl font-bold text-white">Contact Info</h2>
+      <p className="text-slate-400 text-sm">How can we reach you?</p>
+      
+      <div className="space-y-4">
+        <div>
+          <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Email Address</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition-colors"
+            placeholder="john@example.com"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Phone Number</label>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition-colors"
+            placeholder="+1 (555) 000-0000"
+          />
+        </div>
+      </div>
+
+      <div className="pt-4 flex gap-3">
+        <button
+          onClick={prevStep}
+          className="flex-1 py-4 rounded-full font-bold text-lg bg-slate-800 text-white hover:bg-slate-700 transition-colors"
+        >
+          Back
+        </button>
+        <button
+          onClick={nextStep}
+          disabled={!email.trim() || !phone.trim()}
+          className={`flex-1 py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-all ${
+            (!email.trim() || !phone.trim()) 
+              ? "bg-slate-800 text-slate-500" 
+              : "bg-white text-slate-950 hover:bg-slate-200"
+          }`}
+        >
+          Next <ArrowRight className="h-5 w-5" />
+        </button>
+      </div>
+    </div>
+  )
+
+  const Step3 = () => (
+    <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
+      <h2 className="text-2xl font-bold text-white">Address</h2>
+      <p className="text-slate-400 text-sm">Where should we send your card?</p>
+      
+      <div className="space-y-4">
+        <div>
+          <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Zip Code</label>
+          <input
+            type="text"
+            value={zipCode}
+            onChange={(e) => setZipCode(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition-colors"
+            placeholder="10001"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Country</label>
+          <select
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition-colors appearance-none"
+          >
+            <option>United States</option>
+            <option>United Kingdom</option>
+            <option>Canada</option>
+            <option>Germany</option>
+            <option>France</option>
+            <option>Nigeria</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="pt-4 flex gap-3">
+        <button
+          onClick={prevStep}
+          className="flex-1 py-4 rounded-full font-bold text-lg bg-slate-800 text-white hover:bg-slate-700 transition-colors"
+        >
+          Back
+        </button>
+        <button
+          onClick={nextStep}
+          disabled={!zipCode.trim()}
+          className={`flex-1 py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-all ${
+            (!zipCode.trim()) 
+              ? "bg-slate-800 text-slate-500" 
+              : "bg-white text-slate-950 hover:bg-slate-200"
+          }`}
+        >
+          Next <ArrowRight className="h-5 w-5" />
+        </button>
+      </div>
+    </div>
+  )
+
+  const Step4 = () => (
+    <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
+      <h2 className="text-2xl font-bold text-white">Finalize</h2>
+      <p className="text-slate-400 text-sm">Review your details before creating your card.</p>
+      
+      <div className="bg-slate-900 rounded-2xl p-6 space-y-4 border border-slate-800">
+        <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+          <span className="text-slate-400 text-sm">Name</span>
+          <span className="text-white font-medium">{fullName}</span>
+        </div>
+        <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+          <span className="text-slate-400 text-sm">Email</span>
+          <span className="text-white font-medium">{email}</span>
+        </div>
+        <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+          <span className="text-slate-400 text-sm">Phone</span>
+          <span className="text-white font-medium">{phone}</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400 text-sm">Location</span>
+          <span className="text-white font-medium">{zipCode}, {country}</span>
+        </div>
+      </div>
+
+      <div className="pt-4">
+        <button
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className="w-full py-4 rounded-full font-bold text-lg bg-[#0015FF] text-white hover:bg-blue-700 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span>Minting your card...</span>
+            </>
+          ) : (
+            "Create My MintPay Card"
+          )}
+        </button>
+      </div>
+    </div>
+  )
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 px-4 py-12 text-white">
-      <div className="pointer-events-none absolute -left-32 top-0 h-96 w-96 rounded-full bg-blue-600/25 blur-[120px]" />
-      <div className="pointer-events-none absolute -right-24 bottom-0 h-96 w-96 rounded-full bg-violet-600/25 blur-[120px]" />
-
-      <div className="relative w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
-        <div className="mb-6 text-center">
-          <MintPayMark className="mx-auto mb-4 h-14 w-14" />
-          <h1 className="font-display text-2xl font-bold">Set up your account</h1>
-          <p className="mt-2 text-sm text-slate-400">
-            Your wallet is connected. Add your details and we&apos;ll create your MintPay card.
-          </p>
-          {address && (
-            <p className="mx-auto mt-3 w-fit rounded-full bg-white/5 px-3 py-1 font-mono text-xs text-slate-300">
-              {address.slice(0, 8)}…{address.slice(-6)}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-200">Full name</label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ada Lovelace" className={field} />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-200">Phone number</label>
-              <Input
-                type="tel"
-                inputMode="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+234 800 000 0000"
-                className={field}
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-200">Country</label>
-              <Input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Nigeria" className={field} />
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-200">Email</label>
-            <Input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && submit()}
-              placeholder="you@example.com"
-              className={field}
+    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-6">
+      <div className="w-full max-w-md">
+        {/* Progress Bar */}
+        <div className="flex gap-2 mb-8">
+          {[1, 2, 3, 4].map((s) => (
+            <div 
+              key={s} 
+              className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${step >= s ? "bg-white" : "bg-slate-800"}`}
             />
-            <p className="mt-1 text-xs text-slate-500">Your card gets sent here — make sure it&apos;s right.</p>
-          </div>
+          ))}
         </div>
 
-        <Button
-          onClick={submit}
-          disabled={!valid || submitting}
-          className="mt-6 w-full rounded-full bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700"
-        >
-          {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {submitting ? "Creating your card…" : "Create my card"}
-          {!submitting && <ArrowRight className="ml-2 h-4 w-4" />}
-        </Button>
-
-        <p className="mt-3 text-center text-xs text-slate-500">Non-custodial · we never access your funds</p>
+        {/* Step Content */}
+        {step === 1 && <Step1 />}
+        {step === 2 && <Step2 />}
+        {step === 3 && <Step3 />}
+        {step === 4 && <Step4 />}
       </div>
     </div>
   )

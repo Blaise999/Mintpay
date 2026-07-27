@@ -6,7 +6,13 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
-  images: { unoptimized: true },
+  images: {
+    // optimizer ON — serves AVIF/WebP, resizes per device, caches aggressively
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 2592000, // 30 days
+    deviceSizes: [360, 480, 640, 768, 1024, 1280, 1536, 1920],
+    imageSizes: [64, 96, 128, 160, 256, 320, 384],
+  },
 
   // Ship less JS: only pull the icons/components actually used from big libs.
   experimental: {

@@ -63,6 +63,8 @@ export default function RootLayout({
     <html lang="en" className={`${sans.variable} ${display.variable}`} suppressHydrationWarning>
       <head>
         <meta name="google-site-verification" content="pCijtRPRcIw7lEvQNXnUtUE4WReAEAgiFl2FURDGrz0" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="preconnect" href="https://coingecko.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://coingecko.com" />
         <link rel="icon" href="/mintpay-mark.svg" type="image/svg+xml" />
