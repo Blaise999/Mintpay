@@ -248,7 +248,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
   </div>
 
   {/* Hero Image */}
-  <div className="order-2 flex justify-center lg:justify-end overflow-visible">
+  <div className="order-2 -mt-20 sm:-mt-24 md:-mt-10 lg:mt-0 flex justify-center lg:justify-end overflow-visible">
     <MediaSlot
       src="/mint-1.png"
       alt="Trust card"
