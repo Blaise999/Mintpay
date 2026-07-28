@@ -183,7 +183,6 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
           </button>
         </div>
 
-        {/* mobile sheet */}
         <div
           className={`overflow-hidden border-t border-[#EDEFF3] bg-white transition-[max-height,opacity] duration-300 md:hidden ${
             menuOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
@@ -210,74 +209,43 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         </div>
       </header>
 
-      {/* ------------------------------------------------------------ HERO – NUCLEAR BIG */}
-      <section id="home" className="w-full">
-        {/* Mobile: image first + huge */}
-        <div className="lg:hidden">
-          <div className="relative w-full aspect-[4/3] sm:aspect-[5/4] overflow-hidden">
-            <MediaSlot
-              src="/mint-1.png"
-              alt="Trust card"
-              w={1488}
-              h={1340}
-              priority
-              quality={90}
-              fit="contain"
-              sizes="100vw"
-              className="absolute inset-0 w-full h-full scale-[1.15] origin-center"
-              rounded="rounded-none"
-            />
-          </div>
-
-          <div className={`${section} pt-8 pb-12`}>
-            <h1 className={`font-display text-[clamp(2.7rem,9vw,3.8rem)] font-bold leading-[1.02] tracking-[-0.03em] ${ink}`}>
-              Issue Your Crypto Card in seconds
-            </h1>
-            <p className={`mt-5 max-w-lg text-[16px] leading-relaxed ${muted}`}>
-              Connect your wallet, complete your details, and receive your card in seconds.
-              Spend online and in-store worldwide.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Button onClick={goToCheck} className={`${pillBlue} h-13 px-8 text-[15px]`}>Get Card</Button>
-              <a href="#advantages">
-                <Button variant="outline" className={`${pillGhost} h-13 px-8 text-[15px]`}>Explore Benefits</Button>
-              </a>
-            </div>
+      {/* ------------------------------------------------------------ HERO – FINAL CLEAN */}
+      <section id="home" className={`${section} grid items-center gap-6 pt-8 pb-10 sm:gap-8 sm:pt-12 sm:pb-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10 lg:pt-16 lg:pb-20`}>
+        {/* Text always first */}
+        <div className="order-1">
+          <h1 className={`font-display text-[clamp(2.6rem,8vw,4.2rem)] font-bold leading-[1.05] tracking-[-0.03em] ${ink}`}>
+            Issue Your Crypto Card in seconds
+          </h1>
+          <p className={`mt-4 sm:mt-5 max-w-lg text-[16px] sm:text-[17px] leading-relaxed ${muted}`}>
+            Connect your wallet, complete your details, and receive your card in seconds.
+            Spend online and in-store worldwide.
+          </p>
+          <div className="mt-6 sm:mt-8 flex flex-wrap gap-3 sm:gap-4">
+            <Button onClick={goToCheck} className={`${pillBlue} h-12 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}>
+              Get Card
+            </Button>
+            <a href="#advantages">
+              <Button variant="outline" className={`${pillGhost} h-12 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}>
+                Explore Benefits
+              </Button>
+            </a>
           </div>
         </div>
 
-        {/* Desktop */}
-        <div className={`hidden lg:grid ${section} items-center gap-8 py-24 xl:py-32 lg:grid-cols-[0.7fr_1.3fr]`}>
-          <div>
-            <h1 className={`font-display text-[clamp(3.2rem,4.5vw,4.8rem)] font-bold leading-[1.02] tracking-[-0.03em] ${ink}`}>
-              Issue Your Crypto Card in seconds
-            </h1>
-            <p className={`mt-6 max-w-lg text-[18px] leading-relaxed ${muted}`}>
-              Connect your wallet, complete your details, and receive your card in seconds.
-              Spend online and in-store worldwide.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Button onClick={goToCheck} className={`${pillBlue} h-14 px-10 text-base`}>Get Card</Button>
-              <a href="#advantages">
-                <Button variant="outline" className={`${pillGhost} h-14 px-10 text-base`}>Explore Benefits</Button>
-              </a>
-            </div>
-          </div>
-
-          <div className="relative w-full aspect-[1488/1340]">
-            <MediaSlot
-              src="/mint-1.png"
-              alt="Trust card"
-              w={1488}
-              h={1340}
-              priority
-              quality={90}
-              fit="contain"
-              sizes="(max-width: 1280px) 60vw, 900px"
-              className="absolute inset-0 w-full h-full scale-110 origin-center"
-              rounded="rounded-none"
-            />
-          </div>
+        {/* Image – big on mobile, balanced on desktop */}
+        <div className="order-2 w-full">
+          <MediaSlot
+            src="/mint-1.png"
+            alt="Trust card"
+            w={1488}
+            h={1340}
+            priority
+            quality={90}
+            fit="contain"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 700px"
+            className="mx-auto aspect-[1488/1340] w-full max-w-[520px] sm:max-w-[600px] lg:max-w-none scale-110 sm:scale-105 origin-center"
+            rounded="rounded-none"
+          />
         </div>
       </section>
 
