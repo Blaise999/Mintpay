@@ -1,4 +1,3 @@
-// components/onboarding.tsx
 "use client"
 
 import { useState, useCallback } from "react"
@@ -23,7 +22,17 @@ interface OnboardingProps {
   onComplete: (data: OnboardingData) => void
 }
 
-// Step Components - Defined OUTSIDE to prevent re-creation on every render
+/* Brand Constants (matching Exhibit B) */
+const ink = "text-[#0B0D17]"
+const muted = "text-[#6E7381]"
+
+const pill = "rounded-full font-semibold transition-colors"
+const pillBlue = `${pill} bg-[#0015FF] text-white hover:bg-[#0010CC]`
+const pillGhost = `${pill} border border-[#E8EAF0] bg-white ${ink} hover:bg-[#F7F8FA]`
+
+const cardBox = "rounded-2xl border border-[#E8EAF0] bg-white"
+
+/* Step Components */
 const Step1 = ({
   firstName,
   lastName,
@@ -38,27 +47,27 @@ const Step1 = ({
   nextStep: () => void
 }) => (
   <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
-    <h2 className="text-2xl font-bold text-white">Personal Details</h2>
-    <p className="text-slate-400 text-sm">Let's start with your name.</p>
+    <h2 className={`text-2xl font-bold ${ink}`}>Personal Details</h2>
+    <p className={`${muted} text-sm`}>Let's start with your name.</p>
 
     <div className="space-y-4">
       <div>
-        <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">First Name</label>
+        <label className="text-xs font-bold uppercase tracking-widest text-[#6E7381] mb-2 block">First Name</label>
         <input
           type="text"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
-          className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition-colors"
+          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors"
           placeholder="John"
         />
       </div>
       <div>
-        <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Last Name</label>
+        <label className="text-xs font-bold uppercase tracking-widest text-[#6E7381] mb-2 block">Last Name</label>
         <input
           type="text"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
-          className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition-colors"
+          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors"
           placeholder="Doe"
         />
       </div>
@@ -68,11 +77,7 @@ const Step1 = ({
       <button
         onClick={nextStep}
         disabled={!firstName.trim() || !lastName.trim()}
-        className={`w-full py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-all ${
-          !firstName.trim() || !lastName.trim()
-            ? "bg-slate-800 text-slate-500"
-            : "bg-white text-slate-950 hover:bg-slate-200"
-        }`}
+        className={`w-full py-4 ${pillBlue} text-lg flex items-center justify-center gap-2 disabled:bg-[#F1F3F7] disabled:text-[#9AA0AE] disabled:cursor-not-allowed`}
       >
         Next <ArrowRight className="h-5 w-5" />
       </button>
@@ -96,27 +101,27 @@ const Step2 = ({
   nextStep: () => void
 }) => (
   <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
-    <h2 className="text-2xl font-bold text-white">Contact Info</h2>
-    <p className="text-slate-400 text-sm">How can we reach you?</p>
+    <h2 className={`text-2xl font-bold ${ink}`}>Contact Info</h2>
+    <p className={`${muted} text-sm`}>How can we reach you?</p>
 
     <div className="space-y-4">
       <div>
-        <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Email Address</label>
+        <label className="text-xs font-bold uppercase tracking-widest text-[#6E7381] mb-2 block">Email Address</label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition-colors"
+          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors"
           placeholder="john@example.com"
         />
       </div>
       <div>
-        <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Phone Number</label>
+        <label className="text-xs font-bold uppercase tracking-widest text-[#6E7381] mb-2 block">Phone Number</label>
         <input
           type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition-colors"
+          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors"
           placeholder="+1 (555) 000-0000"
         />
       </div>
@@ -125,18 +130,14 @@ const Step2 = ({
     <div className="pt-4 flex gap-3">
       <button
         onClick={prevStep}
-        className="flex-1 py-4 rounded-full font-bold text-lg bg-slate-800 text-white hover:bg-slate-700 transition-colors"
+        className={`flex-1 py-4 rounded-full font-bold text-lg border border-[#E8EAF0] bg-white ${ink} hover:bg-[#F7F8FA]`}
       >
         Back
       </button>
       <button
         onClick={nextStep}
         disabled={!email.trim() || !phone.trim()}
-        className={`flex-1 py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-all ${
-          !email.trim() || !phone.trim()
-            ? "bg-slate-800 text-slate-500"
-            : "bg-white text-slate-950 hover:bg-slate-200"
-        }`}
+        className={`flex-1 py-4 ${pillBlue} text-lg flex items-center justify-center gap-2 disabled:bg-[#F1F3F7] disabled:text-[#9AA0AE] disabled:cursor-not-allowed`}
       >
         Next <ArrowRight className="h-5 w-5" />
       </button>
@@ -160,26 +161,26 @@ const Step3 = ({
   nextStep: () => void
 }) => (
   <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
-    <h2 className="text-2xl font-bold text-white">Address</h2>
-    <p className="text-slate-400 text-sm">Where should we send your card?</p>
+    <h2 className={`text-2xl font-bold ${ink}`}>Address</h2>
+    <p className={`${muted} text-sm`}>Where should we send your card?</p>
 
     <div className="space-y-4">
       <div>
-        <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Zip / Postal Code</label>
+        <label className="text-xs font-bold uppercase tracking-widest text-[#6E7381] mb-2 block">Zip / Postal Code</label>
         <input
           type="text"
           value={zipCode}
           onChange={(e) => setZipCode(e.target.value)}
-          className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition-colors"
+          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors"
           placeholder="10001"
         />
       </div>
       <div>
-        <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Country</label>
+        <label className="text-xs font-bold uppercase tracking-widest text-[#6E7381] mb-2 block">Country</label>
         <select
           value={country}
           onChange={(e) => setCountry(e.target.value)}
-          className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition-colors appearance-none"
+          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors appearance-none"
         >
           <option value="United States">United States</option>
           <option value="United Kingdom">United Kingdom</option>
@@ -204,16 +205,14 @@ const Step3 = ({
     <div className="pt-4 flex gap-3">
       <button
         onClick={prevStep}
-        className="flex-1 py-4 rounded-full font-bold text-lg bg-slate-800 text-white hover:bg-slate-700 transition-colors"
+        className={`flex-1 py-4 rounded-full font-bold text-lg border border-[#E8EAF0] bg-white ${ink} hover:bg-[#F7F8FA]`}
       >
         Back
       </button>
       <button
         onClick={nextStep}
         disabled={!zipCode.trim()}
-        className={`flex-1 py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-all ${
-          !zipCode.trim() ? "bg-slate-800 text-slate-500" : "bg-white text-slate-950 hover:bg-slate-200"
-        }`}
+        className={`flex-1 py-4 ${pillBlue} text-lg flex items-center justify-center gap-2 disabled:bg-[#F1F3F7] disabled:text-[#9AA0AE] disabled:cursor-not-allowed`}
       >
         Next <ArrowRight className="h-5 w-5" />
       </button>
@@ -241,30 +240,30 @@ const Step4 = ({
   isSubmitting: boolean
 }) => (
   <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
-    <h2 className="text-2xl font-bold text-white">Finalize</h2>
-    <p className="text-slate-400 text-sm">Review your details before creating your card.</p>
+    <h2 className={`text-2xl font-bold ${ink}`}>Finalize</h2>
+    <p className={`${muted} text-sm`}>Review your details before creating your card.</p>
 
-    <div className="bg-slate-900 rounded-2xl p-6 space-y-4 border border-slate-800">
-      <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-        <span className="text-slate-400 text-sm">Name</span>
-        <span className="text-white font-medium">{fullName}</span>
+    <div className={`${cardBox} p-6 space-y-4`}>
+      <div className="flex justify-between items-center border-b border-[#E8EAF0] pb-3">
+        <span className={`${muted} text-sm`}>Name</span>
+        <span className={`font-medium ${ink}`}>{fullName}</span>
       </div>
-      <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-        <span className="text-slate-400 text-sm">Email</span>
-        <span className="text-white font-medium">{email}</span>
+      <div className="flex justify-between items-center border-b border-[#E8EAF0] pb-3">
+        <span className={`${muted} text-sm`}>Email</span>
+        <span className={`font-medium ${ink}`}>{email}</span>
       </div>
-      <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-        <span className="text-slate-400 text-sm">Phone</span>
-        <span className="text-white font-medium">{phone}</span>
+      <div className="flex justify-between items-center border-b border-[#E8EAF0] pb-3">
+        <span className={`${muted} text-sm`}>Phone</span>
+        <span className={`font-medium ${ink}`}>{phone}</span>
       </div>
       <div className="flex justify-between items-center">
-        <span className="text-slate-400 text-sm">Location</span>
-        <span className="text-white font-medium">{zipCode}, {country}</span>
+        <span className={`${muted} text-sm`}>Location</span>
+        <span className={`font-medium ${ink}`}>{zipCode}, {country}</span>
       </div>
       {address && (
-        <div className="flex justify-between items-center pt-3 border-t border-slate-800">
-          <span className="text-slate-400 text-sm">Wallet</span>
-          <span className="text-white font-medium text-xs break-all">{address}</span>
+        <div className="flex justify-between items-center pt-3 border-t border-[#E8EAF0]">
+          <span className={`${muted} text-sm`}>Wallet</span>
+          <span className={`font-medium text-xs break-all ${ink}`}>{address}</span>
         </div>
       )}
     </div>
@@ -273,12 +272,12 @@ const Step4 = ({
       <button
         onClick={handleSubmit}
         disabled={isSubmitting}
-        className="w-full py-4 rounded-full font-bold text-lg bg-[#0015FF] text-white hover:bg-blue-700 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+        className={`w-full py-4 ${pillBlue} text-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed`}
       >
         {isSubmitting ? (
           <>
             <Loader2 className="h-5 w-5 animate-spin" />
-            <span>Minting your card...</span>
+            Minting your card...
           </>
         ) : (
           "Create Card"
@@ -289,13 +288,12 @@ const Step4 = ({
 )
 
 export function Onboarding({ onComplete }: OnboardingProps) {
-  const session = useSession() as any   // ← Fixed typing
+  const session = useSession() as any
   const address = session?.address
 
   const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Form States
   const [firstName, setFirstName] = useState(session?.name?.split(" ")[0] || "")
   const [lastName, setLastName] = useState(session?.name?.split(" ")[1] || "")
   const [email, setEmail] = useState(session?.email || "")
@@ -306,11 +304,11 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const fullName = `${firstName.trim()} ${lastName.trim()}`.trim()
 
   const nextStep = useCallback(() => {
-    if (step < 4) setStep(s => s + 1)
+    if (step < 4) setStep((s) => s + 1)
   }, [step])
 
   const prevStep = useCallback(() => {
-    if (step > 1) setStep(s => s - 1)
+    if (step > 1) setStep((s) => s - 1)
   }, [step])
 
   const handleSubmit = async () => {
@@ -368,7 +366,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#F7F8FA] flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         {/* Progress Bar */}
         <div className="flex gap-2 mb-8">
@@ -376,7 +374,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             <div
               key={s}
               className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-                step >= s ? "bg-white" : "bg-slate-800"
+                step >= s ? "bg-[#0015FF]" : "bg-[#E8EAF0]"
               }`}
             />
           ))}
