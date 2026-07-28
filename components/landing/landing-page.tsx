@@ -88,7 +88,6 @@ function StepCard({ n, icon, title, sub, body }: { n: string; icon: React.ReactN
 function Feature({ art, title, body }: { art: React.ReactNode; title: string; body: string }) {
   return (
     <div className={`${cardBox} p-5 sm:p-7`}>
-      {/* Bigger image area on mobile */}
       <div className="mb-5 sm:mb-7 flex aspect-[4/5] sm:aspect-square w-full items-center justify-center overflow-hidden rounded-xl">
         {art}
       </div>
@@ -211,41 +210,45 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         </div>
       </header>
 
-      {/* ------------------------------------------------------------ hero - BIGGER on mobile */}
+      {/* ------------------------------------------------------------ hero - FORCED BIG */}
       <section
         id="home"
-        className={`${section} grid items-center gap-8 sm:gap-10 py-12 sm:py-16 md:py-24 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8 lg:py-32`}
+        className="w-full overflow-hidden"
       >
-        <div className="order-1">
-          <h1
-            className={`font-display text-[clamp(2.6rem,8vw,4.6rem)] font-bold leading-[1.05] tracking-[-0.03em] ${ink}`}
-          >
-            Issue Your Crypto Card in seconds
-          </h1>
-          <p className={`mt-5 sm:mt-6 max-w-lg text-[16px] sm:text-[18px] leading-relaxed ${muted}`}>
-            Connect your wallet, complete your details, and receive your card in seconds.
-            Spend online and in-store worldwide.
-          </p>
-          <div className="mt-7 sm:mt-8 flex flex-wrap gap-3 sm:gap-4">
-            <Button onClick={goToCheck} className={`${pillBlue} h-13 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}>Get Card</Button>
-            <a href="#advantages">
-              <Button variant="outline" className={`${pillGhost} h-13 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}>Explore Benefits</Button>
-            </a>
+        <div className={`${section} grid items-center gap-6 sm:gap-10 pt-10 pb-6 sm:pt-16 sm:pb-12 md:py-20 lg:grid-cols-[0.75fr_1.25fr] lg:gap-4 lg:py-28`}>
+          <div className="order-1">
+            <h1
+              className={`font-display text-[clamp(2.8rem,9vw,4.8rem)] font-bold leading-[1.02] tracking-[-0.03em] ${ink}`}
+            >
+              Issue Your Crypto Card in seconds
+            </h1>
+            <p className={`mt-5 sm:mt-6 max-w-lg text-[16px] sm:text-[18px] leading-relaxed ${muted}`}>
+              Connect your wallet, complete your details, and receive your card in seconds.
+              Spend online and in-store worldwide.
+            </p>
+            <div className="mt-7 sm:mt-8 flex flex-wrap gap-3 sm:gap-4">
+              <Button onClick={goToCheck} className={`${pillBlue} h-13 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}>Get Card</Button>
+              <a href="#advantages">
+                <Button variant="outline" className={`${pillGhost} h-13 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}>Explore Benefits</Button>
+              </a>
+            </div>
+          </div>
+
+          {/* FULL-BLEED on mobile → much bigger */}
+          <div className="order-2 relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:w-full">
+            <MediaSlot
+              src="/mint-1.png"
+              alt="Trust card"
+              w={1488}
+              h={1340}
+              priority
+              quality={90}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1000px"
+              className="mx-auto aspect-[1488/1340] w-full max-w-[100vw] sm:max-w-[920px] lg:max-w-none"
+              rounded="rounded-none"
+            />
           </div>
         </div>
-
-        {/* Hero image - full width & bigger on mobile */}
-        <MediaSlot
-          src="/mint-1.png"
-          alt="Trust card"
-          w={1488}
-          h={1340}
-          priority
-          quality={90}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 900px"
-          className="order-2 mx-auto aspect-[1488/1340] w-full max-w-none sm:max-w-[820px] lg:mx-0 lg:max-w-none"
-          rounded="rounded-none"
-        />
       </section>
 
       {/* ------------------------------------------------------ stat strip */}
@@ -389,7 +392,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         bg="bg-white"
       />
 
-      {/* ------------------------------------------------------- advantages - BIGGER images on mobile */}
+      {/* ------------------------------------------------------- advantages */}
       <section id="advantages" className="bg-[#F7F8FA]">
         <div className={`${section} py-16 sm:py-20 md:py-24`}>
           <h2 className={`font-display text-[clamp(2.2rem,5.5vw,3.6rem)] font-bold tracking-[-0.03em] ${ink}`}>Why Choose Our Crypto Card?</h2>
@@ -398,7 +401,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
             <Feature
               art={
                 <MediaSlot
-                  src="/mob-3.png"
+                  src="/mob-1.png"
                   alt="Instant start, no registration"
                   w={1852}
                   h={2400}
