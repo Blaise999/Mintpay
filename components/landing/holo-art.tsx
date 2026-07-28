@@ -1,7 +1,7 @@
 import type React from "react"
 
 /**
- * Original holographic / isometric illustration set for MintPay.
+ * Original holographic / isometric illustration set for Trust.
  * All hand-built SVG — no third-party or copied assets.
  * Palette: blue -> violet with cyan/fuchsia iridescent edges.
  * Shared gradients live in <HoloDefs/> (render once per page) and are
@@ -77,7 +77,7 @@ export function Coin({
   )
 }
 
-/* --- The MintPay card (glossy, slight tilt) --- */
+/* --- The Trust card (glossy, slight tilt) --- */
 export function CardArt({ className = "w-full" }: { className?: string }) {
   return (
     <svg viewBox="0 0 360 224" className={className} xmlns="http://www.w3.org/2000/svg">
@@ -92,7 +92,7 @@ export function CardArt({ className = "w-full" }: { className?: string }) {
           <rect x="0" y="0" width="34" height="34" rx="10" fill="#ffffff" fillOpacity="0.16" stroke="#ffffff" strokeOpacity="0.5" />
           <path d="M9 26 V11 L17 18 L25 11 V26" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" />
           <path d="M13.5 13 L17 8.5 L20.5 13" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
-          <text x="44" y="22" fill="#ffffff" fontFamily="'Outfit', sans-serif" fontSize="22" fontWeight="700" letterSpacing="-0.5">MintPay</text>
+          <text x="44" y="22" fill="#ffffff" fontFamily="'Outfit', sans-serif" fontSize="22" fontWeight="700" letterSpacing="-0.5">Trust</text>
           <text x="45" y="34" fill="#ffffff" fillOpacity="0.75" fontFamily="'Outfit', sans-serif" fontSize="8" fontWeight="700" letterSpacing="2">CREDIT</text>
         </g>
         {/* contactless */}
@@ -279,7 +279,7 @@ export function PhoneTap({ className = "w-full" }: { className?: string }) {
           <g transform="translate(18 20)">
             <rect width="24" height="24" rx="7" fill="#ffffff" fillOpacity="0.16" stroke="#fff" strokeOpacity="0.5" />
             <path d="M6 18 V8 L12 13 L18 8 V18" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />
-            <text x="32" y="17" fill="#fff" fontFamily="'Outfit',sans-serif" fontSize="15" fontWeight="700">MintPay</text>
+            <text x="32" y="17" fill="#fff" fontFamily="'Outfit',sans-serif" fontSize="15" fontWeight="700">Trust</text>
           </g>
           <text x="18" y="112" fill="#fff" fillOpacity="0.85" fontSize="12" letterSpacing="2">•••• 0927</text>
         </g>

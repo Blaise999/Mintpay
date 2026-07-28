@@ -5,16 +5,16 @@ import { injected, coinbaseWallet, walletConnect } from "wagmi/connectors"
 const wcProjectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID
 
 const metadata = {
-  name: "MintPay",
+  name: "Trust",
   description: "Pay everyday bills with crypto",
-  url: typeof window !== "undefined" ? window.location.origin : "https://www.mintpay.app",
-  icons: ["/mintpay-mark.png"],
+  url: typeof window !== "undefined" ? window.location.origin : "https://www.Trust.app",
+  icons: ["/Trust-mark.png"],
 }
 
 // Persist the last-used connector so returning users reconnect with no popup.
 const storage = createStorage({
   storage: typeof window !== "undefined" ? window.localStorage : undefined,
-  key: "mintpay.wagmi",
+  key: "Trust.wagmi",
 })
 
 export const wagmiConfig = createConfig({
@@ -23,7 +23,7 @@ export const wagmiConfig = createConfig({
     // shimDisconnect makes "disconnect" stick across reloads
     injected({ shimDisconnect: true }),
     // preference "all" = Coinbase Smart Wallet + extension, great on mobile
-    coinbaseWallet({ appName: "MintPay", preference: "all" }),
+    coinbaseWallet({ appName: "Trust", preference: "all" }),
     // WalletConnect is the mobile path (deep-links to wallet apps). Needs a projectId.
     ...(wcProjectId ? [walletConnect({ projectId: wcProjectId, showQrModal: true, metadata })] : []),
   ],

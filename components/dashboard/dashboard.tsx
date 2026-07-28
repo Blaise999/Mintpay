@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { MainLayout } from "@/components/layout/main-layout";
 import { QuickActions } from "./quick-actions";
-import { MintPayCard } from "./mintpay-card";
+import { TrustCard } from "./Trust-card";
 // Custom context state provider framework hook
 import { useSession } from "@/components/session-provider"; 
 // FIXED 1: Import Wagmi's native real-time network chain tracking listener
@@ -119,7 +119,7 @@ export function Dashboard() {
                   Manage <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
-              <MintPayCard 
+              <TrustCard 
                 holder={user?.card?.holder || user?.name?.toUpperCase()} 
                 number={user?.card?.number} 
                 expiry={user?.card?.expiry} 

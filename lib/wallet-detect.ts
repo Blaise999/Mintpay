@@ -16,7 +16,7 @@ import type { Connector } from "wagmi"
  *   5. WalletConnect                          (nothing local; deep-link / QR)
  */
 
-const STORAGE_KEY = "mintpay.wagmi.recentConnectorId"
+const STORAGE_KEY = "Trust.wagmi.recentConnectorId"
 
 type Ranked = { connector: Connector; score: number; why: string }
 

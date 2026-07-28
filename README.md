@@ -1,4 +1,4 @@
-# 🪙 MintPay - Crypto Utility Payment Platform
+# 🪙 Trust - Crypto Utility Payment Platform
 
 **Status:** ✅ *Live on Production*
 
@@ -6,9 +6,9 @@ A revolutionary payment platform that makes it simple for users to convert crypt
 
 ---
 
-## 🎯 What is MintPay?
+## 🎯 What is Trust?
 
-MintPay bridges the gap between cryptocurrency and real-world utility needs in Africa. Whether you want to buy airtime from your favorite telecom provider, pay your electricity or TV bills, or purchase data bundles — you can now do it all using crypto.
+Trust bridges the gap between cryptocurrency and real-world utility needs in Africa. Whether you want to buy airtime from your favorite telecom provider, pay your electricity or TV bills, or purchase data bundles — you can now do it all using crypto.
 
 **Perfect for:**
 - Users who have crypto and want to use it for daily expenses
@@ -53,7 +53,7 @@ Use crypto on three different blockchain networks:
 ## 🚀 Getting Started
 
 ### For Users
-1. Visit the MintPay website at https://www.mintpay.org/
+1. Visit the Trust website at https://www.Trust.org/
 2. Connect your cryptocurrency wallet
 3. Choose what you want to buy or which bill to pay
 4. Enter the amount and details
@@ -69,8 +69,8 @@ Use crypto on three different blockchain networks:
 **Installation:**
 \`\`\`bash
 # Clone the repository
-git clone https://github.com/Team-memevibe/MintPay.git
-cd MintPay
+git clone https://github.com/Team-memevibe/Trust.git
+cd Trust
 
 # Install dependencies
 pnpm install
@@ -112,7 +112,7 @@ The application will be available at `http://localhost:3000/`
 ## 📂 Project Structure
 
 \`\`\`
-mintpay/
+Trust/
 ├── app/                    # Page components and routes
 │   ├── airtime/           # Airtime purchase page
 │   ├── internet/          # Data bundle page
@@ -220,8 +220,8 @@ User's Journey:
 
 Have questions? Need help?
 
-- **Email**: support@mintpay.org
-- **Twitter**: [@MintPay_org1](https://x.com/MintPay_org1)
+- **Email**: support@Trust.org
+- **Twitter**: [@Trust_org1](https://x.com/Trust_org1)
 
 
 ---
@@ -234,7 +234,7 @@ This project is proprietary software. All rights reserved.
 
 ## 👥 Team
 
-Built with ❤️ by the MintPay team at Team Memevibe
+Built with ❤️ by the Trust team at Team Memevibe
 
 ---
 

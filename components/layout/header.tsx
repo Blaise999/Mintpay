@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { MintPayLogo } from "@/components/brand/logo"
+import { TrustLogo } from "@/components/brand/logo"
 import { useTheme } from "next-themes"
 import { useRouter } from "next/navigation"
 import { useSession } from "@/components/session-provider"
@@ -72,7 +72,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         </Button>
 
         <div className="flex items-center space-x-2 lg:space-x-4">
-          <MintPayLogo markClassName="h-8 w-8" wordClassName="text-lg hidden sm:block" />
+          <TrustLogo markClassName="h-8 w-8" wordClassName="text-lg hidden sm:block" />
         </div>
 
         <div className="flex-1 max-w-md mx-4 hidden md:block">

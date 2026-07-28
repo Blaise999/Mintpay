@@ -26,7 +26,7 @@ export default function PrivacyPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <p className="text-muted-foreground">
-              This Privacy Policy explains how MintPay handles your information. We are committed to 
+              This Privacy Policy explains how Trust handles your information. We are committed to 
               protecting your privacy while providing a seamless decentralized payment experience.
             </p>
 
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
                   <h3 className="text-xl font-semibold">1. No Personal Data Collection</h3>
                 </div>
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-9">
-                  <li>MintPay does not collect personal data (name, email, phone, address)</li>
+                  <li>Trust does not collect personal data (name, email, phone, address)</li>
                   <li>We only interact with public blockchain wallet addresses</li>
                   <li>No user accounts or registration required</li>
                   <li>Your identity remains pseudonymous through your wallet address</li>
@@ -153,7 +153,7 @@ export default function PrivacyPage() {
                   <h3 className="text-xl font-semibold">9. International Users</h3>
                 </div>
                 <p className="text-muted-foreground ml-9">
-                  MintPay is accessible globally. By using our service, you acknowledge that 
+                  Trust is accessible globally. By using our service, you acknowledge that 
                   your transaction data will be processed on public blockchains and may be 
                   accessed from various jurisdictions.
                 </p>
@@ -186,7 +186,7 @@ export default function PrivacyPage() {
               </p>
               <div className="mt-3 space-y-1">
                 <p className="font-medium">
-                  Email: <a href="mailto:support@mintpay.app" className="text-primary hover:underline">support@mintpay.app</a>
+                  Email: <a href="mailto:support@Trust.app" className="text-primary hover:underline">support@Trust.app</a>
                 </p>
                 <p className="text-sm text-muted-foreground">
                   We aim to respond to all privacy inquiries within 48 hours.

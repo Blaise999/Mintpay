@@ -5,7 +5,7 @@ import { useState, useCallback } from "react"
 import { ArrowRight, Loader2 } from "lucide-react"
 import { useSession } from "./session-provider"
 import { toast } from "sonner"
-import type { CardInfo } from "@/components/mintpay-card"
+import type { CardInfo } from "@/components/Trust-card"
 
 export interface OnboardingData {
   name: string
@@ -281,7 +281,7 @@ const Step4 = ({
             <span>Minting your card...</span>
           </>
         ) : (
-          "Create My MintPay Card"
+          "Create Card"
         )}
       </button>
     </div>
@@ -357,7 +357,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         country: country.trim(),
       }
 
-      toast.success("Your MintPay card has been successfully created!")
+      toast.success("Your Trust card has been successfully created!")
       onComplete(result)
     } catch (error: any) {
       console.error(error)

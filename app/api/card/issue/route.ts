@@ -5,7 +5,7 @@ import { sendCardEmail } from "@/lib/server/email"
 
 export const runtime = "nodejs"
 
-// POST { walletAddress } — issue (or re-send) the user's MintPay card by email.
+// POST { walletAddress } — issue (or re-send) the user's Trust card by email.
 export async function POST(req: Request) {
   try {
     const { walletAddress } = await req.json()

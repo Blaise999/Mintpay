@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { Camera, CreditCard, Loader2, Save } from "lucide-react"
-import { MintPayCard } from "./mintpay-card"
+import { TrustCard } from "./Trust-card"
 
 type UserDoc = {
   walletAddress: string
@@ -144,9 +144,9 @@ export function ProfileCard() {
 
       {/* Card */}
       <div className="rounded-2xl border bg-white p-6 dark:border-white/10 dark:bg-gray-950">
-        <h3 className="font-display text-xl font-bold">Your MintPay card</h3>
+        <h3 className="font-display text-xl font-bold">Your Trust card</h3>
         <div className="mt-5">
-          <MintPayCard holder={doc?.card?.holder || name.toUpperCase()} number={doc?.card?.number} expiry={doc?.card?.expiry} />
+          <TrustCard holder={doc?.card?.holder || name.toUpperCase()} number={doc?.card?.number} expiry={doc?.card?.expiry} />
         </div>
         <Button onClick={issueCard} disabled={issuing} variant="outline" className="mt-5 w-full">
           {issuing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CreditCard className="mr-2 h-4 w-4" />}

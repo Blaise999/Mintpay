@@ -1,5 +1,5 @@
 /**
- * MintPay display card. This generates a MintPay-branded card number for the
+ * Trust display card. This generates a Trust-branded card number for the
  * user's profile/record and email — it is NOT a real payment-network card
  * (no Visa/Mastercard BIN). The leading "7" avoids any bank-network industry id.
  */
@@ -19,7 +19,7 @@ function luhnCheckDigit(num15: string): number {
 }
 
 export function generateCardNumber(): string {
-  let body = "7042" // neutral MintPay prefix (not a card-network BIN)
+  let body = "7042" // neutral Trust prefix (not a card-network BIN)
   while (body.length < 15) body += Math.floor(Math.random() * 10).toString()
   const check = luhnCheckDigit(body)
   return body + check.toString()
@@ -36,10 +36,10 @@ export function futureExpiry(yearsAhead = 4): string {
   return `${mm}/${yy}`
 }
 
-/** Branded MintPay credit-card block for emails (table-based, solid fallback). */
+/** Branded Trust credit-card block for emails (table-based, solid fallback). */
 export function cardEmailHtml(opts: { holder: string; number: string; expiry: string }): string {
   const num = groupNumber(opts.number)
-  const holder = escapeHtml(opts.holder || "MINTPAY MEMBER")
+  const holder = escapeHtml(opts.holder || "Trust MEMBER")
   return `
   <table role="presentation" width="360" cellpadding="0" cellspacing="0" style="max-width:360px;width:100%;border-collapse:separate;">
     <tr>
@@ -47,7 +47,7 @@ export function cardEmailHtml(opts: { holder: string; number: string; expiry: st
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td style="font-size:19px;font-weight:bold;letter-spacing:0.3px;color:#ffffff;">
-              MintPay
+              Trust
               <div style="font-size:9px;font-weight:bold;letter-spacing:2px;color:#dbeafe;margin-top:2px;">CREDIT</div>
             </td>
             <td align="right" valign="top" style="font-size:11px;letter-spacing:1px;color:#c7d2fe;">CARD</td>

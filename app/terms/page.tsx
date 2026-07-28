@@ -18,12 +18,12 @@ export default function TermsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Welcome to MintPay</CardTitle>
+            <CardTitle className="text-2xl">Welcome to Trust</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <p className="text-muted-foreground">
-              MintPay is a decentralized crypto payment solution built for transparency, security, and on-chain commerce. 
-              By accessing or using MintPay, you agree to the following terms and conditions.
+              Trust is a decentralized crypto payment solution built for transparency, security, and on-chain commerce. 
+              By accessing or using Trust, you agree to the following terms and conditions.
             </p>
 
             <Separator />
@@ -41,8 +41,8 @@ export default function TermsPage() {
               <section className="space-y-4">
                 <h3 className="text-xl font-semibold">2. Service Description</h3>
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                  <li>MintPay enables ERC20 token-based payments on Base blockchain</li>
-                  <li>It is a non-custodial system — MintPay never holds user funds</li>
+                  <li>Trust enables ERC20 token-based payments on Base blockchain</li>
+                  <li>It is a non-custodial system — Trust never holds user funds</li>
                   <li>All interactions are handled via smart contracts with pre-defined logic</li>
                   <li>Services include electricity bill payments, TV subscriptions, internet data, and airtime purchases</li>
                 </ul>
@@ -52,8 +52,8 @@ export default function TermsPage() {
                 <h3 className="text-xl font-semibold">3. Wallet Responsibilities</h3>
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                   <li>Users must maintain sufficient ERC20 token balance for transactions</li>
-                  <li>Users must approve the MintPay smart contract to spend tokens before initiating payments</li>
-                  <li>MintPay is not responsible for losses due to compromised wallets or private keys</li>
+                  <li>Users must approve the Trust smart contract to spend tokens before initiating payments</li>
+                  <li>Trust is not responsible for losses due to compromised wallets or private keys</li>
                   <li>Always verify transaction details before confirming</li>
                 </ul>
               </section>
@@ -110,7 +110,7 @@ export default function TermsPage() {
                 <h3 className="text-xl font-semibold">9. Fees & Costs</h3>
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                   <li>Users pay blockchain gas fees for each on-chain transaction</li>
-                  <li>No additional platform fees are charged by MintPay</li>
+                  <li>No additional platform fees are charged by Trust</li>
                   <li>Service providers may have their own fees included in payment amounts</li>
                 </ul>
               </section>
@@ -118,8 +118,8 @@ export default function TermsPage() {
               <section className="space-y-4">
                 <h3 className="text-xl font-semibold">10. Risks & Disclaimers</h3>
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                  <li>Use MintPay at your own risk. Blockchain transactions are irreversible</li>
-                  <li>MintPay is not liable for incorrect token transfers or user errors</li>
+                  <li>Use Trust at your own risk. Blockchain transactions are irreversible</li>
+                  <li>Trust is not liable for incorrect token transfers or user errors</li>
                   <li>Service downtime, smart contract upgrades, or third-party service issues</li>
                   <li>Cryptocurrency market volatility affecting token values</li>
                   <li>Regulatory changes that may impact service availability</li>
@@ -151,8 +151,8 @@ export default function TermsPage() {
               <p>Last updated: July 31, 2025</p>
               <p className="mt-2">
                 For questions about these terms, contact us at{" "}
-                <a href="mailto:support@mintpay.app" className="text-primary hover:underline">
-                  support@mintpay.app
+                <a href="mailto:support@Trust.app" className="text-primary hover:underline">
+                  support@Trust.app
                 </a>
               </p>
             </div>

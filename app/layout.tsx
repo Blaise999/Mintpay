@@ -23,16 +23,16 @@ const sans = Plus_Jakarta_Sans({
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://mintpay.app"),
-  title: "MintPay — Crypto to Utilities",
+  metadataBase: new URL("https://Trust.app"),
+  title: "Trust — Crypto to Utilities",
   description: "Convert cryptocurrency to pay for airtime, data, TV subscriptions, electricity, and internet bills — instantly.",
   generator: "TEAM MEMEVIBE",
-  applicationName: "MintPay",
+  applicationName: "Trust",
   openGraph: {
-    title: "MintPay — Crypto to Utilities",
+    title: "Trust — Crypto to Utilities",
     description: "Pay everyday bills with crypto — instantly. Airtime, data, electricity, TV, and internet, all from your wallet.",
-    url: "https://mintpay.app",
-    siteName: "MintPay",
+    url: "https://Trust.app",
+    siteName: "Trust",
     locale: "en_US",
     type: "website",
     images: [
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
         url: "/Og-image.png",
         width: 1200,
         height: 630,
-        alt: "MintPay — pay everyday bills with crypto",
+        alt: "Trust — pay everyday bills with crypto",
         type: "image/png",
       },
     ],
@@ -67,10 +67,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="preconnect" href="https://coingecko.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://coingecko.com" />
-        <link rel="icon" href="/mintpay-mark.svg" type="image/svg+xml" />
-        <link rel="icon" href="/mintpay-mark.png" type="image/png" sizes="512x512" />
-        <link rel="shortcut icon" href="/mintpay-mark.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/mintpay-mark.png" />
+        <link rel="icon" href="/Trust-mark.svg" type="image/svg+xml" />
+        <link rel="icon" href="/Trust-mark.png" type="image/png" sizes="512x512" />
+        <link rel="shortcut icon" href="/Trust-mark.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/Trust-mark.png" />
       </head>
       <body className="font-sans">
         <ClientProviders>

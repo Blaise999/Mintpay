@@ -1,18 +1,18 @@
 import { MongoClient, type Db } from "mongodb";
 
 const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB || "mintpay";
+const dbName = process.env.MONGODB_DB || "Trust";
 
 if (!uri) {
   throw new Error("❌ MONGODB_URI is not defined in .env.local");
 }
 
-let cached = (global as any)._mintpayMongo as
+let cached = (global as any)._TrustMongo as
   | { client: MongoClient; db: Db; promise: Promise<MongoClient> | null }
   | undefined;
 
 if (!cached) {
-  cached = (global as any)._mintpayMongo = { 
+  cached = (global as any)._TrustMongo = { 
     client: null as any, 
     db: null as any, 
     promise: null 

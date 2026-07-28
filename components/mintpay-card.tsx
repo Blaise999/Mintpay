@@ -9,7 +9,7 @@ export type CardInfo = {
   issuedAt?: string
 }
 
-export function MintPayCard({
+export function TrustCard({
   holder,
   number,
   expiry,
@@ -31,7 +31,7 @@ export function MintPayCard({
 
       <div className="relative flex items-start justify-between">
         <div>
-          <span className="font-display text-lg font-bold">MintPay</span>
+          <span className="font-display text-lg font-bold">Trust</span>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/70">Credit</p>
         </div>
         {/* contactless */}
@@ -49,7 +49,7 @@ export function MintPayCard({
       <div className="relative mt-3 flex items-end justify-between">
         <div>
           <p className="text-[9px] uppercase tracking-widest text-white/60">Card holder</p>
-          <p className="text-sm uppercase tracking-wider">{holder || "MINTPAY MEMBER"}</p>
+          <p className="text-sm uppercase tracking-wider">{holder || "Trust MEMBER"}</p>
         </div>
         <div className="text-right">
           <p className="text-[9px] uppercase tracking-widest text-white/60">Expires</p>

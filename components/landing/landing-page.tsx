@@ -404,7 +404,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
               ["Can I freeze or unfreeze my card?", "Yes. You can instantly freeze or unfreeze your card whenever you need from your dashboard."],
               ["What happens if my card is lost or stolen?", "You can immediately freeze your card and request a replacement through your account."],
               ["How long does it take to receive my physical card?", "Delivery times vary by country and shipping method. Virtual cards are available instantly after activation."],
-              ["How can I contact support?", "Our support team is available 24/7 through live chat and email at support@mintpay.com."],
+              ["How can I contact support?", "Our support team is available 24/7 through live chat and email at support@Trust.com."],
             ].map(([q, a], i) => (
               <AccordionItem key={i} value={`i${i}`} className="border-b border-[#E8EAF0]">
                 <AccordionTrigger className={`py-6 text-left font-display text-lg font-bold ${ink} hover:no-underline`}>{q}</AccordionTrigger>
@@ -452,7 +452,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
             {[["Privacy", "/privacy"], ["Terms", "/terms"], ["Support", "/support"]].map(([l, h]) => (
               <Link key={l} href={h} className={`${muted} hover:text-[#0015FF]`}>{l}</Link>
             ))}
-            <a href="mailto:support@mintpay.com" className={`${muted} hover:text-[#0015FF]`}>support@mintpay.com</a>
+            <a href="mailto:support@Trust.com" className={`${muted} hover:text-[#0015FF]`}>support@Trust.com</a>
           </nav>
           <p className="text-sm text-[#9AA0AE]">© {new Date().getFullYear()} Trust</p>
         </div>

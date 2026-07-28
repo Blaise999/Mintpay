@@ -1,13 +1,13 @@
 import type { CSSProperties } from "react"
 
 /**
- * MintPay coin mark — a minted-coin tile with an "M" monogram
+ * Trust coin mark — a minted-coin tile with an "M" monogram
  * whose negative space holds an upward "pay" chevron.
  * Self-contained inline SVG so it needs no network / image asset.
  */
-export function MintPayMark({
+export function TrustMark({
   className = "h-8 w-8",
-  title = "MintPay",
+  title = "Trust",
 }: {
   className?: string
   title?: string
@@ -66,10 +66,10 @@ export function MintPayMark({
 }
 
 /**
- * Full MintPay lockup: mark + wordmark.
+ * Full Trust lockup: mark + wordmark.
  * The wordmark uses the display face (Space Grotesk) via `font-display`.
  */
-export function MintPayLogo({
+export function TrustLogo({
   className = "",
   markClassName = "h-9 w-9",
   wordClassName = "text-xl",
@@ -84,7 +84,7 @@ export function MintPayLogo({
 }) {
   return (
     <div className={`flex items-center gap-2.5 ${className}`} style={style}>
-      <MintPayMark className={`${markClassName} drop-shadow-sm`} />
+      <TrustMark className={`${markClassName} drop-shadow-sm`} />
       <span
         className={`font-display font-bold tracking-tight ${wordClassName} ${
           gradient
@@ -92,7 +92,7 @@ export function MintPayLogo({
             : ""
         }`}
       >
-        MintPay
+        Trust
       </span>
     </div>
   )
