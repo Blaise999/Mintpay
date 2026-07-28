@@ -1,6 +1,5 @@
 "use client"
 import { useEffect, useState } from "react"
-import Link from "next/link"
 import Image from "next/image"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
@@ -207,16 +206,21 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
       </header>
 
       {/* ------------------------------------------------------------ hero */}
-      <section id="home" className={`${section} grid items-center gap-6 py-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-8 lg:py-12`}>
+      <section
+        id="home"
+        className={`${section} grid items-center gap-8 py-16 md:py-20 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12 lg:py-28`}
+      >
         <div className="order-1">
-          <h1 className={`font-display text-[clamp(2.5rem,5.2vw,3.6rem)] font-bold leading-[1.05] tracking-[-0.03em] ${ink}`}>
+          <h1
+            className={`font-display text-[clamp(2.85rem,6.8vw,4.6rem)] font-bold leading-[1.05] tracking-[-0.03em] ${ink}`}
+          >
             Issue Your Crypto Card in seconds
           </h1>
-          <p className={`mt-5 max-w-lg text-[17px] leading-relaxed ${muted}`}>
+          <p className={`mt-6 max-w-lg text-[18px] leading-relaxed ${muted}`}>
             Connect your wallet, complete your details, and receive your card in seconds.
             Spend online and in-store worldwide.
           </p>
-          <div className="mt-7 flex flex-wrap gap-4">
+          <div className="mt-8 flex flex-wrap gap-4">
             <Button onClick={goToCheck} className={`${pillBlue} h-14 px-10 text-base`}>Get Card</Button>
             <a href="#advantages">
               <Button variant="outline" className={`${pillGhost} h-14 px-10 text-base`}>Explore Benefits</Button>
@@ -226,8 +230,8 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         <MediaSlot
           src="/mint-1.png" alt="Trust card" w={1488} h={1340}
           priority
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 55vw, 640px"
-          className="order-2 mx-auto aspect-[1488/1340] w-full max-w-[560px] lg:mx-0 lg:max-w-none"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 720px"
+          className="order-2 mx-auto aspect-[1488/1340] w-full max-w-[680px] lg:mx-0 lg:max-w-none"
           rounded="rounded-none"
         />
       </section>
@@ -448,12 +452,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
             <MediaSlot src="/tw.png" alt="Trust" w={180} h={162} className="h-8 w-8" rounded="rounded-lg" />
             <span className={`font-display text-lg font-bold ${ink}`}>Trust</span>
           </div>
-          <nav className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm">
-            {[["Privacy", "/privacy"], ["Terms", "/terms"], ["Support", "/support"]].map(([l, h]) => (
-              <Link key={l} href={h} className={`${muted} hover:text-[#0015FF]`}>{l}</Link>
-            ))}
-            <a href="mailto:support@Trust.com" className={`${muted} hover:text-[#0015FF]`}>support@Trust.com</a>
-          </nav>
+          <a href="mailto:support@Trust.com" className={`${muted} hover:text-[#0015FF] text-sm`}>support@Trust.com</a>
           <p className="text-sm text-[#9AA0AE]">© {new Date().getFullYear()} Trust</p>
         </div>
       </footer>
