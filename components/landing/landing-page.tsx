@@ -208,7 +208,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
       {/* ------------------------------------------------------------ hero */}
       <section
         id="home"
-        className={`${section} grid items-center gap-8 py-16 md:py-20 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12 lg:py-28`}
+        className={`${section} grid items-center gap-10 py-16 md:py-24 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8 lg:py-32`}
       >
         <div className="order-1">
           <h1
@@ -228,10 +228,13 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
           </div>
         </div>
         <MediaSlot
-          src="/mint-1.png" alt="Trust card" w={1488} h={1340}
+          src="/mint-1.png"
+          alt="Trust card"
+          w={1488}
+          h={1340}
           priority
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 720px"
-          className="order-2 mx-auto aspect-[1488/1340] w-full max-w-[680px] lg:mx-0 lg:max-w-none"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 900px"
+          className="order-2 mx-auto aspect-[1488/1340] w-full max-w-[820px] lg:mx-0 lg:max-w-none"
           rounded="rounded-none"
         />
       </section>
@@ -383,7 +386,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
           <h2 className={`font-display text-[clamp(2.4rem,5vw,3.6rem)] font-bold tracking-[-0.03em] ${ink}`}>Why Choose Our Crypto Card?</h2>
           <p className={`mt-3 text-[17px] ${muted}`}>Everything you need to spend crypto with speed, privacy, and global acceptance.</p>
           <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Feature art={<MediaSlot src="/mob-1.png" alt="Instant start, no registration" w={1852} h={2400} className="h-full w-full" rounded="rounded-xl" />} title="Instant start, no registration"
+            <Feature art={<MediaSlot src="/mob-3.png" alt="Instant start, no registration" w={1852} h={2400} className="h-full w-full" rounded="rounded-xl" />} title="Instant start, no registration"
               body="No need to register or pass KYC verification. Start using the card right away." />
             <Feature art={<MediaSlot src="/mob-2.png" alt="Low cost" w={463} h={600} className="h-full w-full" rounded="rounded-xl" />} title="Low cost"
               body="Issuing a card is free. No hidden charges, no monthly costs." />
