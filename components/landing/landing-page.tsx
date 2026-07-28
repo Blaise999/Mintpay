@@ -208,85 +208,84 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         </div>
       </header>
 
-      {/* ========================================================== HERO - CLEAN */}
-    <section
-  id="home"
-  className={`${section} grid items-center gap-6 pt-8 pb-8 sm:pt-12 sm:pb-12 lg:grid-cols-[1fr_1.15fr] lg:gap-8 lg:pt-10 lg:pb-12`}
->
-  {/* Text */}
-  <div className="order-1">
-    <h1
-      className={`font-display text-[clamp(2.8rem,8vw,4.3rem)] font-bold leading-[1.05] tracking-[-0.03em] ${ink}`}
-    >
-      Issue Your Crypto Card in seconds
-    </h1>
-
-    <p
-      className={`mt-5 max-w-[520px] text-[16px] sm:text-[18px] leading-relaxed ${muted}`}
-    >
-      Connect your wallet, complete your details, and receive your card in
-      seconds. Spend online and in-store worldwide.
-    </p>
-
-    <div className="mt-7 sm:mt-8 flex flex-wrap gap-3 sm:gap-4">
-      <Button
-        onClick={goToCheck}
-        className={`${pillBlue} h-12 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}
+      {/* ========================================================== HERO - FIXED */}
+      <section
+        id="home"
+        className={`${section} grid items-center gap-6 pt-8 pb-8 sm:pt-12 sm:pb-12 lg:grid-cols-[1fr_1.15fr] lg:gap-8 lg:pt-10 lg:pb-12 relative`}
       >
-        Get Card
-      </Button>
+        {/* Text */}
+        <div className="order-1 relative z-20">
+          <h1
+            className={`font-display text-[clamp(2.8rem,8vw,4.3rem)] font-bold leading-[1.05] tracking-[-0.03em] ${ink}`}
+          >
+            Issue Your Crypto Card in seconds
+          </h1>
 
-      <a href="#advantages">
-        <Button
-          variant="outline"
-          className={`${pillGhost} h-12 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}
+          <p
+            className={`mt-5 max-w-[520px] text-[16px] sm:text-[18px] leading-relaxed ${muted}`}
+          >
+            Connect your wallet, complete your details, and receive your card in
+            seconds. Spend online and in-store worldwide.
+          </p>
+
+          <div className="mt-7 sm:mt-8 flex flex-wrap gap-3 sm:gap-4">
+            <Button
+              onClick={(e) => { e.preventDefault(); goToCheck(); }}
+              className={`${pillBlue} h-12 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base min-h-[44px] active:scale-[0.97]`}
+            >
+              Get Card
+            </Button>
+
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('advantages')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className={`${pillGhost} h-12 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base min-h-[44px] active:scale-[0.97]`}
+            >
+              Explore Benefits
+            </button>
+          </div>
+        </div>
+
+        {/* Hero Image */}
+        <div className="order-2 -mt-20 sm:-mt-24 md:-mt-10 lg:mt-0 flex justify-center lg:justify-end overflow-visible relative z-10 pointer-events-none">
+          <MediaSlot
+            src="/mint-1.png"
+            alt="Trust card"
+            w={1488}
+            h={1340}
+            priority
+            quality={100}
+            sizes="100vw"
+            className="
+              -mx-12 w-[175%]
+              sm:-mx-16 sm:w-[170%]
+              md:mx-0 md:w-[145%]
+              lg:w-[105%]
+              xl:w-[108%]
+              2xl:w-[112%]
+              max-w-none
+            "
+            rounded="rounded-none"
+            fit="contain"
+          />
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------ stat strip */}
+      <section className="border-y border-[#EEF0F4] bg-white">
+        <div
+          className={`${section} grid grid-cols-2 gap-6 sm:gap-8 py-6 sm:py-7 md:grid-cols-5`}
         >
-          Explore Benefits
-        </Button>
-      </a>
-    </div>
-  </div>
+          <Stat label="Custody" value="Your keys" />
+          <Stat label="Network" value="Multichain" />
+          <Stat label="Verification" value="No KYC" />
+          <Stat label="Issuance" value="Instant" />
+          <Stat label="Cost to issue" value="Free" />
+        </div>
+      </section>
 
-  {/* Hero Image */}
-  <div className="order-2 -mt-20 sm:-mt-24 md:-mt-10 lg:mt-0 flex justify-center lg:justify-end overflow-visible">
-    <MediaSlot
-      src="/mint-1.png"
-      alt="Trust card"
-      w={1488}
-      h={1340}
-      priority
-      quality={100}
-      sizes="100vw"
-      className="
-        -mx-16
-        w-[205%]
-        sm:-mx-16
-        sm:w-[185%]
-        md:mx-0
-        md:w-[145%]
-        lg:w-[105%]
-        xl:w-[108%]
-        2xl:w-[112%]
-        max-w-none
-      "
-      rounded="rounded-none"
-      fit="contain"
-    />
-  </div>
-</section>
-
-{/* ------------------------------------------------------ stat strip */}
-<section className="border-y border-[#EEF0F4] bg-white">
-  <div
-    className={`${section} grid grid-cols-2 gap-6 sm:gap-8 py-6 sm:py-7 md:grid-cols-5`}
-  >
-    <Stat label="Custody" value="Your keys" />
-    <Stat label="Network" value="Multichain" />
-    <Stat label="Verification" value="No KYC" />
-    <Stat label="Issuance" value="Instant" />
-    <Stat label="Cost to issue" value="Free" />
-  </div>
-</section>
       {/* ------------------------------------------------------- blue band */}
       <section className="bg-[#0015FF]">
         <div className={`${section} py-16 sm:py-20 md:py-24`}>
@@ -299,7 +298,10 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
             <p className="mt-5 sm:mt-6 max-w-md text-[16px] sm:text-[17px] leading-relaxed text-white/70">
               Your card is tied to the wallet you already use. Nothing to top up, nothing held by us.
             </p>
-            <Button onClick={goToCheck} className={`${pill} mt-8 sm:mt-10 h-13 sm:h-14 border border-white/30 bg-transparent px-8 sm:px-9 text-[15px] sm:text-base text-white hover:bg-white/10`}>
+            <Button 
+              onClick={(e) => { e.preventDefault(); goToCheck(); }}
+              className={`${pill} mt-8 sm:mt-10 h-13 sm:h-14 border border-white/30 bg-transparent px-8 sm:px-9 text-[15px] sm:text-base text-white hover:bg-white/10 min-h-[44px]`}
+            >
               Get Card <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -347,7 +349,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
                   <ShieldCheck className="h-3.5 w-3.5" /> Non-custodial
                 </span>
               </div>
-              <Button onClick={goToCheck} className={`${pillBlue} mt-6 sm:mt-7 h-13 sm:h-14 w-full text-[15px] sm:text-base`}>Get Card</Button>
+              <Button onClick={(e) => { e.preventDefault(); goToCheck(); }} className={`${pillBlue} mt-6 sm:mt-7 h-13 sm:h-14 w-full text-[15px] sm:text-base`}>Get Card</Button>
             </div>
           </div>
         </div>
@@ -530,17 +532,21 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
             No sign-up, no KYC, and no unnecessary delays.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-            <Button onClick={goToCheck} className={`${pill} h-13 sm:h-14 bg-white px-8 sm:px-10 text-[15px] sm:text-base text-[#0015FF] hover:bg-white/90`}>
+            <Button 
+              onClick={(e) => { e.preventDefault(); goToCheck(); }}
+              className={`${pill} h-13 sm:h-14 bg-white px-8 sm:px-10 text-[15px] sm:text-base text-[#0015FF] hover:bg-white/90 min-h-[44px]`}
+            >
               Get Card <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            <a href="#advantages">
-              <Button
-                variant="outline"
-                className={`${pill} h-13 sm:h-14 border border-white/30 bg-transparent px-8 sm:px-10 text-[15px] sm:text-base text-white hover:bg-white/10`}
-              >
-                Explore Benefits
-              </Button>
-            </a>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('advantages')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className={`${pill} h-13 sm:h-14 border border-white/30 bg-transparent px-8 sm:px-10 text-[15px] sm:text-base text-white hover:bg-white/10 min-h-[44px]`}
+            >
+              Explore Benefits
+            </button>
           </div>
         </div>
       </section>
