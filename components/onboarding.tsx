@@ -22,7 +22,7 @@ interface OnboardingProps {
   onComplete: (data: OnboardingData) => void
 }
 
-/* Brand Constants (matching Exhibit B) */
+/* Brand Constants */
 const ink = "text-[#0B0D17]"
 const muted = "text-[#6E7381]"
 
@@ -34,10 +34,8 @@ const cardBox = "rounded-2xl border border-[#E8EAF0] bg-white"
 
 /* Step Components */
 const Step1 = ({
-  firstName,
-  lastName,
-  setFirstName,
-  setLastName,
+  firstName, setFirstName,
+  lastName, setLastName,
   nextStep,
 }: {
   firstName: string
@@ -57,7 +55,7 @@ const Step1 = ({
           type="text"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
-          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors"
+          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors text-base"
           placeholder="John"
         />
       </div>
@@ -67,7 +65,7 @@ const Step1 = ({
           type="text"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
-          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors"
+          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors text-base"
           placeholder="Doe"
         />
       </div>
@@ -86,10 +84,8 @@ const Step1 = ({
 )
 
 const Step2 = ({
-  email,
-  phone,
-  setEmail,
-  setPhone,
+  email, setEmail,
+  phone, setPhone,
   prevStep,
   nextStep,
 }: {
@@ -111,7 +107,7 @@ const Step2 = ({
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors"
+          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors text-base"
           placeholder="john@example.com"
         />
       </div>
@@ -121,17 +117,14 @@ const Step2 = ({
           type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors"
+          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors text-base"
           placeholder="+1 (555) 000-0000"
         />
       </div>
     </div>
 
     <div className="pt-4 flex gap-3">
-      <button
-        onClick={prevStep}
-        className={`flex-1 py-4 rounded-full font-bold text-lg border border-[#E8EAF0] bg-white ${ink} hover:bg-[#F7F8FA]`}
-      >
+      <button onClick={prevStep} className={`flex-1 py-4 rounded-full font-bold text-lg border border-[#E8EAF0] bg-white ${ink} hover:bg-[#F7F8FA]`}>
         Back
       </button>
       <button
@@ -146,10 +139,8 @@ const Step2 = ({
 )
 
 const Step3 = ({
-  zipCode,
-  country,
-  setZipCode,
-  setCountry,
+  zipCode, setZipCode,
+  country, setCountry,
   prevStep,
   nextStep,
 }: {
@@ -171,7 +162,7 @@ const Step3 = ({
           type="text"
           value={zipCode}
           onChange={(e) => setZipCode(e.target.value)}
-          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors"
+          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors text-base"
           placeholder="10001"
         />
       </div>
@@ -180,7 +171,7 @@ const Step3 = ({
         <select
           value={country}
           onChange={(e) => setCountry(e.target.value)}
-          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors appearance-none"
+          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors text-base appearance-none"
         >
           <option value="United States">United States</option>
           <option value="United Kingdom">United Kingdom</option>
@@ -203,10 +194,7 @@ const Step3 = ({
     </div>
 
     <div className="pt-4 flex gap-3">
-      <button
-        onClick={prevStep}
-        className={`flex-1 py-4 rounded-full font-bold text-lg border border-[#E8EAF0] bg-white ${ink} hover:bg-[#F7F8FA]`}
-      >
+      <button onClick={prevStep} className={`flex-1 py-4 rounded-full font-bold text-lg border border-[#E8EAF0] bg-white ${ink} hover:bg-[#F7F8FA]`}>
         Back
       </button>
       <button
@@ -327,9 +315,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         email: email.trim(),
       }
 
-      if (address) {
-        payload.walletAddress = address
-      }
+      if (address) payload.walletAddress = address
 
       const res = await fetch("/api/onboard", {
         method: "POST",
@@ -339,9 +325,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
       const responseData = await res.json()
 
-      if (!res.ok) {
-        throw new Error(responseData.error || "Failed to create your card")
-      }
+      if (!res.ok) throw new Error(responseData.error || "Failed to create your card")
 
       const result: OnboardingData = {
         name: fullName,
@@ -384,8 +368,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         {step === 1 && (
           <Step1
             firstName={firstName}
-            lastName={lastName}
             setFirstName={setFirstName}
+            lastName={lastName}
             setLastName={setLastName}
             nextStep={nextStep}
           />
@@ -394,8 +378,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         {step === 2 && (
           <Step2
             email={email}
-            phone={phone}
             setEmail={setEmail}
+            phone={phone}
             setPhone={setPhone}
             prevStep={prevStep}
             nextStep={nextStep}
@@ -405,8 +389,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         {step === 3 && (
           <Step3
             zipCode={zipCode}
-            country={country}
             setZipCode={setZipCode}
+            country={country}
             setCountry={setCountry}
             prevStep={prevStep}
             nextStep={nextStep}
@@ -429,4 +413,3 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     </div>
   )
 }
-
