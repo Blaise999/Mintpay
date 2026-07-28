@@ -32,6 +32,12 @@ const pillGhost = `${pill} border border-[#E8EAF0] bg-white ${ink} hover:bg-[#F7
 
 const cardBox = "rounded-2xl border border-[#E8EAF0] bg-white"
 
+/* Shared input styles — pins text color + forces light control theme so iOS
+   dark mode doesn't render text white-on-white */
+const fieldClass =
+  "w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 text-[#0B0D17] placeholder:text-[#9AA0AE] focus:border-[#0015FF] outline-none transition-colors text-base"
+const fieldStyle = { colorScheme: "light" as const }
+
 /* Step Components */
 const Step1 = ({
   firstName, setFirstName,
@@ -55,7 +61,8 @@ const Step1 = ({
           type="text"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
-          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors text-base"
+          style={fieldStyle}
+          className={fieldClass}
           placeholder="John"
         />
       </div>
@@ -65,7 +72,8 @@ const Step1 = ({
           type="text"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
-          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors text-base"
+          style={fieldStyle}
+          className={fieldClass}
           placeholder="Doe"
         />
       </div>
@@ -107,7 +115,8 @@ const Step2 = ({
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors text-base"
+          style={fieldStyle}
+          className={fieldClass}
           placeholder="john@example.com"
         />
       </div>
@@ -117,7 +126,8 @@ const Step2 = ({
           type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors text-base"
+          style={fieldStyle}
+          className={fieldClass}
           placeholder="+1 (555) 000-0000"
         />
       </div>
@@ -162,7 +172,8 @@ const Step3 = ({
           type="text"
           value={zipCode}
           onChange={(e) => setZipCode(e.target.value)}
-          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors text-base"
+          style={fieldStyle}
+          className={fieldClass}
           placeholder="10001"
         />
       </div>
@@ -171,7 +182,8 @@ const Step3 = ({
         <select
           value={country}
           onChange={(e) => setCountry(e.target.value)}
-          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 focus:border-[#0015FF] outline-none transition-colors text-base appearance-none"
+          style={fieldStyle}
+          className="w-full bg-white border border-[#E8EAF0] rounded-2xl p-4 text-[#0B0D17] focus:border-[#0015FF] outline-none transition-colors text-base appearance-none"
         >
           <option value="United States">United States</option>
           <option value="United Kingdom">United Kingdom</option>
