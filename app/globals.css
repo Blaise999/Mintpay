@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   Mobile overflow guard
+   Clips full-bleed elements (hero image at w-[175%], floaty badges) at the
+   screen edge so the browser stops zooming the whole page out to fit them.
+   Sizes are untouched — the bleed still renders, it just no longer widens
+   the viewport.
+   ========================================================================== */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
