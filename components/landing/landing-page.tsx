@@ -211,7 +211,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
       {/* ========================================================== HERO - CLEAN */}
     <section
   id="home"
-  className={`${section} grid items-center gap-10 pt-8 pb-10 sm:pt-12 sm:pb-14 lg:grid-cols-[1fr_1.15fr] lg:gap-8 lg:pt-10 lg:pb-14`}
+  className={`${section} grid items-center gap-6 pt-8 pb-8 sm:pt-12 sm:pb-12 lg:grid-cols-[1fr_1.15fr] lg:gap-8 lg:pt-10 lg:pb-12`}
 >
   {/* Text */}
   <div className="order-1">
@@ -256,14 +256,17 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
       h={1340}
       priority
       quality={100}
-      sizes="(min-width:1024px) 55vw, 100vw"
+      sizes="100vw"
       className="
-        w-[160%]
-        sm:w-[145%]
-        md:w-[125%]
+        -mx-16
+        w-[205%]
+        sm:-mx-16
+        sm:w-[185%]
+        md:mx-0
+        md:w-[145%]
         lg:w-[105%]
         xl:w-[108%]
-        2xl:w-[110%]
+        2xl:w-[112%]
         max-w-none
       "
       rounded="rounded-none"
