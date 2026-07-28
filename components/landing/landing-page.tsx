@@ -209,18 +209,21 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         </div>
       </header>
 
-      {/* ------------------------------------------------------------ HERO – FINAL CLEAN */}
-      <section id="home" className={`${section} grid items-center gap-6 pt-8 pb-10 sm:gap-8 sm:pt-12 sm:pb-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10 lg:pt-16 lg:pb-20`}>
-        {/* Text always first */}
+      {/* ------------------------------------------------------------ HERO */}
+      <section
+        id="home"
+        className={`${section} grid items-center gap-8 pt-10 pb-12 sm:pt-14 sm:pb-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12 lg:pt-16 lg:pb-20`}
+      >
+        {/* Text */}
         <div className="order-1">
           <h1 className={`font-display text-[clamp(2.6rem,8vw,4.2rem)] font-bold leading-[1.05] tracking-[-0.03em] ${ink}`}>
             Issue Your Crypto Card in seconds
           </h1>
-          <p className={`mt-4 sm:mt-5 max-w-lg text-[16px] sm:text-[17px] leading-relaxed ${muted}`}>
+          <p className={`mt-5 max-w-lg text-[16px] sm:text-[18px] leading-relaxed ${muted}`}>
             Connect your wallet, complete your details, and receive your card in seconds.
             Spend online and in-store worldwide.
           </p>
-          <div className="mt-6 sm:mt-8 flex flex-wrap gap-3 sm:gap-4">
+          <div className="mt-7 sm:mt-8 flex flex-wrap gap-3 sm:gap-4">
             <Button onClick={goToCheck} className={`${pillBlue} h-12 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}>
               Get Card
             </Button>
@@ -232,8 +235,8 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
           </div>
         </div>
 
-        {/* Image – big on mobile, balanced on desktop */}
-        <div className="order-2 w-full">
+        {/* Image */}
+        <div className="order-2 flex justify-center lg:justify-end">
           <MediaSlot
             src="/mint-1.png"
             alt="Trust card"
@@ -241,9 +244,11 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
             h={1340}
             priority
             quality={90}
-            fit="contain"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 700px"
-            className="mx-auto aspect-[1488/1340] w-full max-w-[520px] sm:max-w-[600px] lg:max-w-none scale-110 sm:scale-105 origin-center"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 900px"
+            className="aspect-[1488/1340] w-full 
+              max-w-[640px] sm:max-w-[720px] lg:max-w-[820px] xl:max-w-[900px]
+              scale-125 sm:scale-110 lg:scale-105
+              origin-center"
             rounded="rounded-none"
           />
         </div>
@@ -383,7 +388,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         title="Instant Card." accent="Unlimited Spending."
         body="Get your crypto card in seconds and enjoy fast, secure payments online and in stores worldwide."
         art={
-          <div className="relative aspect-[280/560] w-[240px] sm:w-[280px]">
+          <div className="relative aspect-[280/560] w-[280px]">
             <MediaSlot src="/new-3.jpg" alt="Tap to pay" w={1796} h={3842} className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]" sizes="(max-width: 640px) 240px, 320px" rounded="rounded-[38px]" quality={80} />
           </div>
         }
@@ -399,7 +404,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
             <Feature
               art={
                 <MediaSlot
-                  src="/mob-3.png"
+                  src="/mob-1.png"
                   alt="Instant start, no registration"
                   w={1852}
                   h={2400}
