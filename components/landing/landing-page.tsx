@@ -209,7 +209,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         </div>
       </header>
 
-      {/* ------------------------------------------------------------ HERO */}
+      {/* ========================================================== HERO - CLEANED UP */}
       <section
         id="home"
         className={`${section} grid items-center gap-8 pt-10 pb-12 sm:pt-14 sm:pb-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12 lg:pt-16 lg:pb-20`}
@@ -235,7 +235,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
           </div>
         </div>
 
-        {/* Image */}
+        {/* Hero Image - Fixed (No more janky scaling) */}
         <div className="order-2 flex justify-center lg:justify-end">
           <MediaSlot
             src="/mint-1.png"
@@ -244,12 +244,9 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
             h={1340}
             priority
             quality={90}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 900px"
-            className="aspect-[1488/1340] w-full 
-              max-w-[640px] sm:max-w-[720px] lg:max-w-[820px] xl:max-w-[900px]
-              scale-125 sm:scale-110 lg:scale-105
-              origin-center"
-            rounded="rounded-none"
+            sizes="(max-width: 640px) 95vw, (max-width: 1024px) 80vw, 720px"
+            className="aspect-[1488/1340] w-full max-w-[520px] sm:max-w-[620px] lg:max-w-[720px] xl:max-w-[760px]"
+            rounded="rounded-3xl"
           />
         </div>
       </section>
@@ -265,7 +262,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         </div>
       </section>
 
-      {/* -------------------------------------------------------- blue band */}
+      {/* ------------------------------------------------------- blue band */}
       <section className="bg-[#0015FF]">
         <div className={`${section} py-16 sm:py-20 md:py-24`}>
           <div className="max-w-2xl">
