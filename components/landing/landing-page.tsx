@@ -36,11 +36,10 @@ function MediaSlot({
     <div className={`relative ${className}`}>
       {failed ? (
         <div
-          className={`flex h-full w-full flex-col items-center justify-center gap-1 border-2 border-dashed ${rounded} ${boxBg ? "" : "border-[#CFD3E0] bg-[#F2F3F7]/70"}`}
-          style={boxBg ? { background: boxBg, borderColor: "rgba(255,255,255,0.35)" } : undefined}
+          className={`flex h-full w-full flex-col items-center justify-center gap-1 border-2 border-dashed ${rounded} bg-[#F8F9FC] border-[#D1D5DB]`}
         >
-          <span className={`px-2 text-center font-mono text-[11px] font-medium ${boxText ?? "text-[#6E7381]"}`}>{src}</span>
-          <span className={`font-mono text-[10px] ${boxText ? "opacity-70" : "text-[#9AA0AE]"}`}>{w} × {h}</span>
+          <span className="px-2 text-center font-mono text-[11px] font-medium text-[#6E7381]">{src}</span>
+          <span className="font-mono text-[10px] text-[#9AA0AE]">{w} × {h}</span>
         </div>
       ) : (
         <Image
@@ -209,7 +208,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         </div>
       </header>
 
-      {/* ========================================================== HERO - CLEANED UP */}
+      {/* ========================================================== HERO - CLEAN */}
       <section
         id="home"
         className={`${section} grid items-center gap-8 pt-10 pb-12 sm:pt-14 sm:pb-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12 lg:pt-16 lg:pb-20`}
@@ -235,7 +234,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
           </div>
         </div>
 
-        {/* Hero Image - Fixed (No more janky scaling) */}
+        {/* Hero Image - Clean & Balanced */}
         <div className="order-2 flex justify-center lg:justify-end">
           <MediaSlot
             src="/mint-1.png"
@@ -243,10 +242,10 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
             w={1488}
             h={1340}
             priority
-            quality={90}
-            sizes="(max-width: 640px) 95vw, (max-width: 1024px) 80vw, 720px"
-            className="aspect-[1488/1340] w-full max-w-[520px] sm:max-w-[620px] lg:max-w-[720px] xl:max-w-[760px]"
-            rounded="rounded-3xl"
+            quality={95}
+            sizes="(max-width: 640px) 92vw, (max-width: 1024px) 78vw, 680px"
+            className="aspect-[1488/1340] w-full max-w-[460px] sm:max-w-[560px] lg:max-w-[660px] xl:max-w-[720px]"
+            rounded="rounded-2xl"
           />
         </div>
       </section>
