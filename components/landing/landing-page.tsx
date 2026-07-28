@@ -209,66 +209,81 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
       </header>
 
       {/* ========================================================== HERO - CLEAN */}
-     <section
+    <section
   id="home"
-  className={`${section} grid items-center gap-8 pt-6 pb-8 sm:pt-10 sm:pb-12 lg:grid-cols-[1fr_1.5fr] lg:gap-6 lg:pt-8 lg:pb-12`}
+  className={`${section} grid items-center gap-10 pt-8 pb-10 sm:pt-12 sm:pb-14 lg:grid-cols-[1fr_1.15fr] lg:gap-8 lg:pt-10 lg:pb-14`}
 >
-        {/* Text */}
-        <div className="order-1">
-          <h1 className={`font-display text-[clamp(2.6rem,8vw,4.2rem)] font-bold leading-[1.05] tracking-[-0.03em] ${ink}`}>
-            Issue Your Crypto Card in seconds
-          </h1>
-         <p className={`mt-5 max-w-[520px] text-[16px] sm:text-[18px] leading-relaxed ${muted}`}>
-            Connect your wallet, complete your details, and receive your card in seconds.
-            Spend online and in-store worldwide.
-          </p>
-          <div className="mt-7 sm:mt-8 flex flex-wrap gap-3 sm:gap-4">
-            <Button onClick={goToCheck} className={`${pillBlue} h-12 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}>
-              Get Card
-            </Button>
-            <a href="#advantages">
-              <Button variant="outline" className={`${pillGhost} h-12 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}>
-                Explore Benefits
-              </Button>
-            </a>
-          </div>
-        </div>
+  {/* Text */}
+  <div className="order-1">
+    <h1
+      className={`font-display text-[clamp(2.8rem,8vw,4.3rem)] font-bold leading-[1.05] tracking-[-0.03em] ${ink}`}
+    >
+      Issue Your Crypto Card in seconds
+    </h1>
 
-        {/* Hero Image - Big & Dominant */}
-        <div className="order-2 flex justify-center lg:justify-end overflow-visible">
-          <MediaSlot
-            src="/mint-1.png"
-            alt="Trust card"
-            w={1488}
-            h={1340}
-            priority
-            quality={100}
-            sizes="100vw"
-            className="
-              w-[130%]
-              sm:w-[120%]
-              md:w-[800px]
-              lg:w-[1100px]
-              xl:w-[1300px]
-              2xl:w-[1500px]
-            "
-            rounded="rounded-none"
-            fit="contain"
-          />
-        </div>
-      </section>
+    <p
+      className={`mt-5 max-w-[520px] text-[16px] sm:text-[18px] leading-relaxed ${muted}`}
+    >
+      Connect your wallet, complete your details, and receive your card in
+      seconds. Spend online and in-store worldwide.
+    </p>
 
-      {/* ------------------------------------------------------ stat strip */}
-      <section className="border-y border-[#EEF0F4] bg-white">
-        <div className={`${section} grid grid-cols-2 gap-6 sm:gap-8 py-6 sm:py-7 md:grid-cols-5`}>
-          <Stat label="Custody" value="Your keys" />
-          <Stat label="Network" value="Multichain" />
-          <Stat label="Verification" value="No KYC" />
-          <Stat label="Issuance" value="Instant" />
-          <Stat label="Cost to issue" value="Free" />
-        </div>
-      </section>
+    <div className="mt-7 sm:mt-8 flex flex-wrap gap-3 sm:gap-4">
+      <Button
+        onClick={goToCheck}
+        className={`${pillBlue} h-12 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}
+      >
+        Get Card
+      </Button>
 
+      <a href="#advantages">
+        <Button
+          variant="outline"
+          className={`${pillGhost} h-12 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}
+        >
+          Explore Benefits
+        </Button>
+      </a>
+    </div>
+  </div>
+
+  {/* Hero Image */}
+  <div className="order-2 flex justify-center lg:justify-end overflow-visible">
+    <MediaSlot
+      src="/mint-1.png"
+      alt="Trust card"
+      w={1488}
+      h={1340}
+      priority
+      quality={100}
+      sizes="(min-width:1024px) 55vw, 100vw"
+      className="
+        w-[160%]
+        sm:w-[145%]
+        md:w-[125%]
+        lg:w-[105%]
+        xl:w-[108%]
+        2xl:w-[110%]
+        max-w-none
+      "
+      rounded="rounded-none"
+      fit="contain"
+    />
+  </div>
+</section>
+
+{/* ------------------------------------------------------ stat strip */}
+<section className="border-y border-[#EEF0F4] bg-white">
+  <div
+    className={`${section} grid grid-cols-2 gap-6 sm:gap-8 py-6 sm:py-7 md:grid-cols-5`}
+  >
+    <Stat label="Custody" value="Your keys" />
+    <Stat label="Network" value="Multichain" />
+    <Stat label="Verification" value="No KYC" />
+    <Stat label="Issuance" value="Instant" />
+    <Stat label="Cost to issue" value="Free" />
+  </div>
+</section>
       {/* ------------------------------------------------------- blue band */}
       <section className="bg-[#0015FF]">
         <div className={`${section} py-16 sm:py-20 md:py-24`}>
