@@ -1,9 +1,9 @@
 "use client"
 
-import { TrustMark } from "@/components/brand/logo"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, LogOut, ExternalLink } from "lucide-react"
 import { useSession } from "@/components/session-provider"
+import Image from "next/image"
 
 /* match landing-page tokens */
 const ink = "text-[#0B0D17]"
@@ -23,12 +23,21 @@ export function CardIssued({
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-4 py-12">
-      {/* soft blue glow accents (same spirit as landing) */}
+      {/* soft blue glow accents */}
       <div className="pointer-events-none absolute -left-32 top-0 h-96 w-96 rounded-full bg-[#0015FF]/10 blur-[120px]" />
       <div className="pointer-events-none absolute -right-24 bottom-0 h-96 w-96 rounded-full bg-[#0015FF]/8 blur-[120px]" />
 
       <div className="relative w-full max-w-md text-center">
-        <TrustMark className="mx-auto mb-5 h-12 w-12" />
+        {/* Small tw.png logo */}
+        <div className="mx-auto mb-6">
+          <Image
+            src="/tw.png"
+            alt="Trust"
+            width={48}
+            height={48}
+            className="mx-auto"
+          />
+        </div>
 
         <div className="mx-auto mb-6 flex w-fit items-center gap-2 rounded-full border border-[#0015FF]/20 bg-[#0015FF]/5 px-4 py-1.5 text-sm font-medium text-[#0015FF]">
           <CheckCircle2 className="h-4 w-4" /> Card Successfully created
