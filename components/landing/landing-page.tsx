@@ -426,7 +426,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
             <Feature
               art={
                 <MediaSlot
-                  src="/mob-3.png"
+                  src="/mob-3.jpeg"
                   alt="Instant start, no registration"
                   w={1852}
                   h={2400}
