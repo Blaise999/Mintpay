@@ -210,32 +210,11 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         </div>
       </header>
 
-      {/* ------------------------------------------------------------ hero - FORCED BIG */}
-      <section
-        id="home"
-        className="w-full overflow-hidden"
-      >
-        <div className={`${section} grid items-center gap-6 sm:gap-10 pt-10 pb-6 sm:pt-16 sm:pb-12 md:py-20 lg:grid-cols-[0.75fr_1.25fr] lg:gap-4 lg:py-28`}>
-          <div className="order-1">
-            <h1
-              className={`font-display text-[clamp(2.8rem,9vw,4.8rem)] font-bold leading-[1.02] tracking-[-0.03em] ${ink}`}
-            >
-              Issue Your Crypto Card in seconds
-            </h1>
-            <p className={`mt-5 sm:mt-6 max-w-lg text-[16px] sm:text-[18px] leading-relaxed ${muted}`}>
-              Connect your wallet, complete your details, and receive your card in seconds.
-              Spend online and in-store worldwide.
-            </p>
-            <div className="mt-7 sm:mt-8 flex flex-wrap gap-3 sm:gap-4">
-              <Button onClick={goToCheck} className={`${pillBlue} h-13 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}>Get Card</Button>
-              <a href="#advantages">
-                <Button variant="outline" className={`${pillGhost} h-13 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}>Explore Benefits</Button>
-              </a>
-            </div>
-          </div>
-
-          {/* FULL-BLEED on mobile → much bigger */}
-          <div className="order-2 relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:w-full">
+      {/* ------------------------------------------------------------ HERO – NUCLEAR BIG */}
+      <section id="home" className="w-full">
+        {/* Mobile: image first + huge */}
+        <div className="lg:hidden">
+          <div className="relative w-full aspect-[4/3] sm:aspect-[5/4] overflow-hidden">
             <MediaSlot
               src="/mint-1.png"
               alt="Trust card"
@@ -243,8 +222,59 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
               h={1340}
               priority
               quality={90}
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1000px"
-              className="mx-auto aspect-[1488/1340] w-full max-w-[100vw] sm:max-w-[920px] lg:max-w-none"
+              fit="contain"
+              sizes="100vw"
+              className="absolute inset-0 w-full h-full scale-[1.15] origin-center"
+              rounded="rounded-none"
+            />
+          </div>
+
+          <div className={`${section} pt-8 pb-12`}>
+            <h1 className={`font-display text-[clamp(2.7rem,9vw,3.8rem)] font-bold leading-[1.02] tracking-[-0.03em] ${ink}`}>
+              Issue Your Crypto Card in seconds
+            </h1>
+            <p className={`mt-5 max-w-lg text-[16px] leading-relaxed ${muted}`}>
+              Connect your wallet, complete your details, and receive your card in seconds.
+              Spend online and in-store worldwide.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Button onClick={goToCheck} className={`${pillBlue} h-13 px-8 text-[15px]`}>Get Card</Button>
+              <a href="#advantages">
+                <Button variant="outline" className={`${pillGhost} h-13 px-8 text-[15px]`}>Explore Benefits</Button>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop */}
+        <div className={`hidden lg:grid ${section} items-center gap-8 py-24 xl:py-32 lg:grid-cols-[0.7fr_1.3fr]`}>
+          <div>
+            <h1 className={`font-display text-[clamp(3.2rem,4.5vw,4.8rem)] font-bold leading-[1.02] tracking-[-0.03em] ${ink}`}>
+              Issue Your Crypto Card in seconds
+            </h1>
+            <p className={`mt-6 max-w-lg text-[18px] leading-relaxed ${muted}`}>
+              Connect your wallet, complete your details, and receive your card in seconds.
+              Spend online and in-store worldwide.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Button onClick={goToCheck} className={`${pillBlue} h-14 px-10 text-base`}>Get Card</Button>
+              <a href="#advantages">
+                <Button variant="outline" className={`${pillGhost} h-14 px-10 text-base`}>Explore Benefits</Button>
+              </a>
+            </div>
+          </div>
+
+          <div className="relative w-full aspect-[1488/1340]">
+            <MediaSlot
+              src="/mint-1.png"
+              alt="Trust card"
+              w={1488}
+              h={1340}
+              priority
+              quality={90}
+              fit="contain"
+              sizes="(max-width: 1280px) 60vw, 900px"
+              className="absolute inset-0 w-full h-full scale-110 origin-center"
               rounded="rounded-none"
             />
           </div>
@@ -401,7 +431,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
             <Feature
               art={
                 <MediaSlot
-                  src="/mob-1.png"
+                  src="/mob-3.png"
                   alt="Instant start, no registration"
                   w={1852}
                   h={2400}
