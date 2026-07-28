@@ -19,14 +19,18 @@ const pill = "rounded-full font-semibold transition-colors"
 const pillBlue = `${pill} bg-[#0015FF] text-white hover:bg-[#0010CC]`
 const pillGhost = `${pill} border border-[#E8EAF0] bg-white ${ink} hover:bg-[#F7F8FA]`
 const cardBox = "rounded-2xl border border-[#E8EAF0] bg-white"
-const section = "mx-auto w-full max-w-[1200px] px-6"
+const section = "mx-auto w-full max-w-[1200px] px-5 sm:px-6"
 const NAV: [string, string][] = [["Home", "#home"], ["Advantages", "#advantages"], ["FAQ", "#faq"]]
 
 /* --------------------------------------------------------------- sub-parts */
 function MediaSlot({
   src, alt, w, h, className = "", rounded = "rounded-2xl", boxBg, boxText, fit = "contain",
-  priority = false, sizes,
-}: { src: string; alt: string; w: number; h: number; className?: string; rounded?: string; boxBg?: string; boxText?: string; fit?: "contain" | "cover"; priority?: boolean; sizes?: string }) {
+  priority = false, sizes, quality = 85,
+}: {
+  src: string; alt: string; w: number; h: number; className?: string; rounded?: string;
+  boxBg?: string; boxText?: string; fit?: "contain" | "cover"; priority?: boolean;
+  sizes?: string; quality?: number
+}) {
   const [failed, setFailed] = useState(false)
   return (
     <div className={`relative ${className}`}>
@@ -44,7 +48,7 @@ function MediaSlot({
           alt={alt}
           width={w}
           height={h}
-          quality={90}
+          quality={quality}
           priority={priority}
           loading={priority ? undefined : "lazy"}
           sizes={sizes ?? `${w}px`}
@@ -59,8 +63,8 @@ function MediaSlot({
 function Stat({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
     <div className="text-center">
-      <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#6E7381]">{label}</p>
-      <p className={`mt-1 font-display text-[26px] font-medium leading-tight ${ink}`}>
+      <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.14em] text-[#6E7381]">{label}</p>
+      <p className={`mt-1 font-display text-[22px] sm:text-[26px] font-medium leading-tight ${ink}`}>
         {value}{accent ? ` ${accent}` : ""}
       </p>
     </div>
@@ -69,24 +73,27 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
 
 function StepCard({ n, icon, title, sub, body }: { n: string; icon: React.ReactNode; title: string; sub: string; body: string }) {
   return (
-    <div className={`${cardBox} flex flex-col p-6`}>
-      <div className="mb-10 flex items-start justify-between">
-        <span className="font-display text-2xl font-bold text-[#0015FF]">{n}</span>
+    <div className={`${cardBox} flex flex-col p-5 sm:p-6`}>
+      <div className="mb-8 sm:mb-10 flex items-start justify-between">
+        <span className="font-display text-xl sm:text-2xl font-bold text-[#0015FF]">{n}</span>
         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F2F3F7] text-[#4B5162]">{icon}</span>
       </div>
-      <h3 className={`font-display text-lg font-bold ${ink}`}>{title}</h3>
-      <p className="mt-1 text-[14px] font-semibold text-[#4B5162]">{sub}</p>
-      <p className={`mt-2 text-[15px] leading-relaxed ${muted}`}>{body}</p>
+      <h3 className={`font-display text-base sm:text-lg font-bold ${ink}`}>{title}</h3>
+      <p className="mt-1 text-[13px] sm:text-[14px] font-semibold text-[#4B5162]">{sub}</p>
+      <p className={`mt-2 text-[14px] sm:text-[15px] leading-relaxed ${muted}`}>{body}</p>
     </div>
   )
 }
 
 function Feature({ art, title, body }: { art: React.ReactNode; title: string; body: string }) {
   return (
-    <div className={`${cardBox} p-7`}>
-      <div className="mb-7 flex aspect-square w-full items-center justify-center">{art}</div>
-      <h3 className={`font-display text-lg font-bold ${ink}`}>{title}</h3>
-      <p className={`mt-2 text-[15px] leading-relaxed ${muted}`}>{body}</p>
+    <div className={`${cardBox} p-5 sm:p-7`}>
+      {/* Bigger image area on mobile */}
+      <div className="mb-5 sm:mb-7 flex aspect-[4/5] sm:aspect-square w-full items-center justify-center overflow-hidden rounded-xl">
+        {art}
+      </div>
+      <h3 className={`font-display text-base sm:text-lg font-bold ${ink}`}>{title}</h3>
+      <p className={`mt-2 text-[14px] sm:text-[15px] leading-relaxed ${muted}`}>{body}</p>
     </div>
   )
 }
@@ -98,12 +105,12 @@ function Split({
 }) {
   return (
     <section className={bg}>
-      <div className={`${section} grid items-center gap-12 py-24 lg:grid-cols-2`}>
+      <div className={`${section} grid items-center gap-10 sm:gap-12 py-16 sm:py-20 md:py-24 lg:grid-cols-2`}>
         <div className={flip ? "lg:order-2" : ""}>
-          <h2 className={`font-display text-[clamp(2.2rem,4.4vw,3.5rem)] font-bold leading-[1.05] ${ink}`}>
+          <h2 className={`font-display text-[clamp(2rem,5vw,3.5rem)] font-bold leading-[1.05] ${ink}`}>
             {title} {accent}
           </h2>
-          <p className={`mt-6 max-w-md text-[17px] leading-relaxed ${muted}`}>{body}</p>
+          <p className={`mt-5 sm:mt-6 max-w-md text-[16px] sm:text-[17px] leading-relaxed ${muted}`}>{body}</p>
         </div>
         <div className={`flex justify-center ${flip ? "lg:order-1" : ""}`}>{art}</div>
       </div>
@@ -118,7 +125,6 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
-  // UPDATED: "Get Card" now leads to your Wallet Import Flow
   const goToCheck = () => {
     onGetCard()
   }
@@ -147,9 +153,9 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
             : "border-transparent bg-white"
         }`}
       >
-        <div className={`${section} flex h-[80px] items-center justify-between gap-6`}>
+        <div className={`${section} flex h-[72px] sm:h-[80px] items-center justify-between gap-4 sm:gap-6`}>
           <a href="#home" className="flex shrink-0 items-center">
-            <MediaSlot src="/tw.png" alt="Trust" w={180} h={162} className="h-11 w-11" rounded="rounded-xl" />
+            <MediaSlot src="/tw.png" alt="Trust" w={180} h={162} className="h-10 w-10 sm:h-11 sm:w-11" rounded="rounded-xl" quality={90} />
           </a>
 
           <nav className="hidden items-center gap-1 rounded-full border border-[#EDEFF3] bg-[#F7F8FA] p-1 md:flex">
@@ -172,7 +178,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
             onClick={() => setMenuOpen((v) => !v)}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
-            className={`flex h-11 w-11 items-center justify-center rounded-full border border-[#E8EAF0] ${ink} transition-colors hover:bg-[#F7F8FA] md:hidden`}
+            className={`flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full border border-[#E8EAF0] ${ink} transition-colors hover:bg-[#F7F8FA] md:hidden`}
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -205,43 +211,46 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         </div>
       </header>
 
-      {/* ------------------------------------------------------------ hero */}
+      {/* ------------------------------------------------------------ hero - BIGGER on mobile */}
       <section
         id="home"
-        className={`${section} grid items-center gap-10 py-16 md:py-24 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8 lg:py-32`}
+        className={`${section} grid items-center gap-8 sm:gap-10 py-12 sm:py-16 md:py-24 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8 lg:py-32`}
       >
         <div className="order-1">
           <h1
-            className={`font-display text-[clamp(2.85rem,6.8vw,4.6rem)] font-bold leading-[1.05] tracking-[-0.03em] ${ink}`}
+            className={`font-display text-[clamp(2.6rem,8vw,4.6rem)] font-bold leading-[1.05] tracking-[-0.03em] ${ink}`}
           >
             Issue Your Crypto Card in seconds
           </h1>
-          <p className={`mt-6 max-w-lg text-[18px] leading-relaxed ${muted}`}>
+          <p className={`mt-5 sm:mt-6 max-w-lg text-[16px] sm:text-[18px] leading-relaxed ${muted}`}>
             Connect your wallet, complete your details, and receive your card in seconds.
             Spend online and in-store worldwide.
           </p>
-          <div className="mt-8 flex flex-wrap gap-4">
-            <Button onClick={goToCheck} className={`${pillBlue} h-14 px-10 text-base`}>Get Card</Button>
+          <div className="mt-7 sm:mt-8 flex flex-wrap gap-3 sm:gap-4">
+            <Button onClick={goToCheck} className={`${pillBlue} h-13 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}>Get Card</Button>
             <a href="#advantages">
-              <Button variant="outline" className={`${pillGhost} h-14 px-10 text-base`}>Explore Benefits</Button>
+              <Button variant="outline" className={`${pillGhost} h-13 sm:h-14 px-8 sm:px-10 text-[15px] sm:text-base`}>Explore Benefits</Button>
             </a>
           </div>
         </div>
+
+        {/* Hero image - full width & bigger on mobile */}
         <MediaSlot
           src="/mint-1.png"
           alt="Trust card"
           w={1488}
           h={1340}
           priority
+          quality={90}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 900px"
-          className="order-2 mx-auto aspect-[1488/1340] w-full max-w-[820px] lg:mx-0 lg:max-w-none"
+          className="order-2 mx-auto aspect-[1488/1340] w-full max-w-none sm:max-w-[820px] lg:mx-0 lg:max-w-none"
           rounded="rounded-none"
         />
       </section>
 
       {/* ------------------------------------------------------ stat strip */}
       <section className="border-y border-[#EEF0F4] bg-white">
-        <div className={`${section} grid grid-cols-2 gap-8 py-7 md:grid-cols-5`}>
+        <div className={`${section} grid grid-cols-2 gap-6 sm:gap-8 py-6 sm:py-7 md:grid-cols-5`}>
           <Stat label="Custody" value="Your keys" />
           <Stat label="Network" value="Multichain" />
           <Stat label="Verification" value="No KYC" />
@@ -252,17 +261,17 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
 
       {/* -------------------------------------------------------- blue band */}
       <section className="bg-[#0015FF]">
-        <div className={`${section} py-24`}>
+        <div className={`${section} py-16 sm:py-20 md:py-24`}>
           <div className="max-w-2xl">
-            <h2 className="font-display text-[clamp(2.4rem,5vw,4rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white">
+            <h2 className="font-display text-[clamp(2.2rem,6vw,4rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white">
               A crypto card
               <br />
               for everyday life
             </h2>
-            <p className="mt-6 max-w-md text-[17px] leading-relaxed text-white/70">
+            <p className="mt-5 sm:mt-6 max-w-md text-[16px] sm:text-[17px] leading-relaxed text-white/70">
               Your card is tied to the wallet you already use. Nothing to top up, nothing held by us.
             </p>
-            <Button onClick={goToCheck} className={`${pill} mt-10 h-14 border border-white/30 bg-transparent px-9 text-base text-white hover:bg-white/10`}>
+            <Button onClick={goToCheck} className={`${pill} mt-8 sm:mt-10 h-13 sm:h-14 border border-white/30 bg-transparent px-8 sm:px-9 text-[15px] sm:text-base text-white hover:bg-white/10`}>
               Get Card <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -271,13 +280,13 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
 
       {/* ----------------------------------------------------- how it works */}
       <section className="bg-[#F7F8FA]">
-        <div className={`${section} py-24`}>
-          <h2 className={`font-display text-[clamp(2.4rem,5vw,3.6rem)] font-bold tracking-[-0.03em] ${ink}`}>How it works</h2>
-          <p className={`mt-4 max-w-2xl text-[17px] leading-relaxed ${muted}`}>
+        <div className={`${section} py-16 sm:py-20 md:py-24`}>
+          <h2 className={`font-display text-[clamp(2.2rem,5.5vw,3.6rem)] font-bold tracking-[-0.03em] ${ink}`}>How it works</h2>
+          <p className={`mt-3 sm:mt-4 max-w-2xl text-[16px] sm:text-[17px] leading-relaxed ${muted}`}>
             Getting your card takes less than a minute. Connect your wallet, complete a few simple
             steps, and start spending worldwide.
           </p>
-          <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 sm:mt-14 grid gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
             <StepCard n="01" icon={<Share2 className="h-4 w-4" />} title="Connect Your Wallet"
               sub="Securely connect in one tap"
               body="Connect your wallet securely using WalletConnect." />
@@ -297,12 +306,12 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
               sub="Spend worldwide without limits"
               body="Use your card at millions of merchants worldwide for online, in-store, and contactless payments." />
             
-            <div className="rounded-2xl bg-[#F0F1F5] p-7 md:col-span-2">
-              <h3 className={`font-display text-xl font-bold ${ink}`}>Ready to launch</h3>
-              <p className={`mt-3 text-[15px] leading-relaxed ${muted}`}>
+            <div className="rounded-2xl bg-[#F0F1F5] p-6 sm:p-7 md:col-span-2">
+              <h3 className={`font-display text-lg sm:text-xl font-bold ${ink}`}>Ready to launch</h3>
+              <p className={`mt-3 text-[14px] sm:text-[15px] leading-relaxed ${muted}`}>
                 Connect the wallet you already use and have your card in under a minute.
               </p>
-              <div className="mt-6 flex flex-wrap gap-2">
+              <div className="mt-5 sm:mt-6 flex flex-wrap gap-2">
                 <span className={`${cardBox} inline-flex items-center gap-2 px-3.5 py-2 text-[13px] font-medium ${ink}`}>
                   <Zap className="h-3.5 w-3.5" /> Fast activation
                 </span>
@@ -310,7 +319,7 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
                   <ShieldCheck className="h-3.5 w-3.5" /> Non-custodial
                 </span>
               </div>
-              <Button onClick={goToCheck} className={`${pillBlue} mt-7 h-14 w-full text-base`}>Get Card</Button>
+              <Button onClick={goToCheck} className={`${pillBlue} mt-6 sm:mt-7 h-13 sm:h-14 w-full text-[15px] sm:text-base`}>Get Card</Button>
             </div>
           </div>
         </div>
@@ -321,21 +330,21 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         title="Get your card" accent="today"
         body="Connect the wallet you already use and issue your Trust card in a minute."
         art={
-          <div className="relative aspect-[280/560] w-[280px]">
-            <MediaSlot src="/new-1.jpg" alt="Trust app" w={1796} h={3842} className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]" sizes="320px" rounded="rounded-[38px]" />
+          <div className="relative aspect-[280/560] w-[240px] sm:w-[280px]">
+            <MediaSlot src="/new-1.jpg" alt="Trust app" w={1796} h={3842} className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]" sizes="(max-width: 640px) 240px, 320px" rounded="rounded-[38px]" quality={80} />
             <div className="animate-floaty absolute -left-[24%] top-[24%] w-[38%] drop-shadow-xl">
               <div className="rotate-[-8deg]">
-                <MediaSlot src="/g.png" alt="Google Pay" w={600} h={446} rounded="rounded-none" />
+                <MediaSlot src="/g.png" alt="Google Pay" w={600} h={446} rounded="rounded-none" quality={75} />
               </div>
             </div>
             <div className="animate-floaty-slow absolute -right-[16%] -top-[2%] w-[36%] drop-shadow-xl">
               <div className="rotate-[8deg]">
-                <MediaSlot src="/a.png" alt="ATM" w={600} h={285} rounded="rounded-none" />
+                <MediaSlot src="/a.png" alt="ATM" w={600} h={285} rounded="rounded-none" quality={75} />
               </div>
             </div>
             <div className="animate-floaty absolute -right-[20%] top-[52%] w-[40%] drop-shadow-xl">
               <div className="rotate-[-8deg]">
-                <MediaSlot src="/ap.png" alt="Apple Pay" w={600} h={370} rounded="rounded-none" />
+                <MediaSlot src="/ap.png" alt="Apple Pay" w={600} h={370} rounded="rounded-none" quality={75} />
               </div>
             </div>
           </div>
@@ -348,22 +357,22 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         title="Pay directly" accent="from your wallet"
         body="No need to transfer funds to a third-party service — everything settles from the wallet you control."
         art={
-          <div className="relative aspect-[280/560] w-[280px]">
-            <MediaSlot src="/new-2.jpg" alt="Pay from your wallet" w={1796} h={3842} className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]" sizes="320px" rounded="rounded-[38px]" />
+          <div className="relative aspect-[280/560] w-[240px] sm:w-[280px]">
+            <MediaSlot src="/new-2.jpg" alt="Pay from your wallet" w={1796} h={3842} className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]" sizes="(max-width: 640px) 240px, 320px" rounded="rounded-[38px]" quality={80} />
             <div className="animate-floaty absolute -right-[4%] -top-[4%] w-[20%]">
-              <div className="rotate-[8deg]"><MediaSlot src="/coin-3.png" alt="" w={150} h={155} rounded="rounded-none" /></div>
+              <div className="rotate-[8deg]"><MediaSlot src="/coin-3.png" alt="" w={150} h={155} rounded="rounded-none" quality={70} /></div>
             </div>
             <div className="animate-floaty-slow absolute -left-[10%] top-[36%] w-[18%]">
-              <div className="rotate-[-12deg]"><MediaSlot src="/coin-5.png" alt="" w={141} h={158} rounded="rounded-none" /></div>
+              <div className="rotate-[-12deg]"><MediaSlot src="/coin-5.png" alt="" w={141} h={158} rounded="rounded-none" quality={70} /></div>
             </div>
             <div className="animate-floaty absolute -right-[12%] top-[42%] w-[21%]">
-              <div className="rotate-[10deg]"><MediaSlot src="/coin-4.png" alt="" w={147} h={162} rounded="rounded-none" /></div>
+              <div className="rotate-[10deg]"><MediaSlot src="/coin-4.png" alt="" w={147} h={162} rounded="rounded-none" quality={70} /></div>
             </div>
             <div className="animate-floaty-slow absolute -left-[6%] bottom-[16%] w-[17%]">
-              <div className="rotate-[-8deg]"><MediaSlot src="/coin-1.png" alt="" w={157} h={150} rounded="rounded-none" /></div>
+              <div className="rotate-[-8deg]"><MediaSlot src="/coin-1.png" alt="" w={157} h={150} rounded="rounded-none" quality={70} /></div>
             </div>
             <div className="animate-floaty absolute -bottom-[3%] left-[38%] w-[19%]">
-              <div className="rotate-[6deg]"><MediaSlot src="/coin-2.png" alt="" w={179} h={169} rounded="rounded-none" /></div>
+              <div className="rotate-[6deg]"><MediaSlot src="/coin-2.png" alt="" w={179} h={169} rounded="rounded-none" quality={70} /></div>
             </div>
           </div>
         }
@@ -373,36 +382,96 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
         title="Instant Card." accent="Unlimited Spending."
         body="Get your crypto card in seconds and enjoy fast, secure payments online and in stores worldwide."
         art={
-          <div className="relative aspect-[280/560] w-[280px]">
-            <MediaSlot src="/new-3.jpg" alt="Tap to pay" w={1796} h={3842} className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]" sizes="320px" rounded="rounded-[38px]" />
+          <div className="relative aspect-[280/560] w-[240px] sm:w-[280px]">
+            <MediaSlot src="/new-3.jpg" alt="Tap to pay" w={1796} h={3842} className="absolute inset-0 drop-shadow-[0_30px_50px_rgba(11,13,23,0.25)]" sizes="(max-width: 640px) 240px, 320px" rounded="rounded-[38px]" quality={80} />
           </div>
         }
         bg="bg-white"
       />
 
-      {/* ------------------------------------------------------- advantages */}
+      {/* ------------------------------------------------------- advantages - BIGGER images on mobile */}
       <section id="advantages" className="bg-[#F7F8FA]">
-        <div className={`${section} py-24`}>
-          <h2 className={`font-display text-[clamp(2.4rem,5vw,3.6rem)] font-bold tracking-[-0.03em] ${ink}`}>Why Choose Our Crypto Card?</h2>
-          <p className={`mt-3 text-[17px] ${muted}`}>Everything you need to spend crypto with speed, privacy, and global acceptance.</p>
-          <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Feature art={<MediaSlot src="/mob-3.png" alt="Instant start, no registration" w={1852} h={2400} className="h-full w-full" rounded="rounded-xl" />} title="Instant start, no registration"
-              body="No need to register or pass KYC verification. Start using the card right away." />
-            <Feature art={<MediaSlot src="/mob-2.png" alt="Low cost" w={463} h={600} className="h-full w-full" rounded="rounded-xl" />} title="Low cost"
-              body="Issuing a card is free. No hidden charges, no monthly costs." />
-            <Feature art={<MediaSlot src="/icon-4.png" alt="8% cashback rewards" w={463} h={600} className="h-full w-full" rounded="rounded-xl" />} title="8% cashback rewards"
-              body="Turn everyday spending into rewards. Enjoy 8% cashback on all purchases while experiencing secure, seamless payments." />
-            <Feature art={<MediaSlot src="/mob-4.jpeg" alt="Card security" w={1668} h={2160} className="h-full w-full" rounded="rounded-xl" />} title="Card security"
-              body="Freeze and unfreeze your card, get transaction notifications, and set spending controls — all from your side." />
+        <div className={`${section} py-16 sm:py-20 md:py-24`}>
+          <h2 className={`font-display text-[clamp(2.2rem,5.5vw,3.6rem)] font-bold tracking-[-0.03em] ${ink}`}>Why Choose Our Crypto Card?</h2>
+          <p className={`mt-3 text-[16px] sm:text-[17px] ${muted}`}>Everything you need to spend crypto with speed, privacy, and global acceptance.</p>
+          <div className="mt-10 sm:mt-14 grid gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <Feature
+              art={
+                <MediaSlot
+                  src="/mob-3.png"
+                  alt="Instant start, no registration"
+                  w={1852}
+                  h={2400}
+                  className="h-full w-full"
+                  rounded="rounded-xl"
+                  fit="cover"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  quality={80}
+                />
+              }
+              title="Instant start, no registration"
+              body="No need to register or pass KYC verification. Start using the card right away."
+            />
+            <Feature
+              art={
+                <MediaSlot
+                  src="/mob-2.png"
+                  alt="Low cost"
+                  w={463}
+                  h={600}
+                  className="h-full w-full"
+                  rounded="rounded-xl"
+                  fit="cover"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  quality={80}
+                />
+              }
+              title="Low cost"
+              body="Issuing a card is free. No hidden charges, no monthly costs."
+            />
+            <Feature
+              art={
+                <MediaSlot
+                  src="/icon-4.png"
+                  alt="8% cashback rewards"
+                  w={463}
+                  h={600}
+                  className="h-full w-full"
+                  rounded="rounded-xl"
+                  fit="cover"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  quality={80}
+                />
+              }
+              title="8% cashback rewards"
+              body="Turn everyday spending into rewards. Enjoy 8% cashback on all purchases while experiencing secure, seamless payments."
+            />
+            <Feature
+              art={
+                <MediaSlot
+                  src="/mob-4.jpeg"
+                  alt="Card security"
+                  w={1668}
+                  h={2160}
+                  className="h-full w-full"
+                  rounded="rounded-xl"
+                  fit="cover"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  quality={80}
+                />
+              }
+              title="Card security"
+              body="Freeze and unfreeze your card, get transaction notifications, and set spending controls — all from your side."
+            />
           </div>
         </div>
       </section>
 
       {/* -------------------------------------------------------------- faq */}
       <section id="faq" className="bg-white">
-        <div className={`${section} max-w-[860px] py-24`}>
-          <h2 className={`font-display text-[clamp(2.4rem,5vw,3.6rem)] font-bold tracking-[-0.03em] ${ink}`}>FAQ</h2>
-          <Accordion type="single" collapsible className="mt-10">
+        <div className={`${section} max-w-[860px] py-16 sm:py-20 md:py-24`}>
+          <h2 className={`font-display text-[clamp(2.2rem,5.5vw,3.6rem)] font-bold tracking-[-0.03em] ${ink}`}>FAQ</h2>
+          <Accordion type="single" collapsible className="mt-8 sm:mt-10">
             {[
               ["How do I get a card?", "Connect your wallet, complete your details, and follow the issuance process. Your card will be ready in just a few minutes."],
               ["Is the card virtual or physical?", "You can choose either a virtual card for instant use or a physical card for everyday spending."],
@@ -414,8 +483,8 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
               ["How can I contact support?", "Our support team is available 24/7 through live chat and email at support@Trust.com."],
             ].map(([q, a], i) => (
               <AccordionItem key={i} value={`i${i}`} className="border-b border-[#E8EAF0]">
-                <AccordionTrigger className={`py-6 text-left font-display text-lg font-bold ${ink} hover:no-underline`}>{q}</AccordionTrigger>
-                <AccordionContent className={`pb-6 text-[15px] leading-relaxed ${muted}`}>{a}</AccordionContent>
+                <AccordionTrigger className={`py-5 sm:py-6 text-left font-display text-base sm:text-lg font-bold ${ink} hover:no-underline`}>{q}</AccordionTrigger>
+                <AccordionContent className={`pb-5 sm:pb-6 text-[14px] sm:text-[15px] leading-relaxed ${muted}`}>{a}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
@@ -424,22 +493,22 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
 
       {/* ------------------------------------------------------- join today */}
       <section className="bg-[#0015FF]">
-        <div className={`${section} flex flex-col items-center gap-8 py-24 text-center`}>
-          <h2 className="font-display text-[clamp(2.4rem,5vw,4rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white">
+        <div className={`${section} flex flex-col items-center gap-6 sm:gap-8 py-16 sm:py-20 md:py-24 text-center`}>
+          <h2 className="font-display text-[clamp(2.2rem,6vw,4rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white">
             Join today
           </h2>
-          <p className="max-w-xl text-[17px] leading-relaxed text-white/70">
+          <p className="max-w-xl text-[16px] sm:text-[17px] leading-relaxed text-white/70">
             Connect your wallet, complete your details, and issue your crypto card in minutes.
             No sign-up, no KYC, and no unnecessary delays.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Button onClick={goToCheck} className={`${pill} h-14 bg-white px-10 text-base text-[#0015FF] hover:bg-white/90`}>
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+            <Button onClick={goToCheck} className={`${pill} h-13 sm:h-14 bg-white px-8 sm:px-10 text-[15px] sm:text-base text-[#0015FF] hover:bg-white/90`}>
               Get Card <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <a href="#advantages">
               <Button
                 variant="outline"
-                className={`${pill} h-14 border border-white/30 bg-transparent px-10 text-base text-white hover:bg-white/10`}
+                className={`${pill} h-13 sm:h-14 border border-white/30 bg-transparent px-8 sm:px-10 text-[15px] sm:text-base text-white hover:bg-white/10`}
               >
                 Explore Benefits
               </Button>
@@ -450,10 +519,10 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
 
       {/* ----------------------------------------------------------- footer */}
       <footer className="border-t border-[#E8EAF0] bg-[#F7F8FA]">
-        <div className={`${section} flex flex-col items-center justify-between gap-6 py-10 md:flex-row`}>
+        <div className={`${section} flex flex-col items-center justify-between gap-5 sm:gap-6 py-8 sm:py-10 md:flex-row`}>
           <div className="flex items-center gap-2.5">
-            <MediaSlot src="/tw.png" alt="Trust" w={180} h={162} className="h-8 w-8" rounded="rounded-lg" />
-            <span className={`font-display text-lg font-bold ${ink}`}>Trust</span>
+            <MediaSlot src="/tw.png" alt="Trust" w={180} h={162} className="h-7 w-7 sm:h-8 sm:w-8" rounded="rounded-lg" quality={80} />
+            <span className={`font-display text-base sm:text-lg font-bold ${ink}`}>Trust</span>
           </div>
           <a href="mailto:support@Trust.com" className={`${muted} hover:text-[#0015FF] text-sm`}>support@Trust.com</a>
           <p className="text-sm text-[#9AA0AE]">© {new Date().getFullYear()} Trust</p>
