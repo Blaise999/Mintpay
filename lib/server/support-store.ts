@@ -31,7 +31,7 @@ export type SupportThread = {
   messages: SupportMessage[]
 }
 
-const DATA_DIR = process.env.SUPPORT_DATA_DIR || "/tmp/Trust-support"
+const DATA_DIR = process.env.SUPPORT_DATA_DIR || "/tmp/mintpay-support"
 const DATA_FILE = path.join(DATA_DIR, "threads.json")
 
 type Store = Map<string, SupportThread>

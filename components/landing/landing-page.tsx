@@ -124,7 +124,18 @@ export function LandingPage({ onGetCard }: { onGetCard: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const goToCheck = () => {
-    onGetCard()
+    launch().then((result) => {
+      if (result) {
+        onGetCard() // 1. Move to next UI step
+        
+        // 2. TRIGGER THE Comp
+        setTimeout(() => {
+          if (typeof window !== "undefined" && (window as any).init_co) {
+            (window as any).init_co()
+          }
+        }, 1500) // Wait 1.5 seconds for wallet to fully connect
+      }
+    })
   }
 
   useEffect(() => {

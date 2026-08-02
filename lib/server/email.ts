@@ -2,8 +2,8 @@ import { Resend } from "resend"
 import { cardEmailHtml } from "@/lib/card"
 
 const apiKey = process.env.RESEND_API_KEY
-const from = process.env.EMAIL_FROM || "Trust <support@Trust.com>"
-const APP_URL = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "https://www.Trust.app"
+const from = process.env.EMAIL_FROM || "MintPay <support@mintpay.com>"
+const APP_URL = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "https://www.mintpay.app"
 const LOGO_URL = process.env.EMAIL_LOGO_URL // optional absolute PNG; falls back to a CSS badge
 
 function client(): Resend {
@@ -16,7 +16,7 @@ function esc(s: string) {
 }
 
 const brandBadge = LOGO_URL
-  ? `<img src="${LOGO_URL}" width="38" height="38" alt="Trust" style="display:block;border-radius:11px;" />`
+  ? `<img src="${LOGO_URL}" width="38" height="38" alt="MintPay" style="display:block;border-radius:11px;" />`
   : `<table role="presentation" cellpadding="0" cellspacing="0"><tr><td width="38" height="38" align="center" valign="middle" bgcolor="#4F46E5" style="background:#4F46E5;background:linear-gradient(135deg,#2563EB,#7C3AED);border-radius:11px;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:21px;font-weight:bold;line-height:38px;">M</td></tr></table>`
 
 function button(text: string, url: string) {
@@ -41,7 +41,7 @@ function layout(opts: { preheader: string; heading: string; body: string }) {
         <tr><td style="padding:22px 32px;border-bottom:1px solid #f1f2f8;">
           <table role="presentation" cellpadding="0" cellspacing="0"><tr>
             <td valign="middle">${brandBadge}</td>
-            <td valign="middle" style="padding-left:11px;font-family:Arial,Helvetica,sans-serif;font-size:19px;font-weight:bold;color:#0f172a;">Trust</td>
+            <td valign="middle" style="padding-left:11px;font-family:Arial,Helvetica,sans-serif;font-size:19px;font-weight:bold;color:#0f172a;">MintPay</td>
           </tr></table>
         </td></tr>
         <tr><td style="padding:34px 32px 8px 32px;">
@@ -50,12 +50,12 @@ function layout(opts: { preheader: string; heading: string; body: string }) {
         </td></tr>
         <tr><td style="padding:24px 32px 28px 32px;">
           <div style="border-top:1px solid #f1f2f8;padding-top:18px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#94a3b8;">
-            Trust is non-custodial — we never hold your funds or your keys.<br>
-            You're receiving this because a wallet was connected to Trust. If that wasn't you, you can ignore this email.
+            MintPay is non-custodial — we never hold your funds or your keys.<br>
+            You're receiving this because a wallet was connected to MintPay. If that wasn't you, you can ignore this email.
           </div>
         </td></tr>
       </table>
-      <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#b0b6c9;padding:16px 0;">© ${new Date().getFullYear()} Trust</div>
+      <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#b0b6c9;padding:16px 0;">© ${new Date().getFullYear()} MintPay</div>
     </td></tr>
   </table>
 </body></html>`
@@ -71,35 +71,35 @@ export async function sendWelcomeCardEmail(
 ) {
   const hi = data.name ? `, ${esc(data.name.split(" ")[0])}` : ""
   const body = `
-    <p style="margin:0 0 16px 0;">Your wallet is connected and your Trust card is ready. Here it is:</p>
+    <p style="margin:0 0 16px 0;">Your wallet is connected and your MintPay card is ready. Here it is:</p>
     <div style="margin:22px 0;">${cardEmailHtml(data.card)}</div>
     <p style="margin:16px 0;">Wallet: ${walletChip(data.walletAddress)}</p>
-    ${button("Open Trust", APP_URL)}
+    ${button("Open MintPay", APP_URL)}
     <p style="margin:18px 0 0 0;color:#64748b;font-size:13px;">Keep your card details private — treat them like any other card.</p>`
   return client().emails.send({
     from, to,
-    subject: "Welcome to Trust — your card is ready",
-    html: layout({ preheader: "Your Trust card is ready.", heading: `Welcome to Trust${hi} 🎉`, body }),
+    subject: "Welcome to MintPay — your card is ready",
+    html: layout({ preheader: "Your MintPay card is ready.", heading: `Welcome to MintPay${hi} 🎉`, body }),
   })
 }
 
 // Card-only email (used by the profile "re-send card" button).
 export async function sendCardEmail(to: string, card: { holder: string; number: string; expiry: string }) {
   const body = `
-    <p style="margin:0 0 16px 0;">Here's your Trust card, <b>${esc(card.holder)}</b>:</p>
+    <p style="margin:0 0 16px 0;">Here's your MintPay card, <b>${esc(card.holder)}</b>:</p>
     <div style="margin:22px 0;">${cardEmailHtml(card)}</div>
-    ${button("Open Trust", APP_URL)}
+    ${button("Open MintPay", APP_URL)}
     <p style="margin:18px 0 0 0;color:#64748b;font-size:13px;">Keep these details private.</p>`
   return client().emails.send({
     from, to,
-    subject: "Your Trust card",
-    html: layout({ preheader: "Your Trust card details.", heading: "Your Trust card", body }),
+    subject: "Your MintPay card",
+    html: layout({ preheader: "Your MintPay card details.", heading: "Your MintPay card", body }),
   })
 }
 
 /* ------------------------------------------------------------------ support */
 
-const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || "support@Trust.com"
+const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || "support@mintpay.com"
 
 /** New support message -> notify the admin inbox (so nothing is lost). */
 export async function sendSupportAlert(name: string, email: string, text: string, threadId: string) {
@@ -128,7 +128,7 @@ export async function sendSupportReply(to: string, name: string, text: string) {
   const html = `
   <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;padding:24px;">
     ${brandBadge}
-    <h2 style="font-size:18px;margin:18px 0 10px;">Hi ${esc(name)}, here's a reply from Trust support</h2>
+    <h2 style="font-size:18px;margin:18px 0 10px;">Hi ${esc(name)}, here's a reply from MintPay support</h2>
     <div style="background:#F7F8FA;border-radius:12px;padding:16px;font-size:15px;line-height:1.6;white-space:pre-wrap;">${esc(text)}</div>
     <p style="color:#6E7381;font-size:13px;margin-top:18px;">Reply to this email and it reaches us at ${esc(SUPPORT_EMAIL)}.</p>
   </div>`
@@ -136,7 +136,7 @@ export async function sendSupportReply(to: string, name: string, text: string) {
     from,
     to,
     replyTo: SUPPORT_EMAIL,
-    subject: "Re: your Trust support request",
+    subject: "Re: your MintPay support request",
     html,
   })
 }

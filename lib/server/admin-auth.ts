@@ -8,8 +8,8 @@ import crypto from "crypto"
  */
 export const ADMIN_USER = process.env.ADMIN_USER || "Chris"
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Chris222"
-const SECRET = process.env.ADMIN_SECRET || "Trust-support-dev-secret"
-export const COOKIE = "Trust_admin"
+const SECRET = process.env.ADMIN_SECRET || "mintpay-support-dev-secret"
+export const COOKIE = "mintpay_admin"
 
 function sign(value: string) {
   return crypto.createHmac("sha256", SECRET).update(value).digest("hex")

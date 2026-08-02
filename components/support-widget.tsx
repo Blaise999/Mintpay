@@ -5,7 +5,7 @@ import { MessageCircle, X, Send, Loader2 } from "lucide-react"
 
 type Msg = { id: string; from: "user" | "admin"; text: string; at: string }
 
-const KEY = "Trust.support.thread"
+const KEY = "mintpay.support.thread"
 
 /**
  * Floating support widget. Starts a thread with name + email + first message,
@@ -121,7 +121,7 @@ export function SupportWidget() {
         style={{ maxHeight: "min(560px, calc(100vh - 8rem))" }}
       >
         <div className="bg-[#0015FF] px-5 py-4 text-white">
-          <p className="font-display text-[16px] font-bold">Trust Support</p>
+          <p className="font-display text-[16px] font-bold">MintPay Support</p>
           <p className="text-[12px] text-white/70">We usually reply in a few minutes.</p>
         </div>
 
@@ -184,7 +184,7 @@ export function SupportWidget() {
           </div>
           {error && <p className="mt-2 text-[12px] text-red-500">{error}</p>}
           <p className="mt-2 text-center text-[11px] text-[#9AA0AE]">
-            or email <a href="mailto:support@Trust.com" className="underline">support@Trust.com</a>
+            or email <a href="mailto:support@mintpay.com" className="underline">support@mintpay.com</a>
           </p>
         </div>
       </div>

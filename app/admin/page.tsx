@@ -54,18 +54,32 @@ export default function AdminPage() {
     setActiveId(null)
   }
 
-  // poll the inbox
+  // one silent check on mount to restore an existing session (no error toast, no spam)
   useEffect(() => {
+    let alive = true
+    ;(async () => {
+      try {
+        const r = await fetch("/api/support/admin")
+        if (!alive) return
+        if (r.ok) {
+          const d = await r.json()
+          if (Array.isArray(d.threads)) { setThreads(d.threads); setAuthed(true) }
+        }
+      } catch { /* not logged in yet */ }
+    })()
+    return () => { alive = false }
+  }, [])
+
+  // poll the inbox ONLY while authed
+  useEffect(() => {
+    if (!authed) return
     let alive = true
     const tick = async () => {
       try {
         const r = await fetch("/api/support/admin")
         if (r.status === 401) { if (alive) setAuthed(false); return }
         const d = await r.json()
-        if (alive && Array.isArray(d.threads)) {
-          setThreads(d.threads)
-          setAuthed(true)
-        }
+        if (alive && Array.isArray(d.threads)) setThreads(d.threads)
       } catch { /* retry next tick */ }
     }
     tick()
